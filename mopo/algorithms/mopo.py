@@ -401,8 +401,8 @@ class MOPO(RLAlgorithm):
             model_metrics = {}
         else:
             env_samples = self._pool.return_all_samples()
-            train_inputs, train_outputs = format_samples_for_training(env_samples)
-            model_metrics = self._model.train(train_inputs, train_outputs, **kwargs)
+            train_inputs, train_outputs, train_policies = format_samples_for_training(env_samples)
+            model_metrics = self._model.train(train_inputs, train_outputs, train_policies, **kwargs)
         return model_metrics
 
     def _rollout_model(self, rollout_batch_size, **kwargs):
@@ -428,7 +428,11 @@ class MOPO(RLAlgorithm):
                 next_obs, rew, term, info = self.fake_env.step(obs, act, **kwargs)
             steps_added.append(len(obs))
 
-            samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term}
+            # Alan: Add policy identifier to the rollouts
+            # This will not be used during SAC training
+            pol = np.zeros((len(obs), 1))
+
+            samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol}
             self._model_pool.add_samples(samples)
 
             nonterm_mask = ~term.squeeze(-1)
