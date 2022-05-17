@@ -113,17 +113,17 @@ def restore_pool_contiguous(replay_pool, load_path):
 
     state_dim = replay_pool.fields['observations'].shape[1]
     action_dim = replay_pool.fields['actions'].shape[1]
-    expected_dim = state_dim + action_dim + state_dim + 1 + 1
+    expected_dim = state_dim + action_dim + state_dim + 1 + 1 + 1
     actual_dim = data.shape[1]
 
     if actual_dim == expected_dim:
+        print('[ mopo/off_policy ] Pool includes policy identifier')
+    elif actual_dim == expected_dim - 1:
         print('[ mopo/off_policy ] Pool does not include policy identifier - adding')
         policy_id = np.full((data.shape[0], 1), 0)
         data = np.hstack((data, policy_id))
-    elif actual_dim == expected_dim + 1:
-        print('[ mopo/off_policy ] Pool includes policy identifier')
     else:
-        assert False, 'Expected {} dimensions (+ optional policy identifier), found {}'.format(expected_dim, actual_dim)
+        assert False, 'Expected {} dimensions (inc. optional policy identifier), found {}'.format(expected_dim, actual_dim)
 
     dims = [state_dim, action_dim, state_dim, 1, 1, 1]
     ends = []
