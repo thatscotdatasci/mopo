@@ -1,0 +1,5 @@
+Experment MP005
+
+Using dataset generated from a collection of SAC policies, with REx.
+
+Beta = 0.1 (note: multiplying the sum of losses by 1/beta)
