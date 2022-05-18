@@ -1,0 +1,6 @@
+Experment MP010
+
+Paper replication.
+Using dataset generated from 101 episodes of length 1000, where the first and second halves of each episode have different policy identiifers.
+
+With REx. Beta = 0.1 (note: multiplying the sum of losses by 1/beta)
