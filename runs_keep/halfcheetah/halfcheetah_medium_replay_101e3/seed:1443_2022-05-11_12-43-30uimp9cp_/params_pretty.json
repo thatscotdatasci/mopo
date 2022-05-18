@@ -1,0 +1,96 @@
+{
+    "environment_params": {
+        "training": {
+            "domain": "halfcheetah",
+            "task": "medium-replay-v0",
+            "universe": "gym",
+            "kwargs": {}
+        },
+        "evaluation": {
+            "domain": "halfcheetah",
+            "task": "medium-replay-v0",
+            "universe": "gym",
+            "kwargs": {}
+        }
+    },
+    "policy_params": {
+        "type": "GaussianPolicy",
+        "kwargs": {
+            "hidden_layer_sizes": [
+                256,
+                256
+            ],
+            "squash": true
+        }
+    },
+    "Q_params": {
+        "type": "double_feedforward_Q_function",
+        "kwargs": {
+            "hidden_layer_sizes": [
+                256,
+                256
+            ]
+        }
+    },
+    "algorithm_params": {
+        "type": "MOPO",
+        "universe": "gym",
+        "log_dir": "./ray_mopo/",
+        "kwargs": {
+            "epoch_length": 1000,
+            "train_every_n_steps": 1,
+            "n_train_repeat": 1,
+            "eval_render_mode": null,
+            "eval_n_episodes": 10,
+            "eval_deterministic": true,
+            "discount": 0.99,
+            "tau": 0.005,
+            "reward_scale": 1,
+            "model_train_freq": 1000,
+            "model_retain_epochs": 5,
+            "rollout_batch_size": 50000,
+            "deterministic": false,
+            "num_networks": 7,
+            "num_elites": 5,
+            "real_ratio": 0.05,
+            "target_entropy": -3,
+            "max_model_t": null,
+            "separate_mean_var": true,
+            "penalty_learned_var": true,
+            "pool_load_path": "d4rl/halfcheetah-medium-replay-v0",
+            "pool_load_max_size": 101000,
+            "rollout_length": 5,
+            "penalty_coeff": 1,
+            "reparameterize": true,
+            "lr": 0.0003,
+            "target_update_interval": 1,
+            "store_extra_policy_info": false,
+            "action_prior": "uniform",
+            "n_initial_exploration_steps": 5000
+        },
+        "domain": "halfcheetah",
+        "task": "medium-replay-v0",
+        "exp_name": "halfcheetah_medium_replay"
+    },
+    "replay_pool_params": {
+        "type": "SimpleReplayPool",
+        "kwargs": {
+            "max_size": 1000000
+        }
+    },
+    "sampler_params": {
+        "type": "SimpleSampler",
+        "kwargs": {
+            "max_path_length": 1000,
+            "min_pool_size": 1000,
+            "batch_size": 256
+        }
+    },
+    "run_params": {
+        "seed": 1443,
+        "checkpoint_at_end": true,
+        "checkpoint_frequency": 10,
+        "checkpoint_replay_pool": false
+    },
+    "restore": null
+}
