@@ -2,9 +2,12 @@ import os
 import numpy as np
 
 ARRAYS_TO_MERGE = [
-    "/home/ajc348/rds/hpc-work/softlearning/gym/HalfCheetah/v3/2022-05-16T12-29-56-my-sac-experiment-1/id=8592b_00000-seed=4378/rollouts/rollout_1000000_0.npy"
+    "/home/ajc348/rds/hpc-work/softlearning/gym/HalfCheetah/v2/2022-05-17T18-38-36-half_cheetah_v2_3M/id=31acc_00000-seed=9479/short_rollouts/checkpoint_30/rollout_25000_0.npy",
+    "/home/ajc348/rds/hpc-work/softlearning/gym/HalfCheetah/v2/2022-05-17T18-38-36-half_cheetah_v2_3M/id=31acc_00000-seed=9479/short_rollouts/checkpoint_60/rollout_25000_0.npy",
+    "/home/ajc348/rds/hpc-work/softlearning/gym/HalfCheetah/v2/2022-05-17T18-38-36-half_cheetah_v2_3M/id=31acc_00000-seed=9479/short_rollouts/checkpoint_90/rollout_25000_0.npy",
+    "/home/ajc348/rds/hpc-work/softlearning/gym/HalfCheetah/v2/2022-05-17T18-38-36-half_cheetah_v2_3M/id=31acc_00000-seed=9479/short_rollouts/checkpoint_120/rollout_25000_0.npy",
 ]
-OUTPUT_DIR = "/home/ajc348/rds/hpc-work/mopo/rollouts/softlearning/HalfCheetah/v3/2022-05-16T12-29-56-my-sac-experiment-1/id=8592b_00000-seed=4378"
+OUTPUT_DIR = "/home/ajc348/rds/hpc-work/mopo/rollouts/softlearning/HalfCheetah/v2/2022-05-17T18-38-36-half_cheetah_v2_3M/id=31acc_00000-seed=9479"
 
 def main():
     # First ensure that all arrays do exist
