@@ -1,0 +1,59 @@
+Loading rhel8/default-icl
+  Loading requirement: dot rhel8/slurm singularity/current rhel8/global
+    cuda/11.4 intel/compilers/2020.2 intel/mkl/2020.2 intel/impi/2020.2/intel
+    intel/libs/idb/2020.2 intel/libs/tbb/2020.2 intel/libs/ipp/2020.2
+    intel/libs/daal/2020.2 intel/bundles/complib/2020.2
+WARNING: Logging before flag parsing goes to stderr.
+W0518 15:22:16.331833 23096549327744 lazy_loader.py:50] 
+The TensorFlow contrib module will not be included in TensorFlow 2.0.
+For more information, please see:
+  * https://github.com/tensorflow/community/blob/master/rfcs/20180907-contrib-sunset.md
+  * https://github.com/tensorflow/addons
+  * https://github.com/tensorflow/io (for I/O related ops)
+If you depend on functionality not listed there, please file an issue.
+
+Warning: Flow failed to import. Set the environment variable D4RL_SUPPRESS_IMPORT_ERROR=1 to suppress this message.
+No module named 'flow'
+Warning: CARLA failed to import. Set the environment variable D4RL_SUPPRESS_IMPORT_ERROR=1 to suppress this message.
+No module named 'carla'
+2022-05-18 15:22:20,154	INFO node.py:498 -- Process STDOUT and STDERR is being redirected to /tmp/ray/session_2022-05-18_15-22-20_154839_945201/logs.
+2022-05-18 15:22:20,266	INFO services.py:409 -- Waiting for redis server at 127.0.0.1:34566 to respond...
+2022-05-18 15:22:20,380	INFO services.py:409 -- Waiting for redis server at 127.0.0.1:12910 to respond...
+2022-05-18 15:22:20,381	INFO services.py:806 -- Starting Redis shard with 10.0 GB max memory.
+2022-05-18 15:22:20,405	INFO node.py:512 -- Process STDOUT and STDERR is being redirected to /tmp/ray/session_2022-05-18_15-22-20_154839_945201/logs.
+2022-05-18 15:22:20,405	WARNING services.py:1294 -- Warning: Capping object memory store to 20.0GB. To increase this further, specify `object_store_memory` when calling ray.init() or ray start.
+2022-05-18 15:22:20,405	INFO services.py:1442 -- Starting the Plasma object store with 20.0 GB memory using /dev/shm.
+2022-05-18 15:22:20,697	INFO tune.py:61 -- Tip: to resume incomplete experiments, pass resume='prompt' or resume=True to run()
+2022-05-18 15:22:20,697	INFO tune.py:232 -- Starting a new experiment.
+W0518 15:22:20.720205 23096549327744 deprecation_wrapper.py:119] From /rds/user/ajc348/hpc-work/mopo/.env/lib/python3.6/site-packages/ray/tune/logger.py:131: The name tf.VERSION is deprecated. Please use tf.version.VERSION instead.
+
+W0518 15:22:20.720442 23096549327744 deprecation_wrapper.py:119] From /rds/user/ajc348/hpc-work/mopo/.env/lib/python3.6/site-packages/ray/tune/logger.py:136: The name tf.summary.FileWriter is deprecated. Please use tf.compat.v1.summary.FileWriter instead.
+
+W0518 15:34:56.802595 23096549327744 deprecation_wrapper.py:119] From /rds/user/ajc348/hpc-work/mopo/.env/lib/python3.6/site-packages/ray/tune/logger.py:114: The name tf.Summary is deprecated. Please use tf.compat.v1.Summary instead.
+
+2022-05-18 15:41:12,342	WARNING util.py:64 -- The `save_to_disk` operation took 0.6185674667358398 seconds to complete, which may be a performance bottleneck.
+2022-05-18 15:41:12,345	WARNING util.py:64 -- The `process_trial` operation took 0.6270449161529541 seconds to complete, which may be a performance bottleneck.
+2022-05-18 15:43:17,836	WARNING util.py:64 -- The `process_trial` operation took 0.10628581047058105 seconds to complete, which may be a performance bottleneck.
+2022-05-18 15:48:10,726	WARNING util.py:64 -- The `save_to_disk` operation took 0.35558128356933594 seconds to complete, which may be a performance bottleneck.
+2022-05-18 15:48:10,728	WARNING util.py:64 -- The `process_trial` operation took 0.36654162406921387 seconds to complete, which may be a performance bottleneck.
+2022-05-18 15:48:52,649	WARNING util.py:64 -- The `experiment_checkpoint` operation took 0.1061544418334961 seconds to complete, which may be a performance bottleneck.
+2022-05-18 15:55:08,722	WARNING util.py:64 -- The `save_to_disk` operation took 0.41249871253967285 seconds to complete, which may be a performance bottleneck.
+2022-05-18 15:55:08,725	WARNING util.py:64 -- The `process_trial` operation took 0.4204859733581543 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:02:06,818	WARNING util.py:64 -- The `save_to_disk` operation took 0.3889312744140625 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:02:06,820	WARNING util.py:64 -- The `process_trial` operation took 0.3962244987487793 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:09:05,386	WARNING util.py:64 -- The `save_to_disk` operation took 0.39804625511169434 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:09:05,390	WARNING util.py:64 -- The `process_trial` operation took 0.40818214416503906 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:16:03,942	WARNING util.py:64 -- The `save_to_disk` operation took 0.4298288822174072 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:16:03,944	WARNING util.py:64 -- The `process_trial` operation took 0.4366464614868164 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:23:01,803	WARNING util.py:64 -- The `save_to_disk` operation took 0.4419546127319336 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:23:01,805	WARNING util.py:64 -- The `process_trial` operation took 0.4503133296966553 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:24:28,265	WARNING util.py:64 -- The `process_trial` operation took 0.15633678436279297 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:30:01,257	WARNING util.py:64 -- The `save_to_disk` operation took 2.551081418991089 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:30:01,261	WARNING util.py:64 -- The `process_trial` operation took 2.5607426166534424 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:36:54,092	WARNING util.py:64 -- The `save_to_disk` operation took 0.41948723793029785 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:36:54,095	WARNING util.py:64 -- The `process_trial` operation took 0.42769670486450195 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:43:45,417	WARNING util.py:64 -- The `save_to_disk` operation took 0.3975248336791992 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:43:45,420	WARNING util.py:64 -- The `process_trial` operation took 0.4059579372406006 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:50:33,969	WARNING util.py:64 -- The `save_to_disk` operation took 0.4030900001525879 seconds to complete, which may be a performance bottleneck.
+2022-05-18 16:50:33,970	WARNING util.py:64 -- The `process_trial` operation took 0.4098172187805176 seconds to complete, which may be a performance bottleneck.
+slurmstepd: error: *** JOB 61334113 ON cpu-q-254 CANCELLED AT 2022-05-18T16:52:16 ***
