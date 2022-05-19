@@ -1,0 +1,7 @@
+Experiment MP021
+
+Paper replication.
+Using dataset generated from 101 episodes of length 1000, where the first and second halves of each episode have different policy identiifers.
+This dataset was generated using d3rlpy - D3RLPY-PEP2.
+
+With REx. Beta = 0.2 (note: multiplying the sum of losses by 1/beta)
