@@ -1,3 +1,0 @@
-Experment MP003
-
-Using dataset generated from a collection of SAC policies, without REx.
