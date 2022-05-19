@@ -1,0 +1,5 @@
+Experment MP013
+
+This was an attempt to replicate the original example results.
+
+Execution was on GPU.

@@ -1,0 +1,3 @@
+wThis was an attempt to replicate the original example results.
+
+Execution was on CPU as the Pascal GPU was not available.
