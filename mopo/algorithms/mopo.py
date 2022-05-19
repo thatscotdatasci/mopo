@@ -82,6 +82,10 @@ class MOPO(RLAlgorithm):
             model_load_dir=None,
             penalty_coeff=0.,
             penalty_learned_var=False,
+
+            rex=False,
+            rex_beta=10.0,
+
             **kwargs,
     ):
         """
@@ -104,9 +108,15 @@ class MOPO(RLAlgorithm):
             reparameterize ('bool'): If True, we use a gradient estimator for
                 the policy derived using the reparameterization trick. We use
                 a likelihood ratio based estimator otherwise.
+            rex (`bool`): If True, we add the V-REx penalty to the loss during
+                dynamics training.
+            rex_beta (`float`): The penalty value to use in V-REx.
         """
 
         super(MOPO, self).__init__(**kwargs)
+
+        self._log_dir = os.getcwd()
+        self._writer = Writer(self._log_dir)
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)
@@ -115,7 +125,8 @@ class MOPO(RLAlgorithm):
         self._model = construct_model(obs_dim=obs_dim, act_dim=act_dim, hidden_dim=hidden_dim,
                                       num_networks=num_networks, num_elites=num_elites,
                                       model_type=model_type, separate_mean_var=separate_mean_var,
-                                      name=model_name, load_dir=model_load_dir, deterministic=deterministic)
+                                      name=model_name, load_dir=model_load_dir, deterministic=deterministic,
+                                      rex=rex, rex_beta=rex_beta, log_dir=self._log_dir)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
@@ -130,9 +141,6 @@ class MOPO(RLAlgorithm):
         self._deterministic = deterministic
         self._rollout_random = rollout_random
         self._real_ratio = real_ratio
-
-        self._log_dir = os.getcwd()
-        self._writer = Writer(self._log_dir)
 
         self._training_environment = training_environment
         self._evaluation_environment = evaluation_environment

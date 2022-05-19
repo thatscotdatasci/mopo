@@ -7,12 +7,14 @@ from mopo.models.bnn import BNN
 
 def construct_model(obs_dim=11, act_dim=3, rew_dim=1, hidden_dim=200, num_networks=7,
 					num_elites=5, session=None, model_type='mlp', separate_mean_var=False,
-					name=None, load_dir=None, deterministic=False):
+					name=None, load_dir=None, deterministic=False, rex=False, rex_beta=10.0,
+					log_dir=None):
 	if name is None:
 		name = 'BNN'
-	print('[ BNN ] Name {} | Observation dim {} | Action dim: {} | Hidden dim: {}'.format(name, obs_dim, act_dim, hidden_dim))
+	print('[ BNN ] Name {} | Observation dim {} | Action dim: {} | Hidden dim: {} | REx: {} | REx Beta: {}'.format(name, obs_dim, act_dim, hidden_dim, rex, rex_beta))
 	params = {'name': name, 'num_networks': num_networks, 'num_elites': num_elites,
-				'sess': session, 'separate_mean_var': separate_mean_var, 'deterministic': deterministic}
+				'sess': session, 'separate_mean_var': separate_mean_var, 'deterministic': deterministic,
+				'rex': rex, 'rex_beta': rex_beta, 'log_dir': log_dir}
 
 	if load_dir is not None:
 		print('Specified load dir', load_dir)
