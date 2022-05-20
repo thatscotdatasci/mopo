@@ -78,6 +78,7 @@ class BNN:
         self.sy_pred_mean2d, self.sy_pred_var2d = None, None
         self.sy_pred_in3d, self.sy_pred_mean3d_fac, self.sy_pred_var3d_fac = None, None, None
 
+        self.deterministic = params.get('deterministic', False)
         self.separate_mean_var = params.get('separate_mean_var', False)
 
         if params.get('load_model', False):
@@ -94,18 +95,15 @@ class BNN:
             self.num_elites = params['num_elites'] #params.get('num_elites', 1)
             self.model_loaded = False
 
-        self.deterministic = params.get('deterministic', False)
-        self.separate_mean_var = params.get('separate_mean_var', False)
+            if self.separate_mean_var:
+                self.var_layers = []
+            else:
+                self.var_layers = None
 
-        if self.separate_mean_var:
-            self.var_layers = []
-        else:
-            self.var_layers = None
-
-        if self.num_nets == 1:
-            print("Created a neural network with variance predictions.")
-        else:
-            print("Created an ensemble of {} neural networks with variance predictions | Elites: {}".format(self.num_nets, self.num_elites))
+            if self.num_nets == 1:
+                print("Created a neural network with variance predictions.")
+            else:
+                print("Created an ensemble of {} neural networks with variance predictions | Elites: {}".format(self.num_nets, self.num_elites))
 
     @property
     def is_probabilistic(self):
@@ -289,7 +287,7 @@ class BNN:
 
     def load_params(self):
         with self.sess.as_default():
-            params_dict = loadmat(os.path.join(self.model_dir, "%s.mat" % self.name))
+            params_dict = loadmat(os.path.join(self.model_dir, "%s_0.mat" % self.name))
             all_vars = self.nonoptvars + self.optvars
             for i, var in enumerate(all_vars):
                 var.load(params_dict[str(i)])
@@ -626,7 +624,7 @@ class BNN:
         the structure of this network.
         """
         structure = []
-        with open(os.path.join(self.model_dir, "%s.nns" % self.name), "r") as f:
+        with open(os.path.join(self.model_dir, "%s_0.nns" % self.name), "r") as f:
             for line in f:
                 kwargs = {
                     key: val for (key, val) in
@@ -640,7 +638,8 @@ class BNN:
                 structure.append(FC(**kwargs))
         self.layers = structure
         if self.separate_mean_var:
-            with open(os.path.join(self.model_dir, "%s_var.nns" % self.name), "r") as f:
+            var_structure = []
+            with open(os.path.join(self.model_dir, "%s_0_var.nns" % self.name), "r") as f:
                 for line in f:
                     kwargs = {
                         key: val for (key, val) in
@@ -651,8 +650,8 @@ class BNN:
                     kwargs["weight_decay"] = None if kwargs["weight_decay"] == "None" else float(kwargs["weight_decay"])
                     kwargs["activation"] = None if kwargs["activation"] == "None" else kwargs["activation"][1:-1]
                     kwargs["ensemble_size"] = int(kwargs["ensemble_size"])
-                    structure.append(FC(**kwargs))
-            self.var_layers = structure
+                    var_structure.append(FC(**kwargs))
+            self.var_layers = var_structure
 
     #######################
     # Compilation methods #
