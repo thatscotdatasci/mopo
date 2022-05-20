@@ -19,6 +19,7 @@ def construct_model(obs_dim=11, act_dim=3, rew_dim=1, hidden_dim=200, num_networ
 	if load_dir is not None:
 		print('Specified load dir', load_dir)
 		params['model_dir'] = load_dir
+		params['load_model'] = True
 
 	model = BNN(params)
 
