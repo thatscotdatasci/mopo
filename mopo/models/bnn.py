@@ -718,34 +718,51 @@ class BNN:
 
         Returns: (tf.Tensor) A tensor representing the loss on the input arguments.
         """
+        # These have dimensions [B N D], where:
+        # B = number of networks/batches; N = number of observations; D =  number of dimensions
         mean, log_var = self._compile_outputs(inputs, ret_log_var=True)
         inv_var = tf.exp(-log_var)
 
-        def calc_policy_loss(pol):
-            mean_pol    = tf.where(tf.equal(tf.tile(policies,(1,1,mean.shape[-1])),pol),    mean, tf.zeros_like(mean))
-            targets_pol = tf.where(tf.equal(tf.tile(policies,(1,1,targets.shape[-1])),pol), targets, tf.zeros_like(targets))
-            log_var_pol = tf.where(tf.equal(tf.tile(policies,(1,1,log_var.shape[-1])),pol), log_var, tf.zeros_like(log_var))
-            inv_var_pol = tf.where(tf.equal(tf.tile(policies,(1,1,inv_var.shape[-1])),pol), inv_var, tf.zeros_like(inv_var))
+        # In the below the loss for each observation in each batch is determined
+        # obs_losses will have dimensions: [B N 1]; the final dimension is retained
+        # as this is needed for future matric multiplication
+        if inc_var_loss:
+            # Alan: Log-likelihood.
+            obs_mse_losses = tf.reduce_mean(tf.square(mean - targets) * inv_var, axis=-1, keepdims=True)
+            obs_var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
+            obs_losses = obs_mse_losses + obs_var_losses
+        else:
+            # Alan: MSE.
+            obs_losses = tf.reduce_mean(tf.square(mean - targets), axis=-1, keepdims=True)
 
-            if inc_var_loss:
-                # Alan: Log-likelihood.
-                mse_losses = tf.reduce_mean(tf.reduce_mean(tf.square(mean_pol - targets_pol) * inv_var_pol, axis=-1), axis=-1)
-                var_losses = tf.reduce_mean(tf.reduce_mean(log_var_pol, axis=-1), axis=-1)
-                return mse_losses + var_losses
-            else:
-                # Alan: MSE.
-                return tf.reduce_mean(tf.reduce_mean(tf.square(mean_pol - targets_pol), axis=-1), axis=-1)
-
+        # Identify the unique policies present across all batches of data
+        policies = tf.cast(policies, tf.int32)
         unique_pols = tf.unique(tf.reshape(policies, [-1])).y
-        policy_losses = tf.map_fn(calc_policy_loss, unique_pols)
 
-        # Add the losses across all the policies
-        total_loss = tf.reduce_sum(policy_losses, axis=0)
+        # Create a policy one-hot encoding - this will have dimensions: [B N P], where:
+        # P = the number of unique policies
+        pol_one_hot = tf.squeeze(tf.one_hot(policies, tf.reduce_max(unique_pols+1), axis=-1), axis=-2)
+        
+        # Take the sum of the observation losses for the records belonging to each policy in each batch
+        # Following transposition, performing multiplication: [B P N] x [B N 1] = [B P 1]
+        pol_mean_sum = tf.squeeze(tf.matmul(tf.transpose(pol_one_hot, [0,2,1]), obs_losses), axis=-1)
+
+        # Count the number of observations belonging to each policy in each batch
+        # This also has demensions [B P 1]
+        pol_count = tf.reduce_sum(pol_one_hot, axis=-2)
+
+        # Perform a safe division - not all batches will contain a record for every policy
+        # Use divide_no_nan to avoid division by 0 errors. Output dimensionality is [B P]
+        policy_losses = tf.math.divide_no_nan(pol_mean_sum, pol_count)
+
+        # Add the losses across all the policies. Results in vector of length B.
+        total_loss = tf.reduce_sum(policy_losses,axis=-1)
 
         if self.rex:
-            # Determine the variance of the losses
+            # Determine the variance of the losses - use boolean mask to ensure only taking variance for
+            # policies which appear in the batch (i.e., some batches may not have record for all policies).
             # Scale the sum of the losses by (1/\beta) and add the variance term
-            loss_var = tf.math.reduce_variance(policy_losses, axis=0)
+            loss_var = tf.math.reduce_variance(tf.ragged.boolean_mask(policy_losses, pol_count>0.), axis=-1)
             total_loss = loss_var + (1/self.rex_beta) * total_loss
 
         return total_loss
