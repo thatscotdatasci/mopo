@@ -70,7 +70,7 @@ class BNN:
 
         # Training objects
         self.optimizer = None
-        self.sy_train_in, self.sy_train_targ, self.sy_train_pol = None, None, None
+        self.sy_train_in, self.sy_train_targ, self.sy_train_pol, self.sy_apply_rex_pen = None, None, None, None
         self.train_op, self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss = None, None, None, None
 
         # Prediction objects
@@ -249,16 +249,19 @@ class BNN:
             self.sy_train_pol = tf.placeholder(dtype=tf.float32,
                                               shape=[self.num_nets, None, 1],
                                               name="training_policies")
+            self.sy_apply_rex_pen = tf.placeholder(dtype=bool,
+                                                    shape=(),
+                                                    name="training_rex_penalty")
 
             if not self.deterministic:
-                train_loss, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, inc_var_loss=True)
+                train_loss, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=True)
                 train_loss = tf.reduce_sum(train_loss)
                 train_loss += tf.add_n(self.decays)
                 train_loss += 0.01 * tf.reduce_sum(self.max_logvar) - 0.01 * tf.reduce_sum(self.min_logvar)
             else:
-                train_loss, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, inc_var_loss=False)
+                train_loss, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
                 train_loss += tf.add_n(self.decays)
-            self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, inc_var_loss=False)
+            self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
             self.train_op = self.optimizer.minimize(train_loss, var_list=self.optvars)
 
         # Initialize all variables
@@ -371,6 +374,7 @@ class BNN:
                 self.sy_train_in: inputs,
                 self.sy_train_targ: targets,
                 self.sy_train_pol: policies,
+                self.sy_apply_rex_pen: self.rex,
                 }
         )
         mean_elite_loss = np.sort(losses)[:self.num_elites].mean()
@@ -456,65 +460,92 @@ class BNN:
 
         t0 = time.time()
         grad_updates = 0
-        for epoch in epoch_iter:
-            for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
-                batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
-                self.sess.run(
-                    self.train_op,
-                    feed_dict={self.sy_train_in: inputs[batch_idxs], self.sy_train_targ: targets[batch_idxs], self.sy_train_pol: policies[batch_idxs]}
-                )
-                grad_updates += 1
 
-            idxs = shuffle_rows(idxs)
-            if not hide_progress:
-                if holdout_ratio < 1e-12:
-                    losses, pol_total_losses, pol_var_losses = self.sess.run(
-                            (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
-                            feed_dict={
-                                self.sy_train_in: inputs[idxs[:, :max_logging]],
-                                self.sy_train_targ: targets[idxs[:, :max_logging]],
-                                self.sy_train_pol: policies[idxs[:, :max_logging]],
-                            }
-                        )
-                    self._save_losses(losses, pol_total_losses, pol_var_losses)
-                    named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
-                    progress.set_description(named_losses)
-                else:
-                    losses, pol_total_losses, pol_var_losses = self.sess.run(
-                            (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
-                            feed_dict={
-                                self.sy_train_in: inputs[idxs[:, :max_logging]],
-                                self.sy_train_targ: targets[idxs[:, :max_logging]],
-                                self.sy_train_pol: policies[idxs[:, :max_logging]],
-                            }
-                        )
-                    holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses = self.sess.run(
-                            (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
-                            feed_dict={
-                                self.sy_train_in: holdout_inputs,
-                                self.sy_train_targ: holdout_targets,
-                                self.sy_train_pol: holdout_policies,
-                            }
-                        )
-                    self._save_losses(losses, pol_total_losses, pol_var_losses)
-                    self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout=True)
-                    named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
-                    named_holdout_losses = [['V{}'.format(i), holdout_losses[i]] for i in range(len(holdout_losses))]
-                    named_losses = named_losses + named_holdout_losses + [['T', time.time() - t0]]
-                    progress.set_description(named_losses)
+        # Complete two loops of training if running in REx mode
+        # First loop performs normal training; the second loop includes REx adjustments
+        for o_loop in range(2 if self.rex else 1):
+            if o_loop == 0:
+                print('[ BNN ] Begginning training')
+                rex_training_loop = False
+            elif o_loop == 1:
+                # Complete as much training as was performed in the first training loop again
+                epoch_iter = range(epoch+1)
+                print('[ BNN ] Begginning further {} epochs of REx training'.format(epoch+1))
+                rex_training_loop = True
+            else:
+                raise RuntimeError('Attempting to complete unexpected training loop')
 
-                    break_train = self._save_best(epoch, holdout_losses)
+            for epoch in epoch_iter:
+                for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
+                    batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
+                    self.sess.run(
+                        self.train_op,
+                        feed_dict={
+                            self.sy_train_in: inputs[batch_idxs],
+                            self.sy_train_targ: targets[batch_idxs],
+                            self.sy_train_pol: policies[batch_idxs],
+                            self.sy_apply_rex_pen: rex_training_loop,
+                        }
+                    )
+                    grad_updates += 1
 
-            progress.update()
-            t = time.time() - t0
-            if break_train or (max_grad_updates and grad_updates > max_grad_updates):
-                break
-            if max_t and t > max_t:
-                descr = 'Breaking because of timeout: {}! (max: {})'.format(t, max_t)
-                progress.append_description(descr)
-                # print('Breaking because of timeout: {}! | (max: {})\n'.format(t, max_t))
-                # time.sleep(5)
-                break
+                idxs = shuffle_rows(idxs)
+                if not hide_progress:
+                    if holdout_ratio < 1e-12:
+                        losses, pol_total_losses, pol_var_losses = self.sess.run(
+                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
+                                feed_dict={
+                                    self.sy_train_in: inputs[idxs[:, :max_logging]],
+                                    self.sy_train_targ: targets[idxs[:, :max_logging]],
+                                    self.sy_train_pol: policies[idxs[:, :max_logging]],
+                                    self.sy_apply_rex_pen: rex_training_loop,
+                                }
+                            )
+                        self._save_losses(losses, pol_total_losses, pol_var_losses)
+                        named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
+                        progress.set_description(named_losses)
+                    else:
+                        losses, pol_total_losses, pol_var_losses = self.sess.run(
+                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
+                                feed_dict={
+                                    self.sy_train_in: inputs[idxs[:, :max_logging]],
+                                    self.sy_train_targ: targets[idxs[:, :max_logging]],
+                                    self.sy_train_pol: policies[idxs[:, :max_logging]],
+                                    self.sy_apply_rex_pen: rex_training_loop,
+                                }
+                            )
+                        holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses = self.sess.run(
+                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
+                                feed_dict={
+                                    self.sy_train_in: holdout_inputs,
+                                    self.sy_train_targ: holdout_targets,
+                                    self.sy_train_pol: holdout_policies,
+                                    self.sy_apply_rex_pen: rex_training_loop,
+                                }
+                            )
+                        self._save_losses(losses, pol_total_losses, pol_var_losses)
+                        self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout=True)
+                        named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
+                        named_holdout_losses = [['V{}'.format(i), holdout_losses[i]] for i in range(len(holdout_losses))]
+                        named_losses = named_losses + named_holdout_losses + [['T', time.time() - t0]]
+                        progress.set_description(named_losses)
+
+                        break_train = self._save_best(epoch, holdout_losses)
+
+                progress.update()
+                t = time.time() - t0
+
+                # Break conditions apply only in the first, standard training loop
+                # In the second loop we force an equal number of training epochs as in the first loop
+                # Second loop only takes place is self.rex is True
+                if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
+                    break
+                if max_t and t > max_t:
+                    descr = 'Breaking because of timeout: {}! (max: {})'.format(t, max_t)
+                    progress.append_description(descr)
+                    # print('Breaking because of timeout: {}! | (max: {})\n'.format(t, max_t))
+                    # time.sleep(5)
+                    break
 
         progress.stamp()
         if timer: timer.stamp('bnn_train')
@@ -528,6 +559,7 @@ class BNN:
                 self.sy_train_in: holdout_inputs,
                 self.sy_train_targ: holdout_targets,
                 self.sy_train_pol: holdout_policies,
+                self.sy_apply_rex_pen: self.rex,
             }
         )
 
@@ -713,7 +745,7 @@ class BNN:
         else:
             return mean, tf.exp(logvar)
 
-    def _compile_losses(self, inputs, targets, policies, inc_var_loss=True):
+    def _compile_losses(self, inputs, targets, policies, apply_rex_pen, inc_var_loss=True):
         """Helper method for compiling the loss function.
 
         The loss function is obtained from the log likelihood, assuming that the output
@@ -724,6 +756,7 @@ class BNN:
             inputs: (tf.Tensor) A tensor representing the input batch
             targets: (tf.Tensor) The desired targets for each input vector in inputs.
             policies: (tf.Tensor) The policy used to generate each input vector in inputs.
+            apply_rex_pen: (tf.Tensor) Boolean indicating whether to apply the REx penalty
             inc_var_loss: (bool) If True, includes log variance loss.
 
         Returns: (tf.Tensor) A tensor representing the loss on the input arguments.
@@ -768,7 +801,7 @@ class BNN:
         # Add the losses across all the policies. Results in vector of length B.
         policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
 
-        if self.rex:
+        def losses_rex():
             # Determine the variance of the losses - use boolean mask to ensure only taking variance for
             # policies which appear in the batch (i.e., some batches may not have record for all policies).
             # Scale the sum of the losses by (1/\beta) and add the variance term
@@ -777,8 +810,17 @@ class BNN:
                 return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
             policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
             total_losses = policy_var_losses + (1/self.rex_beta) * policy_total_losses
-        else:
+            return total_losses, policy_var_losses
+
+        def losses_no_rex():
+            # Determine losses without REx penalties.
             policy_var_losses = tf.zeros_like(policy_total_losses)
             total_losses = policy_total_losses
+            return total_losses, policy_var_losses
+
+        total_losses, policy_var_losses = tf.cond(apply_rex_pen,
+            lambda: losses_rex(),
+            lambda: losses_no_rex()
+        )
 
         return total_losses, policy_total_losses, policy_var_losses
