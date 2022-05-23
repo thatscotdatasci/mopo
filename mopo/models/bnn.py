@@ -772,7 +772,10 @@ class BNN:
             # Determine the variance of the losses - use boolean mask to ensure only taking variance for
             # policies which appear in the batch (i.e., some batches may not have record for all policies).
             # Scale the sum of the losses by (1/\beta) and add the variance term
-            policy_var_losses = tf.math.reduce_variance(tf.ragged.boolean_mask(policy_losses, pol_count>0.), axis=-1)
+            def determine_var(x):
+                batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
+                return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
+            policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
             total_losses = policy_var_losses + (1/self.rex_beta) * policy_total_losses
         else:
             policy_var_losses = tf.zeros_like(policy_total_losses)
