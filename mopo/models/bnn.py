@@ -71,7 +71,7 @@ class BNN:
         # Training objects
         self.optimizer = None
         self.sy_train_in, self.sy_train_targ, self.sy_train_pol, self.sy_apply_rex_pen = None, None, None, None
-        self.train_op, self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss = None, None, None, None
+        self.train_op, self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss = None, None, None, None, None
 
         # Prediction objects
         self.sy_pred_in2d, self.sy_pred_mean2d_fac, self.sy_pred_var2d_fac = None, None, None
@@ -254,14 +254,14 @@ class BNN:
                                                     name="training_rex_penalty")
 
             if not self.deterministic:
-                train_loss, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=True)
+                train_loss, _, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=True)
                 train_loss = tf.reduce_sum(train_loss)
                 train_loss += tf.add_n(self.decays)
                 train_loss += 0.01 * tf.reduce_sum(self.max_logvar) - 0.01 * tf.reduce_sum(self.min_logvar)
             else:
-                train_loss, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
+                train_loss, _, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
                 train_loss += tf.add_n(self.decays)
-            self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
+            self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
             self.train_op = self.optimizer.minimize(train_loss, var_list=self.optvars)
 
         # Initialize all variables
@@ -380,17 +380,19 @@ class BNN:
         mean_elite_loss = np.sort(losses)[:self.num_elites].mean()
         return mean_elite_loss
 
-    def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, holdout=False):
+    def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, holdout=False):
         """Save the current training/holdout losses.
         """
         if holdout:
             total_loss_history_path =     os.path.join(self._log_dir, 'model_holdout_loss_history.txt')
             pol_total_loss_history_path = os.path.join(self._log_dir, 'model_holdout_pol_total_loss_history.txt')
             pol_var_loss_history_path =   os.path.join(self._log_dir, 'model_holdout_pol_var_loss_history.txt')
+            mean_pol_loss_history_path =  os.path.join(self._log_dir, 'model_holdout_mean_pol_loss_history.txt')
         else:
             total_loss_history_path =     os.path.join(self._log_dir, 'model_loss_history.txt')
             pol_total_loss_history_path = os.path.join(self._log_dir, 'model_pol_total_loss_history.txt')
             pol_var_loss_history_path =   os.path.join(self._log_dir, 'model_pol_var_loss_history.txt')
+            mean_pol_loss_history_path =  os.path.join(self._log_dir, 'model_mean_pol_loss_history.txt')
 
         with open(total_loss_history_path, 'a') as f:
             f.write(",".join(list(total_losses.astype(str)))+"\n")
@@ -398,6 +400,8 @@ class BNN:
             f.write(",".join(list(pol_total_losses.astype(str)))+"\n")
         with open(pol_var_loss_history_path, 'a') as f:
             f.write(",".join(list(pol_var_losses.astype(str)))+"\n")
+        with open(mean_pol_loss_history_path, 'a') as f:
+            f.write(",".join(list(mean_pol_losses.astype(str)))+"\n")
 
     #################
     # Model Methods #
@@ -492,8 +496,8 @@ class BNN:
                 idxs = shuffle_rows(idxs)
                 if not hide_progress:
                     if holdout_ratio < 1e-12:
-                        losses, pol_total_losses, pol_var_losses = self.sess.run(
-                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
+                        losses, pol_total_losses, pol_var_losses, mean_pol_losses = self.sess.run(
+                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss),
                                 feed_dict={
                                     self.sy_train_in: inputs[idxs[:, :max_logging]],
                                     self.sy_train_targ: targets[idxs[:, :max_logging]],
@@ -501,12 +505,12 @@ class BNN:
                                     self.sy_apply_rex_pen: rex_training_loop,
                                 }
                             )
-                        self._save_losses(losses, pol_total_losses, pol_var_losses)
+                        self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses)
                         named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
                         progress.set_description(named_losses)
                     else:
-                        losses, pol_total_losses, pol_var_losses = self.sess.run(
-                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
+                        losses, pol_total_losses, pol_var_losses, mean_pol_losses = self.sess.run(
+                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss),
                                 feed_dict={
                                     self.sy_train_in: inputs[idxs[:, :max_logging]],
                                     self.sy_train_targ: targets[idxs[:, :max_logging]],
@@ -514,8 +518,8 @@ class BNN:
                                     self.sy_apply_rex_pen: rex_training_loop,
                                 }
                             )
-                        holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses = self.sess.run(
-                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss),
+                        holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout_mean_pol_losses = self.sess.run(
+                                (self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss),
                                 feed_dict={
                                     self.sy_train_in: holdout_inputs,
                                     self.sy_train_targ: holdout_targets,
@@ -523,8 +527,8 @@ class BNN:
                                     self.sy_apply_rex_pen: rex_training_loop,
                                 }
                             )
-                        self._save_losses(losses, pol_total_losses, pol_var_losses)
-                        self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout=True)
+                        self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses)
+                        self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout_mean_pol_losses, holdout=True)
                         named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
                         named_holdout_losses = [['V{}'.format(i), holdout_losses[i]] for i in range(len(holdout_losses))]
                         named_losses = named_losses + named_holdout_losses + [['T', time.time() - t0]]
@@ -798,6 +802,9 @@ class BNN:
         # Use divide_no_nan to avoid division by 0 errors. Output dimensionality is [B P]
         policy_losses = tf.math.divide_no_nan(pol_mean_sum, pol_count)
 
+        # Determine the mean loss for each policy across the batches
+        mean_policy_losses = tf.reduce_mean(policy_losses, axis=0)
+
         # Add the losses across all the policies. Results in vector of length B.
         policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
 
@@ -823,4 +830,4 @@ class BNN:
             lambda: losses_no_rex()
         )
 
-        return total_losses, policy_total_losses, policy_var_losses
+        return total_losses, policy_total_losses, policy_var_losses, mean_policy_losses
