@@ -1,0 +1,35 @@
+{
+    "name": "BNN",
+    "num_networks": 7,
+    "num_elites": 5,
+    "sess": null,
+    "separate_mean_var": true,
+    "deterministic": false,
+    "rex": true,
+    "rex_beta": 10,
+    "log_dir": "/rds/user/ajc348/hpc-work/mopo",
+    "model_dir": "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pep3_101e3/seed:1443_2022-05-25_13-42-23e1g5yr31/models",
+    "load_model": true,
+    "environment_params": {
+        "training": {
+            "domain": "HalfCheetah",
+            "task": "v2",
+            "universe": "gym",
+            "kwargs": {}
+        },
+        "evaluation": {
+            "domain": "HalfCheetah",
+            "task": "v2",
+            "universe": "gym",
+            "kwargs": {}
+        }
+    },
+    "replay_pool_params": {
+        "type": "SimpleReplayPool",
+        "kwargs": {
+            "max_size": 1000000
+        },
+        "pool_load_path": "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PEP3-P3.npy"
+    },
+    "seed": 1443
+}
