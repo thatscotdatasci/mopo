@@ -436,10 +436,24 @@ class BNN:
         num_holdout = min(int(inputs.shape[0] * holdout_ratio), max_logging)
         permutation = np.random.permutation(inputs.shape[0])
 
-        inputs, holdout_inputs = inputs[permutation[num_holdout:]], inputs[permutation[:num_holdout]]
-        targets, holdout_targets = targets[permutation[num_holdout:]], targets[permutation[:num_holdout]]
-        policies, holdout_policies = policies[permutation[num_holdout:]], policies[permutation[:num_holdout]]
-        
+        # Original method
+        # inputs, holdout_inputs = inputs[permutation[num_holdout:]], inputs[permutation[:num_holdout]]
+        # targets, holdout_targets = targets[permutation[num_holdout:]], targets[permutation[:num_holdout]]
+        # policies, holdout_policies = policies[permutation[num_holdout:]], policies[permutation[:num_holdout]]
+
+        # Policy based method
+        inputs = inputs[permutation, :]
+        targets = targets[permutation, :]
+        policies = policies[permutation, :]
+
+        holdout_ratio = 1.
+        holdout_policy = 4.
+        holdout_mask = np.squeeze(policies)==holdout_policy
+        inputs, holdout_inputs = inputs[np.squeeze(np.argwhere(~holdout_mask)), :], inputs[np.squeeze(np.argwhere(holdout_mask)), :]
+        targets, holdout_targets = targets[np.squeeze(np.argwhere(~holdout_mask)), :], targets[np.squeeze(np.argwhere(holdout_mask)), :]
+        policies, holdout_policies = policies[np.squeeze(np.argwhere(~holdout_mask)), :], policies[np.squeeze(np.argwhere(holdout_mask)), :]
+        # End of policy based method
+
         holdout_inputs = np.tile(holdout_inputs[None], [self.num_nets, 1, 1])
         holdout_targets = np.tile(holdout_targets[None], [self.num_nets, 1, 1])
         holdout_policies = np.tile(holdout_policies[None], [self.num_nets, 1, 1])
