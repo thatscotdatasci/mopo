@@ -1,3 +1,4 @@
+import os
 import json
 
 import numpy as np
@@ -10,15 +11,25 @@ from mopo.off_policy.loader import restore_pool_contiguous
 from softlearning.environments.utils import get_environment_from_params
 from softlearning.replay_pools.utils import get_replay_pool_from_variant
 
-PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 
-def main():
+MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pep4_101e3/seed:1443_2022-05-26_13-18-09lld5ol1u/models"
+DATA_PATH = "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PEP4.npy"
+
+PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
+OUTPUT_BASE_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/model_scoring"
+
+
+def score_model(model_dir: str, data_path: str):
     # Load parameters - the mininal needed give we are loading a pre-trained model
     with open(PARAMETERS_PATH, 'r') as f:
         params = json.load(f)
+    params["model_dir"] = model_dir
+    params["replay_pool_params"]["pool_load_path"] = data_path
 
     # Set the seed
-    np.random.seed(params['seed'])
+    seed = params['seed']
+    if seed is not None:
+        np.random.seed(seed)
 
     ##########################
     # Get training environment
@@ -64,7 +75,11 @@ def main():
     model_means = np.mean(ensemble_model_means, axis=0)
     model_stds = np.mean(ensemble_model_stds, axis=0)
 
-    log_prob, dev = FakeEnv._get_logprob(None, samples, ensemble_model_means, ensemble_model_vars)
+    k = samples.shape[-1]
+    ## [ num_networks, batch_size ]
+    log_prob = -1/2 * (k * np.log(2*np.pi) + np.log(ensemble_model_vars).sum(-1) + (np.power(samples-ensemble_model_means, 2)/ensemble_model_vars).sum(-1))
+    prob = np.exp(log_prob).mean()
+    log_prob = np.log(prob)
 
     pred_rewards, pred_next_obs = samples[:,:1], samples[:,1:]
     
@@ -77,11 +92,26 @@ def main():
 
     print(f'Model Directory: {params["model_dir"]}')
     print(f'Data Used: {params["replay_pool_params"]["pool_load_path"]}')
-    print(f'Reward MSE: {reward_mse} | Observation MSE: {obs_mse} | Mean Log Prob: {log_prob.mean()}')
+    print(f'Reward MSE: {reward_mse} | Observation MSE: {obs_mse} | Mean Log Prob: {log_prob}')
 
-    return reward_mse, obs_mse, log_prob.mean()
+    json_results = {
+        "model_dir": model_dir,
+        "data_path": data_path,
+        "seed": seed,
+        "reward_mse": reward_mse,
+        "observation_mse": obs_mse,
+        "log_prob": log_prob
+    }
+    json_output_dir = os.path.join(OUTPUT_BASE_DIR, model_dir.split("/")[-3], model_dir.split("/")[-2])
+    if not os.path.isdir(json_output_dir):
+        os.makedirs(json_output_dir)
+    json_output_path = os.path.join(json_output_dir, f'{DATA_PATH.split("/")[-1][:-4]}_{seed}.json')
+    with open(json_output_path, 'w') as f:
+        json.dump(json_results, f, indent=4)
+
+    return reward_mse, obs_mse, log_prob
 
 
 if __name__ == "__main__":
-    main()
+    score_model(MODEL_DIR, DATA_PATH)
 

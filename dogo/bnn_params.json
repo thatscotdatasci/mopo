@@ -8,7 +8,7 @@
     "rex": true,
     "rex_beta": 10,
     "log_dir": "/rds/user/ajc348/hpc-work/mopo",
-    "model_dir": "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pep3_101e3/seed:1443_2022-05-25_13-42-23e1g5yr31/models",
+    "model_dir": null,
     "load_model": true,
     "environment_params": {
         "training": {
@@ -29,7 +29,7 @@
         "kwargs": {
             "max_size": 1000000
         },
-        "pool_load_path": "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PEP3-P3.npy"
+        "pool_load_path": null
     },
     "seed": 1443
 }
