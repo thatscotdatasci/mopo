@@ -86,6 +86,8 @@ class MOPO(RLAlgorithm):
             rex=False,
             rex_beta=10.0,
 
+            holdout_policy=None,
+
             **kwargs,
     ):
         """
@@ -111,6 +113,9 @@ class MOPO(RLAlgorithm):
             rex (`bool`): If True, we add the V-REx penalty to the loss during
                 dynamics training.
             rex_beta (`float`): The penalty value to use in V-REx.
+            holdout_policy (`float` or `None`): The policy to holdout during
+                training and use for evaluation. If not specified, will select
+                a subset of data from across policies randomly.
         """
 
         super(MOPO, self).__init__(**kwargs)
@@ -141,6 +146,8 @@ class MOPO(RLAlgorithm):
         self._deterministic = deterministic
         self._rollout_random = rollout_random
         self._real_ratio = real_ratio
+
+        self._holdout_policy = holdout_policy
 
         self._training_environment = training_environment
         self._evaluation_environment = evaluation_environment
@@ -233,7 +240,7 @@ class MOPO(RLAlgorithm):
         )
 
         max_epochs = 1 if self._model.model_loaded else None
-        model_train_metrics = self._train_model(batch_size=256, max_epochs=max_epochs, holdout_ratio=0.2, max_t=self._max_model_t)
+        model_train_metrics = self._train_model(batch_size=256, max_epochs=max_epochs, holdout_ratio=0.2, max_t=self._max_model_t, holdout_policy=self._holdout_policy)
         model_metrics.update(model_train_metrics)
         self._log_model()
         gt.stamp('epoch_train_model')

@@ -409,7 +409,8 @@ class BNN:
 
     def train(self, inputs, targets, policies,
               batch_size=32, max_epochs=None, max_epochs_since_update=5,
-              hide_progress=False, holdout_ratio=0.0, max_logging=1000, max_grad_updates=None, timer=None, max_t=None):
+              hide_progress=False, holdout_ratio=0.0, max_logging=1000, max_grad_updates=None, timer=None, max_t=None,
+              holdout_policy=None):
         """Trains/Continues network training
 
         Arguments:
@@ -421,6 +422,8 @@ class BNN:
             batch_size (int): The minibatch size to be used for training.
             epochs (int): Number of epochs (full network passes that will be done.
             hide_progress (bool): If True, hides the progress bar shown at the beginning of training.
+            holdout_policy (float or None): The policy to hold-out during training and use in evaluation.
+                If not specified, uses holdout_ratio to randomly select records from across all policies.
 
         Returns: None
         """
@@ -436,10 +439,26 @@ class BNN:
         num_holdout = min(int(inputs.shape[0] * holdout_ratio), max_logging)
         permutation = np.random.permutation(inputs.shape[0])
 
-        inputs, holdout_inputs = inputs[permutation[num_holdout:]], inputs[permutation[:num_holdout]]
-        targets, holdout_targets = targets[permutation[num_holdout:]], targets[permutation[:num_holdout]]
-        policies, holdout_policies = policies[permutation[num_holdout:]], policies[permutation[:num_holdout]]
-        
+        if holdout_policy is None:
+            ## Original method
+            inputs, holdout_inputs = inputs[permutation[num_holdout:]], inputs[permutation[:num_holdout]]
+            targets, holdout_targets = targets[permutation[num_holdout:]], targets[permutation[:num_holdout]]
+            policies, holdout_policies = policies[permutation[num_holdout:]], policies[permutation[:num_holdout]]
+        else:
+            # Policy based method
+
+            # Setting holdout_ratio to 1 to avoid issues with a later check
+            holdout_ratio = 1.
+
+            inputs = inputs[permutation, :]
+            targets = targets[permutation, :]
+            policies = policies[permutation, :]
+
+            holdout_mask = np.squeeze(policies.astype(int))==int(holdout_policy)
+            inputs, holdout_inputs = inputs[np.squeeze(np.argwhere(~holdout_mask)), :], inputs[np.squeeze(np.argwhere(holdout_mask)), :]
+            targets, holdout_targets = targets[np.squeeze(np.argwhere(~holdout_mask)), :], targets[np.squeeze(np.argwhere(holdout_mask)), :]
+            policies, holdout_policies = policies[np.squeeze(np.argwhere(~holdout_mask)), :], policies[np.squeeze(np.argwhere(holdout_mask)), :]
+
         holdout_inputs = np.tile(holdout_inputs[None], [self.num_nets, 1, 1])
         holdout_targets = np.tile(holdout_targets[None], [self.num_nets, 1, 1])
         holdout_policies = np.tile(holdout_policies[None], [self.num_nets, 1, 1])
@@ -808,26 +827,17 @@ class BNN:
         # Add the losses across all the policies. Results in vector of length B.
         policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
 
-        def losses_rex():
-            # Determine the variance of the losses - use boolean mask to ensure only taking variance for
-            # policies which appear in the batch (i.e., some batches may not have record for all policies).
-            # Scale the sum of the losses by (1/\beta) and add the variance term
-            def determine_var(x):
-                batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
-                return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
-            policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
-            total_losses = policy_var_losses + (1/self.rex_beta) * policy_total_losses
-            return total_losses, policy_var_losses
+        # Determine the variance of the losses - use boolean mask to ensure only taking variance for
+        # policies which appear in the batch (i.e., some batches may not have record for all policies).
+        # Scale the sum of the losses by (1/\beta) and add the variance term
+        def determine_var(x):
+            batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
+            return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
+        policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
 
-        def losses_no_rex():
-            # Determine losses without REx penalties.
-            policy_var_losses = tf.zeros_like(policy_total_losses)
-            total_losses = policy_total_losses
-            return total_losses, policy_var_losses
-
-        total_losses, policy_var_losses = tf.cond(apply_rex_pen,
-            lambda: losses_rex(),
-            lambda: losses_no_rex()
+        total_losses = tf.cond(apply_rex_pen,
+            lambda: policy_var_losses + (1/self.rex_beta) * policy_total_losses,
+            lambda: policy_total_losses
         )
 
         return total_losses, policy_total_losses, policy_var_losses, mean_policy_losses
