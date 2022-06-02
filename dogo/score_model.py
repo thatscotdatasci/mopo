@@ -12,8 +12,8 @@ from softlearning.environments.utils import get_environment_from_params
 from softlearning.replay_pools.utils import get_replay_pool_from_variant
 
 
-MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pep4_101e3/seed:1443_2022-05-26_13-18-09lld5ol1u/models"
-DATA_PATH = "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PEP4.npy"
+MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_sac_pap3_101e3/seed:1443_2022-05-25_09-43-27q9376kbm/models"
+DATA_PATH = "/home/ajc348/rds/hpc-work/dogo_results/data/SAC-PAP3.npy"
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 OUTPUT_BASE_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/model_scoring"
@@ -64,24 +64,34 @@ def score_model(model_dir: str, data_path: str):
     ###################################
     # From the `step` method in FakeEnv: mopo/models/fake_env.py
 
-    obs, acts = env_samples['observations'], env_samples['actions']
+    obs, acts, rewards, next_obs = env_samples['observations'], env_samples['actions'], env_samples['rewards'], env_samples['next_observations']
     inputs = np.concatenate((obs, acts), axis=-1)
+    outputs = np.concatenate((rewards, next_obs), axis=-1)
+
     ensemble_model_means, ensemble_model_vars = bnn.predict(inputs, factored=True)
     ensemble_model_means[:,:,1:] += obs
     ensemble_model_stds = np.sqrt(ensemble_model_vars)
-    ensemble_samples = ensemble_model_means + np.random.normal(size=ensemble_model_means.shape) * ensemble_model_stds
     
-    samples = np.mean(ensemble_samples, axis=0)
-    model_means = np.mean(ensemble_model_means, axis=0)
-    model_stds = np.mean(ensemble_model_stds, axis=0)
+    ensemble_reward_model_means, ensemble_next_obs_model_means = ensemble_model_means[:,:,:1], ensemble_model_means[:,:,1:]
+    ensemble_reward_model_vars, ensemble_next_obs_model_vars = ensemble_model_vars[:,:,:1], ensemble_model_vars[:,:,1:]
 
-    k = samples.shape[-1]
+    ensemble_samples = ensemble_model_means + np.random.normal(size=ensemble_model_means.shape) * ensemble_model_stds
+    samples = np.mean(ensemble_samples, axis=0)
+    pred_rewards, pred_next_obs = samples[:,:1], samples[:,1:]
+
+    k = outputs.shape[-1]
     ## [ num_networks, batch_size ]
-    log_prob = -1/2 * (k * np.log(2*np.pi) + np.log(ensemble_model_vars).sum(-1) + (np.power(samples-ensemble_model_means, 2)/ensemble_model_vars).sum(-1))
-    prob = np.exp(log_prob).mean()
+    log_probs = -1/2 * (k * np.log(2*np.pi) + np.log(ensemble_model_vars).sum(-1) + (np.power(outputs-ensemble_model_means, 2)/ensemble_model_vars).sum(-1))
+    prob = np.exp(log_probs).mean()
     log_prob = np.log(prob)
 
-    pred_rewards, pred_next_obs = samples[:,:1], samples[:,1:]
+    reward_log_probs = -1/2 * (1 * np.log(2*np.pi) + np.log(ensemble_reward_model_vars).sum(-1) + (np.power(rewards-ensemble_reward_model_means, 2)/ensemble_reward_model_vars).sum(-1))
+    reward_prob = np.exp(reward_log_probs).mean()
+    reward_log_prob = np.log(reward_prob)
+
+    next_obs_log_probs = -1/2 * ((k-1) * np.log(2*np.pi) + np.log(ensemble_next_obs_model_vars).sum(-1) + (np.power(next_obs-ensemble_next_obs_model_means, 2)/ensemble_next_obs_model_vars).sum(-1))
+    next_obs_prob = np.exp(next_obs_log_probs).mean()
+    next_obs_log_prob = np.log(next_obs_prob)
     
     ###############
     # Determine MSE
@@ -100,7 +110,9 @@ def score_model(model_dir: str, data_path: str):
         "seed": seed,
         "reward_mse": reward_mse,
         "observation_mse": obs_mse,
-        "log_prob": log_prob
+        "log_prob": float(log_prob),
+        "reward_log_prob": float(reward_log_prob),
+        "next_obs_log_prob": float(next_obs_log_prob),
     }
     json_output_dir = os.path.join(OUTPUT_BASE_DIR, model_dir.split("/")[-3], model_dir.split("/")[-2])
     if not os.path.isdir(json_output_dir):
