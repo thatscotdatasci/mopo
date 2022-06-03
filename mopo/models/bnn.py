@@ -332,7 +332,7 @@ class BNN:
                 self._save_state(i)
                 updated = True
                 improvement = (best - current) / best
-                # print('epoch {} | updated {} | improvement: {:.4f} | best: {:.4f} | current: {:.4f}'.format(epoch, i, improvement, best, current))
+                print('epoch {} | updated {} | improvement: {:.4f} | best: {:.4f} | current: {:.4f}'.format(epoch, i, improvement, best, current))
         
         if updated:
             self._epochs_since_update = 0
@@ -340,7 +340,7 @@ class BNN:
             self._epochs_since_update += 1
 
         if self._epochs_since_update > self._max_epochs_since_update:
-            # print('[ BNN ] Breaking at epoch {}: {} epochs since update ({} max)'.format(epoch, self._epochs_since_update, self._max_epochs_since_update))
+            print('[ BNN ] Breaking at epoch {}: {} epochs since update ({} max)'.format(epoch, self._epochs_since_update, self._max_epochs_since_update))
             return True
         else:
             return False
@@ -484,17 +484,19 @@ class BNN:
         t0 = time.time()
         grad_updates = 0
 
-        # Complete two loops of training if running in REx mode
-        # First loop performs normal training; the second loop includes REx adjustments
-        for o_loop in range(2 if self.rex else 1):
+        # Complete two loops of training. First loop performs normal training
+        # The second loop includes REx adjustments, if REx is enabled
+        for o_loop in range(2):
             if o_loop == 0:
                 print('[ BNN ] Begginning training')
                 rex_training_loop = False
             elif o_loop == 1:
                 # Complete as much training as was performed in the first training loop again
                 epoch_iter = range(epoch+1)
-                print('[ BNN ] Begginning further {} epochs of REx training'.format(epoch+1))
-                rex_training_loop = True
+                print('[ BNN ] Begginning further {} epochs of training'.format(epoch+1))
+                if self.rex:
+                    print('[ BNN ] Enabling REx training')
+                    rex_training_loop = True
             else:
                 raise RuntimeError('Attempting to complete unexpected training loop')
 
