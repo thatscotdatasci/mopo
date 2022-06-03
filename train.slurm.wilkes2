@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 ##SBATCH --exclusive
-#SBATCH --time=01:00:00
+#SBATCH --time=12:00:00
 #SBATCH --mail-type=FAIL
 #! Uncomment this to prevent the job from being requeued (e.g. if
 #! interrupted by node failure or system downtime):
@@ -35,7 +35,7 @@ source /home/ajc348/rds/hpc-work/mopo/README.mopo.activate
 application="mopo"
 
 #! Run options for the application:
-options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=10"
+options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=100"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
