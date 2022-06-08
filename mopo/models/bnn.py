@@ -70,7 +70,7 @@ class BNN:
 
         # Training objects
         self.optimizer = None
-        self.sy_train_in, self.sy_train_targ, self.sy_train_pol, self.sy_apply_rex_pen = None, None, None, None
+        self.sy_train_in, self.sy_train_targ, self.sy_train_pol, self.sy_rex_training_loop = None, None, None, None
         self.train_op, self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss = None, None, None, None, None
 
         # Prediction objects
@@ -249,19 +249,19 @@ class BNN:
             self.sy_train_pol = tf.placeholder(dtype=tf.float32,
                                               shape=[self.num_nets, None, 1],
                                               name="training_policies")
-            self.sy_apply_rex_pen = tf.placeholder(dtype=bool,
+            self.sy_rex_training_loop = tf.placeholder(dtype=bool,
                                                     shape=(),
-                                                    name="training_rex_penalty")
+                                                    name="training_rex_loop")
 
             if not self.deterministic:
-                train_loss, _, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=True)
+                train_loss, _, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=True)
                 train_loss = tf.reduce_sum(train_loss)
                 train_loss += tf.add_n(self.decays)
                 train_loss += 0.01 * tf.reduce_sum(self.max_logvar) - 0.01 * tf.reduce_sum(self.min_logvar)
             else:
-                train_loss, _, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
+                train_loss, _, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=False)
                 train_loss += tf.add_n(self.decays)
-            self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, apply_rex_pen=self.sy_apply_rex_pen, inc_var_loss=False)
+            self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=False)
             self.train_op = self.optimizer.minimize(train_loss, var_list=self.optvars)
 
         # Initialize all variables
@@ -366,6 +366,9 @@ class BNN:
             [layer.reset(self.sess) for layer in self.var_layers]
 
     def validate(self, inputs, targets, policies):
+        # Alan: This function does not appear to be called
+        # Assumed that it is most reasonable to run as if it were
+        # in the REx training loop.
         inputs = np.tile(inputs[None], [self.num_nets, 1, 1])
         targets = np.tile(targets[None], [self.num_nets, 1, 1])
         losses = self.sess.run(
@@ -374,7 +377,7 @@ class BNN:
                 self.sy_train_in: inputs,
                 self.sy_train_targ: targets,
                 self.sy_train_pol: policies,
-                self.sy_apply_rex_pen: self.rex,
+                self.sy_rex_training_loop: True,
                 }
         )
         mean_elite_loss = np.sort(losses)[:self.num_elites].mean()
@@ -489,14 +492,13 @@ class BNN:
         for o_loop in range(2):
             if o_loop == 0:
                 print('[ BNN ] Begginning training')
+                epoch = -1
                 rex_training_loop = False
             elif o_loop == 1:
                 # Complete as much training as was performed in the first training loop again
                 epoch_iter = range(epoch+1)
                 print('[ BNN ] Begginning further {} epochs of training'.format(epoch+1))
-                if self.rex:
-                    print('[ BNN ] Enabling REx training')
-                    rex_training_loop = True
+                rex_training_loop = True
             else:
                 raise RuntimeError('Attempting to complete unexpected training loop')
 
@@ -509,7 +511,7 @@ class BNN:
                             self.sy_train_in: inputs[batch_idxs],
                             self.sy_train_targ: targets[batch_idxs],
                             self.sy_train_pol: policies[batch_idxs],
-                            self.sy_apply_rex_pen: rex_training_loop,
+                            self.sy_rex_training_loop: rex_training_loop,
                         }
                     )
                     grad_updates += 1
@@ -523,7 +525,7 @@ class BNN:
                                     self.sy_train_in: inputs[idxs[:, :max_logging]],
                                     self.sy_train_targ: targets[idxs[:, :max_logging]],
                                     self.sy_train_pol: policies[idxs[:, :max_logging]],
-                                    self.sy_apply_rex_pen: rex_training_loop,
+                                    self.sy_rex_training_loop: rex_training_loop,
                                 }
                             )
                         self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses)
@@ -536,7 +538,7 @@ class BNN:
                                     self.sy_train_in: inputs[idxs[:, :max_logging]],
                                     self.sy_train_targ: targets[idxs[:, :max_logging]],
                                     self.sy_train_pol: policies[idxs[:, :max_logging]],
-                                    self.sy_apply_rex_pen: rex_training_loop,
+                                    self.sy_rex_training_loop: rex_training_loop,
                                 }
                             )
                         holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout_mean_pol_losses = self.sess.run(
@@ -545,7 +547,7 @@ class BNN:
                                     self.sy_train_in: holdout_inputs,
                                     self.sy_train_targ: holdout_targets,
                                     self.sy_train_pol: holdout_policies,
-                                    self.sy_apply_rex_pen: rex_training_loop,
+                                    self.sy_rex_training_loop: rex_training_loop,
                                 }
                             )
                         self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses)
@@ -575,7 +577,8 @@ class BNN:
         progress.stamp()
         if timer: timer.stamp('bnn_train')
 
-        self._set_state()
+        if not self.model_loaded:
+            self._set_state()
         if timer: timer.stamp('bnn_set_state')
 
         holdout_losses = self.sess.run(
@@ -584,7 +587,7 @@ class BNN:
                 self.sy_train_in: holdout_inputs,
                 self.sy_train_targ: holdout_targets,
                 self.sy_train_pol: holdout_policies,
-                self.sy_apply_rex_pen: self.rex,
+                self.sy_rex_training_loop: rex_training_loop,
             }
         )
 
@@ -770,7 +773,7 @@ class BNN:
         else:
             return mean, tf.exp(logvar)
 
-    def _compile_losses(self, inputs, targets, policies, apply_rex_pen, inc_var_loss=True):
+    def _compile_losses(self, inputs, targets, policies, rex_training_loop, inc_var_loss=True):
         """Helper method for compiling the loss function.
 
         The loss function is obtained from the log likelihood, assuming that the output
@@ -781,7 +784,7 @@ class BNN:
             inputs: (tf.Tensor) A tensor representing the input batch
             targets: (tf.Tensor) The desired targets for each input vector in inputs.
             policies: (tf.Tensor) The policy used to generate each input vector in inputs.
-            apply_rex_pen: (tf.Tensor) Boolean indicating whether to apply the REx penalty
+            rex_training_loop: (tf.Tensor) Boolean indicating whether this is the REx training loop
             inc_var_loss: (bool) If True, includes log variance loss.
 
         Returns: (tf.Tensor) A tensor representing the loss on the input arguments.
@@ -837,8 +840,8 @@ class BNN:
             return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
         policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
 
-        total_losses = tf.cond(apply_rex_pen,
-            lambda: policy_var_losses + (1/self.rex_beta) * policy_total_losses,
+        total_losses = tf.cond(rex_training_loop,
+            lambda: policy_var_losses + (1/self.rex_beta) * policy_total_losses if self.rex else (1/self.rex_beta) * policy_total_losses,
             lambda: policy_total_losses
         )
 
