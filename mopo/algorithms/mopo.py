@@ -88,6 +88,8 @@ class MOPO(RLAlgorithm):
 
             holdout_policy=None,
 
+            train_bnn_only=False,
+
             **kwargs,
     ):
         """
@@ -116,6 +118,7 @@ class MOPO(RLAlgorithm):
             holdout_policy (`float` or `None`): The policy to holdout during
                 training and use for evaluation. If not specified, will select
                 a subset of data from across policies randomly.
+            train_bnn_only ('bool'): If True, only the BNN will be trained.
         """
 
         super(MOPO, self).__init__(**kwargs)
@@ -148,6 +151,8 @@ class MOPO(RLAlgorithm):
         self._real_ratio = real_ratio
 
         self._holdout_policy = holdout_policy
+
+        self._train_bnn_only = train_bnn_only
 
         self._training_environment = training_environment
         self._evaluation_environment = evaluation_environment
@@ -239,11 +244,14 @@ class MOPO(RLAlgorithm):
             self._epoch, self._model_train_freq, self._timestep, self._total_timestep)
         )
 
-        max_epochs = 1 if self._model.model_loaded else None
+        max_epochs = 0 if self._model.model_loaded else None
         model_train_metrics = self._train_model(batch_size=256, max_epochs=max_epochs, holdout_ratio=0.2, max_t=self._max_model_t, holdout_policy=self._holdout_policy)
         model_metrics.update(model_train_metrics)
         self._log_model()
         gt.stamp('epoch_train_model')
+
+        if self._train_bnn_only:
+            yield {'done': True, **{}}
         #### 
 
         for self._epoch in gt.timed_for(range(self._epoch, self._n_epochs)):

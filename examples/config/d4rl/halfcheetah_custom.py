@@ -14,4 +14,7 @@ params['kwargs'].update({
     'rollout_length': 5,
     'penalty_coeff': 1.0,
     'holdout_policy': None,
+    # 'train_bnn_only': False,
+    'rex': False,
+    'rex_beta': 10.0,
 })
