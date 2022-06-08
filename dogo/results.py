@@ -2,6 +2,7 @@ import os
 import json
 from collections import namedtuple
 
+import numpy as np
 import pandas as pd
 
 from dogo.constants import (
@@ -84,3 +85,23 @@ def get_score(experiment, dataset, seed=DEFAULT_SEED):
 
     with open(os.path.join(SCORING_BASEDIR, mopo_results_map[experiment]['base_dir'], mopo_results_map[experiment]['experiment_dir'], f'{dataset}_{seed}.json')) as f:
         return json.load(f)
+
+def get_pred_means_and_vars(experiment, dataset, seed=DEFAULT_SEED):
+    with open(MOPO_RESULTS_MAP_PATH, 'r') as f:
+        mopo_results_map = json.load(f)
+
+    means_path = os.path.join(SCORING_BASEDIR, mopo_results_map[experiment]['base_dir'], mopo_results_map[experiment]['experiment_dir'], f'{dataset}_{seed}_means.npy')
+    if os.path.isfile(means_path):
+        with open(means_path, 'rb') as f:
+            means = np.load(f)
+    else:
+        means = None
+    
+    vars_path = os.path.join(SCORING_BASEDIR, mopo_results_map[experiment]['base_dir'], mopo_results_map[experiment]['experiment_dir'], f'{dataset}_{seed}_vars.npy')
+    if os.path.isfile(vars_path):
+        with open(vars_path, 'rb') as f:
+            vars = np.load(f)
+    else:
+        vars = None
+
+    return means, vars
