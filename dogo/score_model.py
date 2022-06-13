@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 from typing import List
 
@@ -72,27 +73,31 @@ from dogo.results import get_experiment_details
 
 
 DATA_PATHS = [
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P0-3.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P1-4.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P0_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P1_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P2_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P3_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P4_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P0_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P1_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P2_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P3_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-PAP5-P4_100000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1_100000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P0-3.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P1-4.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P0_25000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P1_25000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P2_25000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P3_25000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P4_25000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P0_100000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P1_100000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P2_100000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P3_100000.npy",
+    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P4_100000.npy",
 ]
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 OUTPUT_BASE_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/model_scoring"
 
 
-def score_model(model_dir: str, data_paths: List[str], deterministic=True):
+def score_model(experiment: str, data_paths: List[str], deterministic=True):
+    exp_details = get_experiment_details(experiment, get_elites=True)
+    model_dir = os.path.join(exp_details.results_dir, 'models')
+    elites = exp_details.elites
+
     # Load parameters - the mininal needed give we are loading a pre-trained model
     with open(PARAMETERS_PATH, 'r') as f:
         params = json.load(f)
@@ -154,45 +159,51 @@ def score_model(model_dir: str, data_paths: List[str], deterministic=True):
         else:
             ensemble_samples = ensemble_model_means + np.random.normal(size=ensemble_model_means.shape) * ensemble_model_stds
 
-        samples = np.mean(ensemble_samples, axis=0)
-        pred_rewards, pred_next_obs = samples[:,:1], samples[:,1:]
+        pred_rewards, pred_next_obs = ensemble_samples[:,:,:1], ensemble_samples[:,:,1:]
+        pred_outputs = np.concatenate((pred_rewards, pred_next_obs), axis=-1)
 
         k = outputs.shape[-1]
         ## [ num_networks, batch_size ]
         log_probs = -1/2 * (k * np.log(2*np.pi) + np.log(ensemble_model_vars).sum(-1) + (np.power(outputs-ensemble_model_means, 2)/ensemble_model_vars).sum(-1))
-        prob = np.exp(log_probs).mean()
-        log_prob = np.log(prob)
+        log_prob = log_probs.mean(axis=-1)
 
         reward_log_probs = -1/2 * (1 * np.log(2*np.pi) + np.log(ensemble_reward_model_vars).sum(-1) + (np.power(rewards-ensemble_reward_model_means, 2)/ensemble_reward_model_vars).sum(-1))
-        reward_prob = np.exp(reward_log_probs).mean()
-        reward_log_prob = np.log(reward_prob)
+        reward_log_prob = reward_log_probs.mean(axis=-1)
 
         next_obs_log_probs = -1/2 * ((k-1) * np.log(2*np.pi) + np.log(ensemble_next_obs_model_vars).sum(-1) + (np.power(next_obs-ensemble_next_obs_model_means, 2)/ensemble_next_obs_model_vars).sum(-1))
-        next_obs_prob = np.exp(next_obs_log_probs).mean()
-        next_obs_log_prob = np.log(next_obs_prob)
+        next_obs_log_prob = next_obs_log_probs.mean(axis=-1)
         
         ###############
         # Determine MSE
         ###############
         actual_rewards, actual_next_obs = env_samples['rewards'], env_samples['next_observations']
-        reward_mse = ((actual_rewards-pred_rewards)**2).mean()
-        obs_mse = ((actual_next_obs-pred_next_obs)**2).mean()
+        overall_mse = ((outputs-pred_outputs)**2).mean(axis=-1).mean(axis=-1)
+        reward_mse = ((actual_rewards-pred_rewards)**2).mean(axis=-1).mean(axis=-1)
+        obs_mse = ((actual_next_obs-pred_next_obs)**2).mean(axis=-1).mean(axis=-1)
 
         print(f'Model Directory: {params["model_dir"]}')
         print(f'Data Used: {params["replay_pool_params"]["pool_load_path"]}')
-        print(f'Reward MSE: {reward_mse} | Observation MSE: {obs_mse} | log_prob: {log_prob}')
+        print(f'Reward MSE: {reward_mse[elites].mean()} | Observation MSE: {obs_mse[elites].mean()} | log_prob: {log_prob[elites].mean()}')
 
         # Save a JSON with the results
         json_results = {
             "model_dir": model_dir,
             "data_path": data_path,
             "seed": seed,
+            "elites": exp_details.elites,
             "deterministic": deterministic,
-            "reward_mse": float(reward_mse),
-            "observation_mse": float(obs_mse),
-            "log_prob": float(log_prob),
-            "reward_log_prob": float(reward_log_prob),
-            "next_obs_log_prob": float(next_obs_log_prob),
+            "overall_mse": float(overall_mse[elites].mean()),
+            "overall_mses": overall_mse.tolist(),
+            "reward_mse": float(reward_mse[elites].mean()),
+            "reward_mses": reward_mse.tolist(),
+            "observation_mse": float(obs_mse[elites].mean()),
+            "observation_mses": obs_mse.tolist(),
+            "log_prob": float(log_prob[elites].mean()),
+            "log_probs": log_prob.tolist(),
+            "reward_log_prob": float(reward_log_prob[elites].mean()),
+            "reward_log_probs": reward_log_prob.tolist(),
+            "next_obs_log_prob": float(next_obs_log_prob[elites].mean()),
+            "next_obs_log_probs": next_obs_log_prob.tolist(),
         }
         json_output_dir = os.path.join(OUTPUT_BASE_DIR, model_dir.split("/")[-3], model_dir.split("/")[-2])
         if not os.path.isdir(json_output_dir):
@@ -202,10 +213,11 @@ def score_model(model_dir: str, data_paths: List[str], deterministic=True):
             json.dump(json_results, f, indent=4)
 
         # Save the means and variances
-        with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_means.npy'), 'wb') as f:
-            np.save(f, ensemble_model_means)
-        with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_vars.npy'), 'wb') as f:
-            np.save(f, ensemble_model_vars)
+        # with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_means.npy'), 'wb') as f:
+        #     np.save(f, ensemble_model_means)
+        # with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_vars.npy'), 'wb') as f:
+        #     np.save(f, ensemble_model_vars)
 
 if __name__ == "__main__":
-    score_model(MODEL_DIR, DATA_PATHS)
+    experiment = sys.argv[1]
+    score_model(experiment, DATA_PATHS)
