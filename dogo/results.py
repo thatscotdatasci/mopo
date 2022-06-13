@@ -1,5 +1,7 @@
 import os
+import re
 import json
+from glob import glob
 from collections import namedtuple
 
 import numpy as np
@@ -12,7 +14,7 @@ from dogo.constants import (
 ########
 # Tuples
 ########
-experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta holdout_policy'.split()
+experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta holdout_policy elites'.split()
 ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
@@ -28,7 +30,7 @@ def get_results_path(local_path: str):
     else:
         return local_path
 
-def get_experiment_details(experiment: str):
+def get_experiment_details(experiment: str, get_elites: bool = False):
     with open(MOPO_RESULTS_MAP_PATH, 'r') as f:
         mopo_results_map = json.load(f)
 
@@ -44,6 +46,12 @@ def get_experiment_details(experiment: str):
     with open(os.path.join(results_dir, "params.json"), 'r') as f:
         params = json.load(f)
 
+    if get_elites:
+        with open(glob(os.path.join(results_dir, "train-log.*"))[0], 'r') as f:
+            elites = json.loads(re.findall("(?<=Using 5 / 7 models: ).*", f.read())[0])
+    else:
+        elites = None
+
     return ExperimentDetails(
         name = experiment,
         base_dir = base_dir,
@@ -56,6 +64,7 @@ def get_experiment_details(experiment: str):
         rex = params["algorithm_params"]["kwargs"].get("rex", False),
         rex_beta = params["algorithm_params"]["kwargs"].get("rex_beta", None),
         holdout_policy = params["algorithm_params"]["kwargs"].get("holdout_policy", None),
+        elites = elites
     )
 
 def get_results(experiment: str):
@@ -64,13 +73,19 @@ def get_results(experiment: str):
     dynamics_training_results = {}
     for k, v in DYNAMICS_TRAINING_FILES.items():
         file_path = os.path.join(experiment_details.results_dir, v)
-        dynamics_training_results[k] = pd.read_csv(file_path, header=None)
+        if os.path.isfile(file_path):
+            dynamics_training_results[k] = pd.read_csv(file_path, header=None)
+        else:
+            dynamics_training_results[k] = None
     dynamics_training_results = DynamicsTrainingResults(**dynamics_training_results)
 
     sac_training_results = {}
     for k, v in SAC_TRAINING_FILES.items():
         file_path = os.path.join(experiment_details.results_dir, v)
-        sac_training_results[k] = pd.read_json(file_path, lines=True)
+        if os.path.isfile(file_path):
+            sac_training_results[k] = pd.read_json(file_path, lines=True)
+        else:
+            sac_training_results[k] = None
     sac_training_results = SacTrainingResults(**sac_training_results)
 
     return ExperimentResults(
