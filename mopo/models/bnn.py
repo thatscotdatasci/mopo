@@ -876,7 +876,7 @@ class BNN:
                     rex_tl_loss = policy_var_losses + (1/self.rex_beta) * policy_total_losses
             else:
                 rex_tl_loss = (1/self.rex_beta) * policy_total_losses
-            return (1/self.lr_decay) * rex_tl_loss
+            return self.lr_decay * rex_tl_loss
 
         total_losses = tf.cond(rex_training_loop,
             rex_training_loop_total_losses,
