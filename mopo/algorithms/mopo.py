@@ -83,12 +83,12 @@ class MOPO(RLAlgorithm):
             penalty_coeff=0.,
             penalty_learned_var=False,
 
+            # Project parameters
             rex=False,
             rex_beta=10.0,
-
             holdout_policy=None,
-
             train_bnn_only=False,
+            repeat_epochs=1,
 
             **kwargs,
     ):
@@ -119,6 +119,8 @@ class MOPO(RLAlgorithm):
                 training and use for evaluation. If not specified, will select
                 a subset of data from across policies randomly.
             train_bnn_only ('bool'): If True, only the BNN will be trained.
+            repeat_epochs ('int'): Number of epochs to repeat again after
+                convergence condition is met.
         """
 
         super(MOPO, self).__init__(**kwargs)
@@ -151,6 +153,7 @@ class MOPO(RLAlgorithm):
         self._real_ratio = real_ratio
 
         self._holdout_policy = holdout_policy
+        self._repeat_epochs = repeat_epochs
 
         self._train_bnn_only = train_bnn_only
 
@@ -245,7 +248,14 @@ class MOPO(RLAlgorithm):
         )
 
         max_epochs = 0 if self._model.model_loaded else None
-        model_train_metrics = self._train_model(batch_size=256, max_epochs=max_epochs, holdout_ratio=0.2, max_t=self._max_model_t, holdout_policy=self._holdout_policy)
+        model_train_metrics = self._train_model(
+            batch_size=256,
+            max_epochs=max_epochs,
+            holdout_ratio=0.2,
+            max_t=self._max_model_t,
+            holdout_policy=self._holdout_policy,
+            repeat_epochs=self._repeat_epochs
+        )
         model_metrics.update(model_train_metrics)
         self._log_model()
         gt.stamp('epoch_train_model')
