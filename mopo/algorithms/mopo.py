@@ -89,7 +89,7 @@ class MOPO(RLAlgorithm):
             rex_multiply=False,
             holdout_policy=None,
             train_bnn_only=False,
-            repeat_epochs=1,
+            repeat_dynamics_epochs=1,
             lr_decay=1.0,
 
             **kwargs,
@@ -123,8 +123,8 @@ class MOPO(RLAlgorithm):
                 training and use for evaluation. If not specified, will select
                 a subset of data from across policies randomly.
             train_bnn_only ('bool'): If True, only the BNN will be trained.
-            repeat_epochs ('int'): Number of epochs to repeat again after
-                convergence condition is met.
+            repeat_dynamics_epochs ('int'): Number of epochs of dynamics model
+                training to repeat again after convergence condition is met.
             lr_decay ('float'): (optional) Multiply the core loss by this number
                 before returning. Applies in REx training loop.
         """
@@ -160,7 +160,7 @@ class MOPO(RLAlgorithm):
         self._real_ratio = real_ratio
 
         self._holdout_policy = holdout_policy
-        self._repeat_epochs = repeat_epochs
+        self._repeat_dynamics_epochs = repeat_dynamics_epochs
 
         self._train_bnn_only = train_bnn_only
 
@@ -261,7 +261,7 @@ class MOPO(RLAlgorithm):
             holdout_ratio=0.2,
             max_t=self._max_model_t,
             holdout_policy=self._holdout_policy,
-            repeat_epochs=self._repeat_epochs
+            repeat_dynamics_epochs=self._repeat_dynamics_epochs
         )
         model_metrics.update(model_train_metrics)
         self._log_model()

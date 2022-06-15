@@ -17,6 +17,6 @@ params['kwargs'].update({
     'train_bnn_only': False,
     'rex': False,
     'rex_beta': 10.0,
-    'repeat_epochs': 1,
+    'repeat_dynamics_epochs': 1,
     'lr_decay': 1.0,
 })

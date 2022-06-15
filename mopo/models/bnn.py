@@ -439,7 +439,7 @@ class BNN:
     def train(self, inputs, targets, policies,
               batch_size=32, max_epochs=None, max_epochs_since_update=5,
               hide_progress=False, holdout_ratio=0.0, max_logging=1000, max_grad_updates=None, timer=None, max_t=None,
-              holdout_policy=None, repeat_epochs=1):
+              holdout_policy=None, repeat_dynamics_epochs=1):
         """Trains/Continues network training
 
         Arguments:
@@ -453,7 +453,8 @@ class BNN:
             hide_progress (bool): If True, hides the progress bar shown at the beginning of training.
             holdout_policy (float or None): The policy to hold-out during training and use in evaluation.
                 If not specified, uses holdout_ratio to randomly select records from across all policies.
-            repeat_epochs ('int'): Number of epochs to repeat again after convergence condition is met.
+            repeat_dynamics_epochs ('int'): Number of epochs to repeat again after convergence condition
+                is met.
 
         Returns: None
         """
@@ -523,7 +524,7 @@ class BNN:
                 rex_training_loop = False
             elif o_loop == 1:
                 # Complete as much training as was performed in the first training loop again
-                epoch_iter = range(repeat_epochs*epoch+1)
+                epoch_iter = range(repeat_dynamics_epochs*epoch+1)
                 print('[ BNN ] Begginning further {} epochs of training'.format(epoch+1))
                 rex_training_loop = True
             else:
