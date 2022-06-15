@@ -89,6 +89,7 @@ class MOPO(RLAlgorithm):
             holdout_policy=None,
             train_bnn_only=False,
             repeat_epochs=1,
+            lr_decay=1.0,
 
             **kwargs,
     ):
@@ -121,6 +122,8 @@ class MOPO(RLAlgorithm):
             train_bnn_only ('bool'): If True, only the BNN will be trained.
             repeat_epochs ('int'): Number of epochs to repeat again after
                 convergence condition is met.
+            lr_decay ('float'): (optional) Multiply the core loss by this number
+                before returning. Applies in REx training loop.
         """
 
         super(MOPO, self).__init__(**kwargs)
@@ -136,7 +139,7 @@ class MOPO(RLAlgorithm):
                                       num_networks=num_networks, num_elites=num_elites,
                                       model_type=model_type, separate_mean_var=separate_mean_var,
                                       name=model_name, load_dir=model_load_dir, deterministic=deterministic,
-                                      rex=rex, rex_beta=rex_beta, log_dir=self._log_dir)
+                                      rex=rex, rex_beta=rex_beta, lr_decay=lr_decay, log_dir=self._log_dir)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
