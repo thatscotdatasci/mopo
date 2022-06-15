@@ -43,6 +43,8 @@ class BNN:
                 .rex (bool): (optional) If True, we add the V-REx penalty to the loss during dynamics
                     training.
                 .rex_beta (float): (optional) The penalty value to use in V-REx.
+                .rex_multiply (`bool`): If True, multiply variance by beta, else divide sum of losses
+                    by beta.
                 .lr_decay ('float'): (optional) Multiply the core loss by this number before returning.
                     Applies in REx training loop.
                 .log_dir (str): Where to save logs to during training.
@@ -69,6 +71,7 @@ class BNN:
         # REx parameters
         self.rex = params.get('rex', False)
         self.rex_beta = params.get('rex_beta', 10.0)
+        self.rex_multiply = params.get('rex_multiply', False)
         self.lr_decay = params.get('lr_decay', 1.0)
 
         # Training objects
@@ -867,7 +870,10 @@ class BNN:
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             if self.rex:
-                rex_tl_loss = policy_var_losses + (1/self.rex_beta) * policy_total_losses
+                if self.rex_multiply:
+                    rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses
+                else:
+                    rex_tl_loss = policy_var_losses + (1/self.rex_beta) * policy_total_losses
             else:
                 rex_tl_loss = (1/self.rex_beta) * policy_total_losses
             return (1/self.lr_decay) * rex_tl_loss

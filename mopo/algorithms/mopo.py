@@ -86,6 +86,7 @@ class MOPO(RLAlgorithm):
             # Project parameters
             rex=False,
             rex_beta=10.0,
+            rex_multiply=False,
             holdout_policy=None,
             train_bnn_only=False,
             repeat_epochs=1,
@@ -116,6 +117,8 @@ class MOPO(RLAlgorithm):
             rex (`bool`): If True, we add the V-REx penalty to the loss during
                 dynamics training.
             rex_beta (`float`): The penalty value to use in V-REx.
+            rex_multiply (`bool`): If True, multiply variance by beta, else
+                divide sum of losses by beta.
             holdout_policy (`float` or `None`): The policy to holdout during
                 training and use for evaluation. If not specified, will select
                 a subset of data from across policies randomly.
@@ -139,7 +142,8 @@ class MOPO(RLAlgorithm):
                                       num_networks=num_networks, num_elites=num_elites,
                                       model_type=model_type, separate_mean_var=separate_mean_var,
                                       name=model_name, load_dir=model_load_dir, deterministic=deterministic,
-                                      rex=rex, rex_beta=rex_beta, lr_decay=lr_decay, log_dir=self._log_dir)
+                                      rex=rex, rex_beta=rex_beta, rex_multiply=rex_multiply, 
+                                      lr_decay=lr_decay, log_dir=self._log_dir)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
