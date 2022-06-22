@@ -14,79 +14,86 @@ from softlearning.environments.utils import get_environment_from_params
 from softlearning.replay_pools.utils import get_replay_pool_from_variant
 from dogo.results import get_experiment_details
 
-##################
-# PAP5 Experiments
-##################
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-02_18-00-39fnhnkljn/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-02_18-00-52d5tl1m3e/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-02_18-03-01g6l6v5s7/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-02_18-03-07tlo_lnqh/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1234_2022-06-02_19-31-12zvhbtily/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1234_2022-06-02_19-31-11xl42u_po/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1234_2022-06-02_19-34-59z5a4yar7/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1234_2022-06-02_19-35-33js3upueh/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:4321_2022-06-02_19-37-14a2q9o806/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:4321_2022-06-02_19-37-59u77cj7_f/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:4321_2022-06-02_19-39-52sn2zawbk/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:4321_2022-06-02_19-40-08sckp5u_v/models"
-
-# Additional models
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-03_16-05-26sitz4u3t/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-03_16-06-26h_fbckpg/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-03_16-08-02zd2g2vw7/models"
-
-# Weight decay models
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-07_09-57-42f_xdlp_7/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1234_2022-06-07_09-58-47ks5vz8ef/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:4321_2022-06-07_09-59-56a1mci2rh/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1443_2022-06-07_10-01-00or8ip3kc/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:1234_2022-06-07_10-02-01lw4sl5m7/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_pap5_101e3/seed:4321_2022-06-07_10-02-534zmjqg28/models"
-
-
-#################
-# MP1 Experiments
-#################
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-03_10-12-32frkill7m/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-03_10-13-01h3k6c1g5/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-03_10-14-117mj_xfq5/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-03_10-14-47qm688i6a/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1234_2022-06-03_10-15-49g6s6nvdn/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1234_2022-06-03_10-16-211wgd0h6a/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1234_2022-06-03_10-17-06x84f8rk2/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1234_2022-06-03_10-18-14jzadorh6/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:4321_2022-06-03_10-26-23i2iqe13u/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:4321_2022-06-03_10-26-55_34mzot9/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:4321_2022-06-03_10-28-01akst9xyh/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:4321_2022-06-03_10-28-58fur7k1s_/models"
-
-# Additional models
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-03_16-10-43c99ekxmd/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-03_16-17-26ryn7rqqd/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-03_16-18-51x87sdp5y/models"
-
-# Varying REx values
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-06_16-25-32bstdj_8u/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-06_16-27-01_czy9zwt/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-06_16-28-22m9oubspq/models"
-# MODEL_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_mp1_101e3/seed:1443_2022-06-06_16-30-14mfkx6tx8/models"
-
-
+DATA_BASEDIR = "/home/ajc348/rds/hpc-work/dogo_results/data"
 DATA_PATHS = [
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P0-3.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P1-4.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P0_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P1_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P2_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P3_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P4_25000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P0_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P1_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P2_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P3_100000.npy",
-    "/home/ajc348/rds/hpc-work/dogo_results/data/D3RLPY-MP1-P4_100000.npy",
+    "D3RLPY-MP1.npy",
+    "D3RLPY-MP1_100000.npy",
+    "D3RLPY-MP1-P0-3.npy",
+    "D3RLPY-MP1-P1-4.npy",
+    "D3RLPY-MP1-P0_25000.npy",
+    "D3RLPY-MP1-P1_25000.npy",
+    "D3RLPY-MP1-P2_25000.npy",
+    "D3RLPY-MP1-P3_25000.npy",
+    "D3RLPY-MP1-P4_25000.npy",
+    "D3RLPY-MP1-P0_100000.npy",
+    "D3RLPY-MP1-P1_100000.npy",
+    "D3RLPY-MP1-P2_100000.npy",
+    "D3RLPY-MP1-P3_100000.npy",
+    "D3RLPY-MP1-P4_100000.npy",
+    "D3RLPY-MP2-P0_100000.npy",
+    "D3RLPY-MP2-P1_100000.npy",
+    "D3RLPY-MP2-P2_100000.npy",
+    "D3RLPY-MP2-P3_100000.npy",
+    "D3RLPY-MP2-P4_100000.npy",
+    "D3RLPY-MP3-P0_100000.npy",
+    "D3RLPY-MP3-P1_100000.npy",
+    "D3RLPY-MP3-P2_100000.npy",
+    "D3RLPY-MP3-P3_100000.npy",
+    "D3RLPY-MP3-P4_100000.npy",
+    "D3RLPY-PAP5.npy",
+    "D3RLPY-PAP5_100000.npy",
+    "D3RLPY-PAP5-P0-3.npy",
+    "D3RLPY-PAP5-P1-4.npy",
+    "D3RLPY-PAP5-P0_25000.npy",
+    "D3RLPY-PAP5-P1_25000.npy",
+    "D3RLPY-PAP5-P2_25000.npy",
+    "D3RLPY-PAP5-P3_25000.npy",
+    "D3RLPY-PAP5-P4_25000.npy",
+    "D3RLPY-PAP5-P0_100000.npy",
+    "D3RLPY-PAP5-P1_100000.npy",
+    "D3RLPY-PAP5-P2_100000.npy",
+    "D3RLPY-PAP5-P3_100000.npy",
+    "D3RLPY-PAP5-P4_100000.npy",
+    "D3RLPY-PAP6-P0_100000.npy",
+    "D3RLPY-PAP6-P1_100000.npy",
+    "D3RLPY-PAP6-P2_100000.npy",
+    "D3RLPY-PAP6-P3_100000.npy",
+    "D3RLPY-PAP6-P4_100000.npy",
+    "D3RLPY-PAP7-P0_100000.npy",
+    "D3RLPY-PAP7-P1_100000.npy",
+    "D3RLPY-PAP7-P2_100000.npy",
+    "D3RLPY-PAP7-P3_100000.npy",
+    "D3RLPY-PAP7-P4_100000.npy",
+    "RAND-1.npy",
+    "RAND-2.npy",
+    "RAND-3.npy",
+    "RAND-4.npy",
+    "RAND-5.npy",
+    "RAND-6.npy",
+    "RAND-7.npy",
+    "RAND-8.npy",
+    "RAND-9.npy",
+    "RAND-10.npy",
+    "RAND-D3RLPY-MP1-P0-1.npy",
+    "RAND-D3RLPY-MP1-P1-1.npy",
+    "RAND-D3RLPY-MP1-P2-1.npy",
+    "RAND-D3RLPY-MP1-P3-1.npy",
+    "RAND-D3RLPY-MP1-P4-1.npy",
+    "RAND-D3RLPY-PAP5-P0-1.npy",
+    "RAND-D3RLPY-PAP5-P1-1.npy",
+    "RAND-D3RLPY-PAP5-P2-1.npy",
+    "RAND-D3RLPY-PAP5-P3-1.npy",
+    "RAND-D3RLPY-PAP5-P4-1.npy",
+    # "NOISE-D3RLPY-MP1-P0-1.npy",
+    # "NOISE-D3RLPY-MP1-P1-1.npy",
+    # "NOISE-D3RLPY-MP1-P2-1.npy",
+    # "NOISE-D3RLPY-MP1-P3-1.npy",
+    # "NOISE-D3RLPY-MP1-P4-1.npy",
+    # "NOISE-D3RLPY-PAP5-P0-1.npy",
+    # "NOISE-D3RLPY-PAP5-P1-1.npy",
+    # "NOISE-D3RLPY-PAP5-P2-1.npy",
+    # "NOISE-D3RLPY-PAP5-P3-1.npy",
+    # "NOISE-D3RLPY-PAP5-P4-1.npy",
 ]
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
@@ -126,6 +133,8 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
     bnn.finalize(tf.train.AdamOptimizer, {"learning_rate": 0.001})
 
     for data_path in data_paths:
+        data_path = os.path.join(DATA_BASEDIR, data_path)
+
         #####################################
         # Create and load replay pool/dataset
         #####################################
@@ -163,7 +172,6 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
         pred_outputs = np.concatenate((pred_rewards, pred_next_obs), axis=-1)
 
         k = outputs.shape[-1]
-        ## [ num_networks, batch_size ]
         log_probs = -1/2 * (k * np.log(2*np.pi) + np.log(ensemble_model_vars).sum(-1) + (np.power(outputs-ensemble_model_means, 2)/ensemble_model_vars).sum(-1))
         log_prob = log_probs.mean(axis=-1)
 

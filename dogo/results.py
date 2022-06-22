@@ -14,7 +14,7 @@ from dogo.constants import (
 ########
 # Tuples
 ########
-experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta holdout_policy elites'.split()
+experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites'.split()
 ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
@@ -63,6 +63,7 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         seed = params["run_params"]["seed"],
         rex = params["algorithm_params"]["kwargs"].get("rex", False),
         rex_beta = params["algorithm_params"]["kwargs"].get("rex_beta", None),
+        lr_decay = params["algorithm_params"]["kwargs"].get("lr_decay", None),
         holdout_policy = params["algorithm_params"]["kwargs"].get("holdout_policy", None),
         elites = elites
     )
@@ -94,7 +95,7 @@ def get_results(experiment: str):
         sac = sac_training_results
     )
 
-def get_score(experiment, dataset, seed=DEFAULT_SEED):
+def get_experiment_dataset_score(experiment, dataset, seed=DEFAULT_SEED):
     with open(MOPO_RESULTS_MAP_PATH, 'r') as f:
         mopo_results_map = json.load(f)
 
@@ -120,3 +121,34 @@ def get_pred_means_and_vars(experiment, dataset, seed=DEFAULT_SEED):
         vars = None
 
     return means, vars
+
+def get_scores_df(experiments: list, datasets: list):
+    scores = {}
+    for exp in experiments:
+        exp_details = get_experiment_details(exp)
+        for dataset in datasets:
+            score = get_experiment_dataset_score(exp, dataset)
+            score['rex'] = exp_details.rex
+            score['rex_beta'] = exp_details.rex_beta or 0.
+            score['seed'] = exp_details.seed
+            score['training_dataset'] = exp_details.dataset
+            scores[(exp_details.name, dataset)] = score
+    return (
+        pd.DataFrame().from_dict(scores, orient='index')[['training_dataset', 'rex', 'rex_beta', 'seed', 'overall_mse', 'observation_mse', 'reward_mse', 'log_prob', 'next_obs_log_prob', 'reward_log_prob']].
+        reset_index().rename(columns={'level_0': 'experiment', 'level_1': 'evaluation_dataset'})
+    )
+
+def average_scores_over_seeds(exps: list):
+    metrics = ['model_pol_total_loss_history', 'model_pol_var_loss_history', 'model_train_decay_loss_history', 'model_train_var_lim_loss_history']
+    results = {m: 0. for m in metrics}
+    results['model_pol_std_loss_history'] = 0.
+    for exp in exps:
+        for metric in metrics:
+            if metric == 'model_pol_total_loss_history':
+                results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric).mean(axis=1)[-50:].mean()/getattr(exp.dynamics, 'model_mean_pol_loss_history').shape[1])
+            elif metric == 'model_pol_var_loss_history':
+                results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric).mean(axis=1)[-50:].mean())
+                results['model_pol_std_loss_history'] += (1/len(exps)) * (np.sqrt(getattr(exp.dynamics, metric)).mean(axis=1)[-50:].mean())
+            else:
+                results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric)[-50:].values.mean())
+    return results
