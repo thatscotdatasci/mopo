@@ -285,6 +285,30 @@ def get_parser(allow_policy_list=False):
         default=None,
         help="Save frequency for videos.")
 
+    parser.add_argument(
+        '--seed',
+        type=int,
+        default=None,
+        help="The random seed to use.")
+
+    parser.add_argument(
+        '--exp-name',
+        type=str,
+        default=None,
+        help="The name of the experiment.")
+
+    parser.add_argument(
+        '--dataset',
+        type=str,
+        default=None,
+        help="The dataset to use in training.")
+
+    parser.add_argument(
+        '--dynamics-model-exp',
+        type=str,
+        default=None,
+        help="The experiment whose dynamics model should be loaded.")
+
     parser = add_ray_init_args(parser)
     parser = add_ray_tune_args(parser)
 
