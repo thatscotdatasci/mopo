@@ -254,7 +254,7 @@ class MOPO(RLAlgorithm):
             self._epoch, self._model_train_freq, self._timestep, self._total_timestep)
         )
 
-        max_epochs = 0 if self._model.model_loaded else None
+        max_epochs = 1 if self._model.model_loaded else None
         model_train_metrics = self._train_model(
             batch_size=256,
             max_epochs=max_epochs,

@@ -271,6 +271,10 @@ class BNN:
                 self.train_var_lim_loss = None  # Note: will error when attempt is made to save to disk - but this logic branch should not be invoked
                 self.train_loss = self.train_core_loss + self.train_decay_loss
             self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=False)
+            self.train_loss = tf.cond(self.sy_rex_training_loop,
+                lambda: self.lr_decay * self.train_loss,
+                lambda: self.train_loss
+            )
             self.train_op = self.optimizer.minimize(self.train_loss, var_list=self.optvars)
 
         # Initialize all variables
@@ -335,12 +339,12 @@ class BNN:
         for i in range(len(holdout_losses)):
             current = holdout_losses[i]
             _, best = self._snapshots[i]
-            improvement = (best - current) / best
+            improvement = (best - current) / np.abs(best)
             if improvement > 0.01:
                 self._snapshots[i] = (epoch, current)
                 self._save_state(i)
                 updated = True
-                improvement = (best - current) / best
+                improvement = (best - current) / np.abs(best)
                 print('epoch {} | updated {} | improvement: {:.4f} | best: {:.4f} | current: {:.4f}'.format(epoch, i, improvement, best, current))
         
         if updated:
@@ -524,7 +528,8 @@ class BNN:
                 rex_training_loop = False
             elif o_loop == 1:
                 # Complete as much training as was performed in the first training loop again
-                epoch_iter = range(repeat_dynamics_epochs*epoch+1)
+                # Unless a pre-trained model has been loaded, in which case do not perform any further training
+                epoch_iter = range(0) if self.model_loaded else range(repeat_dynamics_epochs*(epoch+1))
                 print('[ BNN ] Begginning further {} epochs of training'.format(epoch+1))
                 rex_training_loop = True
             else:
@@ -880,7 +885,7 @@ class BNN:
                     rex_tl_loss = policy_total_losses
                 else:
                     rex_tl_loss = (1/self.rex_beta) * policy_total_losses
-            return self.lr_decay * rex_tl_loss
+            return rex_tl_loss
 
         total_losses = tf.cond(rex_training_loop,
             rex_training_loop_total_losses,
