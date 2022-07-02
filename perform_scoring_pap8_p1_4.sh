@@ -5,18 +5,18 @@
 ########################################
 
 for model in \
-MP329 \
-MP330 \
-MP331 \
-MP332 \
-MP333 \
-MP334 \
-MP335 \
-MP336 \
-MP337 \
-MP338 \
-MP339 \
-MP340
+MP437 \
+MP438 \
+MP439 \
+MP440 \
+MP441 \
+MP442 \
+MP443 \
+MP444 \
+MP445 \
+MP446 \
+MP447 \
+MP448
 do
-    .env/bin/python dogo/score_model_orig.py $model
+    .env/bin/python dogo/score_model_new.py $model
 done

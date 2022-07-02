@@ -18,5 +18,5 @@ MP350 \
 MP351 \
 MP352
 do
-    .env/bin/python dogo/score_model.py $model
+    .env/bin/python dogo/score_model_po_1.py $model
 done
