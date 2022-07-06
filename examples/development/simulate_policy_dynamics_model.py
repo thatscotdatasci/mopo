@@ -6,6 +6,7 @@ import pickle
 
 import numpy as np
 import tensorflow as tf
+from mujoco_py import MujocoException
 
 import mopo.static
 from mopo.models.bnn import BNN
@@ -28,9 +29,37 @@ from softlearning.samplers.utils import get_sampler_from_variant
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 EPISODE_LENGTH = 1000
-DETERMINISTIC_MODEL = False
+DETERMINISTIC_MODEL = True
 DETERMINISTIC_POLICY = True
-START_LOCS_FROM_POLICY_TRAINING = True
+START_LOCS_FROM_POLICY_TRAINING = False
+
+class RolloutCollector:
+    def __init__(self) -> None:
+        self.obs = []
+        self.acts = []
+        self.next_obs = []
+        self.rews = []
+
+    def add_transition(self, obs, act, next_obs, rew):
+        if type(obs) == dict:
+            obs = obs['observations']
+        if type(next_obs) == dict:
+            next_obs = next_obs['observations']
+        if type(rew) == np.array:
+            rew = rew[0,0]
+
+        self.obs.append(obs)
+        self.acts.append(act)
+        self.next_obs.append(next_obs)
+        self.rews.append(rew)
+
+    def return_transitions(self):
+        return {
+            'obs':      np.vstack(self.obs),
+            'acts':     np.vstack(self.acts),
+            'next_obs': np.vstack(self.next_obs),
+            'rewards':  np.vstack(self.rews),
+        }
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -55,35 +84,65 @@ def parse_args():
 
     return args
 
-def rollout_model(policy, fake_env, gym_env, sampler):
-    pool = SimpleReplayPool(gym_env.observation_space, gym_env.action_space, EPISODE_LENGTH)
+def get_qpos_qvel(obs):
+    qpos = np.hstack((np.zeros(1),obs[:8]))
+    qvel = obs[8:]
+    return qpos, qvel
+
+def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
+    fake_collector = RolloutCollector()
+    eval_collector = RolloutCollector()
+    gym_collector = RolloutCollector()
 
     if sampler is not None:
         batch = sampler.random_batch(1)
         obs = batch['observations']
+
+        obs_gym = obs
+        gym_env._env.set_state(*get_qpos_qvel(obs_gym.flatten()))
     else:
-        obs = gym_env.convert_to_active_observation(gym_env.reset())[None,:]
+        obs_gym = gym_env.convert_to_active_observation(gym_env.reset())[None,:]
+        obs = obs_gym
 
-    infos = []
+    real_env_broken = False
     for _ in range(EPISODE_LENGTH):
+        # Query policy for the action to take
         act = policy.actions_np(obs)
-        next_obs, rew, term, info = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
-        pol = np.zeros((len(obs), 1))
-        infos.append(info)
-        samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol}
-        pool.add_samples(samples)
+
+        # Dynamics model - predicted next_obs and reward
+        next_obs, rew, _, _ = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
+        fake_collector.add_transition(obs, act, next_obs, rew)
+
+        # Evaluation environment - set the state to the current state, apply action, get true next obs and reward
+        next_obs_real = np.ones_like(obs)*np.nan
+        rew_real = np.nan
+        if not real_env_broken:
+            eval_env._env.set_state(*get_qpos_qvel(obs.flatten()))
+            try:
+                next_obs_real, rew_real, _, _ = eval_env.step(act)
+            except MujocoException:
+                print('MuJoCo env became unstable')
+                real_env_broken = True
+        eval_collector.add_transition(obs, act, next_obs_real, rew_real)
+
+        # Gym environment - follow the real dynamics, taking actions from the policy
+        act_gym = policy.actions_np(obs_gym)
+        next_obs_gym, rew_gym, _, _ = gym_env.step(act_gym)
+        gym_collector.add_transition(obs_gym, act_gym, next_obs_gym, rew_gym)
+        
+        # Update the current observation for the next loop
         obs = next_obs
+        obs_gym = next_obs_gym['observations'][None,:]
     
-    path = pool.batch_by_indices(
-        np.arange(pool._size),
-        observation_keys=getattr(gym_env, 'observation_keys', None))
-    path['infos'] = infos
+    return {
+        'fake': fake_collector.return_transitions(),
+        'eval': eval_collector.return_transitions(),
+        'gym':  gym_collector.return_transitions()
+    }
 
-    return path
-
-def rollouts(n_paths, policy, fake_env, evaluation_environment, sampler):
-    paths = [rollout_model(policy, fake_env, evaluation_environment, sampler) for _ in range(n_paths)]
-    return paths
+def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler):
+    rollouts = [rollout_model(policy, fake_env, eval_env, gym_env, sampler) for _ in range(n_rollouts)]
+    return rollouts
 
 def simulate_policy(args):
     session = tf.keras.backend.get_session()
@@ -115,10 +174,11 @@ def simulate_policy(args):
         variant['environment_params']['evaluation']
         if 'evaluation' in variant['environment_params']
         else variant['environment_params']['training'])
-    evaluation_environment = get_environment_from_params(environment_params)
+    eval_env = get_environment_from_params(environment_params)
+    gym_env = get_environment_from_params(environment_params)
 
     policy = (
-        get_policy_from_variant(variant, evaluation_environment, Qs=[None]))
+        get_policy_from_variant(variant, eval_env, Qs=[None]))
     policy.set_weights(picklable['policy_weights'])
 
     #########################
@@ -146,11 +206,11 @@ def simulate_policy(args):
     #####################################
 
     if START_LOCS_FROM_POLICY_TRAINING:
-        replay_pool = get_replay_pool_from_variant(variant, evaluation_environment)
+        replay_pool = get_replay_pool_from_variant(variant, eval_env)
         restore_pool_contiguous(replay_pool, variant['algorithm_params']['kwargs']['pool_load_path'])
 
         sampler = get_sampler_from_variant(variant)
-        sampler.initialize(evaluation_environment, policy, replay_pool)
+        sampler.initialize(eval_env, policy, replay_pool)
     else:
         sampler = None
 
@@ -158,22 +218,30 @@ def simulate_policy(args):
     # Create rollouts
     #################
     with policy.set_deterministic(DETERMINISTIC_POLICY):
-        paths = rollouts(
+        rollouts = generate_rollouts(
             args.num_rollouts,
             policy,
             fake_env,
-            evaluation_environment,
+            eval_env,
+            gym_env,
             sampler,
         )
 
     ###############
     # Print rewards
     ###############
-    rewards = [path['rewards'].sum() for path in paths]
-    print('Rewards: {}'.format(rewards))
-    print('Mean: {}'.format(np.mean(rewards)))
+    fake_rewards = [ro['fake']['rewards'].sum() for ro in rollouts]
+    eval_rewards = [ro['eval']['rewards'].sum() for ro in rollouts]
+    gym_rewards = [ro['gym']['rewards'].sum() for ro in rollouts]
+    print('Fake Rewards: {}'.format(fake_rewards))
+    print('Eval Rewards: {}'.format(eval_rewards))
+    print('Gym Rewards: {}'.format(gym_rewards))
+    print('---')
+    print('Fake Mean: {}'.format(np.mean(fake_rewards)))
+    print('Eval Mean: {}'.format(np.mean(eval_rewards)))
+    print('Gym Mean: {}'.format(np.mean(gym_rewards)))
     
-    return paths
+    return rollouts
 
 
 if __name__ == '__main__':
