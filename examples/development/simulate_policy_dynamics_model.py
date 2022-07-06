@@ -17,9 +17,17 @@ from dogo.results import get_experiment_details
 from softlearning.replay_pools import SimpleReplayPool
 
 
-# TODO: Confirm these parameters are appropriate in this case
+# NOTE: Items to be aware of:
+# - the step method in FakeEnv can be run in deterministic mode, or not
+# - there are parameters in bnn_params, however these should mostly not be used
+# - choosing to be deterministic or not has a large impact
+# - parameter deterministic is set to False in trining, which impacts the dynamics
+# - parameter eval_deterministic is True in training, which impacts the policy
+
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 EPISODE_LENGTH = 1000
+DETERMINISTIC_MODEL = False
+DETERMINISTIC_POLICY = True
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -36,12 +44,6 @@ def parse_args():
                         default=None,
                         choices=('human', 'rgb_array', 'None'),
                         help="Mode to render the rollouts in.")
-    parser.add_argument('--deterministic', '-d',
-                        type=lambda x: bool(strtobool(x)),
-                        nargs='?',
-                        const=True,
-                        default=True,
-                        help="Evaluate policy deterministically.")
 
     args = parser.parse_args()
     
@@ -50,8 +52,7 @@ def parse_args():
 
     return args
 
-# TODO: determine the kwargs being passed into fake_env, and whether to keep them
-def rollout_model(policy, fake_env, gym_env, **kwargs):
+def rollout_model(policy, fake_env, gym_env):
     pool = SimpleReplayPool(gym_env.observation_space, gym_env.action_space, EPISODE_LENGTH)
 
     # Starting locations are currently random samples from the environment
@@ -60,7 +61,7 @@ def rollout_model(policy, fake_env, gym_env, **kwargs):
     infos = []
     for _ in range(EPISODE_LENGTH):
         act = policy.actions_np(obs)
-        next_obs, rew, term, info = fake_env.step(obs, act, **kwargs)
+        next_obs, rew, term, info = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
         pol = np.zeros((len(obs), 1))
         infos.append(info)
         samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol}
@@ -137,7 +138,7 @@ def simulate_policy(args):
     #################
     # Create rollouts
     #################
-    with policy.set_deterministic(args.deterministic):
+    with policy.set_deterministic(DETERMINISTIC_POLICY):
         paths = rollouts(
             args.num_rollouts,
             policy,
