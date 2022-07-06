@@ -5,6 +5,7 @@ import os
 import pickle
 
 import numpy as np
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from mujoco_py import MujocoException
 
@@ -32,6 +33,30 @@ EPISODE_LENGTH = 1000
 DETERMINISTIC_MODEL = True
 DETERMINISTIC_POLICY = True
 START_LOCS_FROM_POLICY_TRAINING = False
+
+cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+
+def plot_rollouts(rollouts):
+    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+
+    n_rollouts = len(rollouts)
+    fake_rewards = np.stack([np.cumsum(rollouts[i]['fake']['rewards']) for i in range(n_rollouts)], axis=-1)
+    eval_rewards = np.stack([np.cumsum(rollouts[i]['eval']['rewards']) for i in range(n_rollouts)], axis=-1)
+    gym_rewards  = np.stack([np.cumsum(rollouts[i]['gym']['rewards']) for i in range(n_rollouts)], axis=-1)
+    
+    for i, (rewards, label) in enumerate([
+        (fake_rewards, 'Prediction'),
+        (eval_rewards, 'True Value'),
+        (gym_rewards, 'Real Environment'),
+    ]):
+        mean_reward = rewards.mean(axis=-1)
+        std_reward = rewards.std(axis=-1)
+        ax.plot(mean_reward, c=cols[i], ls='-', label=label)
+        ax.fill_between(np.arange(EPISODE_LENGTH), mean_reward-2*std_reward, mean_reward+2*std_reward, color=cols[i], alpha=0.25)
+
+    ax.legend()
+
+    plt.savefig('policy_model_rollout.jpeg')
 
 class RolloutCollector:
     def __init__(self) -> None:
@@ -204,7 +229,6 @@ def simulate_policy(args):
     #####################################
     # Create and load replay pool/dataset
     #####################################
-
     if START_LOCS_FROM_POLICY_TRAINING:
         replay_pool = get_replay_pool_from_variant(variant, eval_env)
         restore_pool_contiguous(replay_pool, variant['algorithm_params']['kwargs']['pool_load_path'])
@@ -243,7 +267,7 @@ def simulate_policy(args):
     
     return rollouts
 
-
 if __name__ == '__main__':
     args = parse_args()
-    simulate_policy(args)
+    rollouts = simulate_policy(args)
+    plot_rollouts(rollouts)
