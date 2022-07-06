@@ -10,11 +10,13 @@ import tensorflow as tf
 import mopo.static
 from mopo.models.bnn import BNN
 from mopo.models.fake_env import FakeEnv
+from mopo.off_policy.loader import restore_pool_contiguous
 from softlearning.environments.utils import get_environment_from_params
 from softlearning.policies.utils import get_policy_from_variant
-from softlearning.samplers import rollouts
+from softlearning.replay_pools.utils import get_replay_pool_from_variant
 from dogo.results import get_experiment_details
 from softlearning.replay_pools import SimpleReplayPool
+from softlearning.samplers.utils import get_sampler_from_variant
 
 
 # NOTE: Items to be aware of:
@@ -28,6 +30,7 @@ PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 EPISODE_LENGTH = 1000
 DETERMINISTIC_MODEL = False
 DETERMINISTIC_POLICY = True
+START_LOCS_FROM_POLICY_TRAINING = True
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -52,11 +55,14 @@ def parse_args():
 
     return args
 
-def rollout_model(policy, fake_env, gym_env):
+def rollout_model(policy, fake_env, gym_env, sampler):
     pool = SimpleReplayPool(gym_env.observation_space, gym_env.action_space, EPISODE_LENGTH)
 
-    # Starting locations are currently random samples from the environment
-    obs = gym_env.convert_to_active_observation(gym_env.reset())[None,:]
+    if sampler is not None:
+        batch = sampler.random_batch(1)
+        obs = batch['observations']
+    else:
+        obs = gym_env.convert_to_active_observation(gym_env.reset())[None,:]
 
     infos = []
     for _ in range(EPISODE_LENGTH):
@@ -75,8 +81,8 @@ def rollout_model(policy, fake_env, gym_env):
 
     return path
 
-def rollouts(n_paths, policy, fake_env, evaluation_environment):
-    paths = [rollout_model(policy, fake_env, evaluation_environment) for _ in range(n_paths)]
+def rollouts(n_paths, policy, fake_env, evaluation_environment, sampler):
+    paths = [rollout_model(policy, fake_env, evaluation_environment, sampler) for _ in range(n_paths)]
     return paths
 
 def simulate_policy(args):
@@ -135,6 +141,19 @@ def simulate_policy(args):
         dynamics_model, static_fns, penalty_coeff=0., penalty_learned_var=True
     )
 
+    #####################################
+    # Create and load replay pool/dataset
+    #####################################
+
+    if START_LOCS_FROM_POLICY_TRAINING:
+        replay_pool = get_replay_pool_from_variant(variant, evaluation_environment)
+        restore_pool_contiguous(replay_pool, variant['algorithm_params']['kwargs']['pool_load_path'])
+
+        sampler = get_sampler_from_variant(variant)
+        sampler.initialize(evaluation_environment, policy, replay_pool)
+    else:
+        sampler = None
+
     #################
     # Create rollouts
     #################
@@ -144,6 +163,7 @@ def simulate_policy(args):
             policy,
             fake_env,
             evaluation_environment,
+            sampler,
         )
 
     ###############
