@@ -23,9 +23,9 @@ EPISODE_LENGTH = 1000
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('policy_checkpoint_path',
+    parser.add_argument('policy_experiment',
                         type=str,
-                        help='Path to the policy checkpoint.')
+                        help='Experiment whose dynamics model should be used.')
     parser.add_argument('dynamics_experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
@@ -53,6 +53,8 @@ def parse_args():
 # TODO: determine the kwargs being passed into fake_env, and whether to keep them
 def rollout_model(policy, fake_env, gym_env, **kwargs):
     pool = SimpleReplayPool(gym_env.observation_space, gym_env.action_space, EPISODE_LENGTH)
+
+    # Starting locations are currently random samples from the environment
     obs = gym_env.convert_to_active_observation(gym_env.reset())[None,:]
 
     infos = []
@@ -79,9 +81,18 @@ def rollouts(n_paths, policy, fake_env, evaluation_environment):
 def simulate_policy(args):
     session = tf.keras.backend.get_session()
 
-    policy_checkpoint_path = args.policy_checkpoint_path.rstrip('/')
-    policy_experiment_path = (
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(policy_checkpoint_path)))))
+    #######################
+    # Load the policy model
+    #######################
+    policy_exp_details = get_experiment_details(args.policy_experiment, get_elites=False)
+    policy_experiment_path = policy_exp_details.results_dir
+    policy_checkpoint_path = os.path.join(
+        policy_exp_details.results_dir,
+        'ray_mopo',
+        policy_exp_details.environment,
+        policy_exp_details.base_dir,
+        policy_exp_details.experiment_dir,
+        'checkpoint_501',
     )
 
     variant_path = os.path.join(policy_experiment_path, 'params.json')
@@ -103,25 +114,29 @@ def simulate_policy(args):
         get_policy_from_variant(variant, evaluation_environment, Qs=[None]))
     policy.set_weights(picklable['policy_weights'])
 
+    #########################
     # Load the dynamics model
-    exp_details = get_experiment_details(args.dynamics_experiment, get_elites=True)
-    model_dir = os.path.join(exp_details.results_dir, 'models')
+    #########################
+    dynamics_exp_details = get_experiment_details(args.dynamics_experiment, get_elites=True)
+    dynamics_model_dir = os.path.join(dynamics_exp_details.results_dir, 'models')
     with open(PARAMETERS_PATH, 'r') as f:
         dynamics_params = json.load(f)
-    dynamics_params["model_dir"] = model_dir
+    dynamics_params["model_dir"] = dynamics_model_dir
 
     dynamics_model = BNN(dynamics_params)
     dynamics_model.model_loaded = True
     dynamics_model.finalize(tf.train.AdamOptimizer, {"learning_rate": 0.001})
-    dynamics_model._model_inds = exp_details.elites
+    dynamics_model._model_inds = dynamics_exp_details.elites
 
     domain = environment_params['domain']
     static_fns = mopo.static[domain.lower()]
     fake_env = FakeEnv(
-        dynamics_model, static_fns, penalty_coeff=0.,
-        penalty_learned_var=True, gym_environment=evaluation_environment
+        dynamics_model, static_fns, penalty_coeff=0., penalty_learned_var=True
     )
 
+    #################
+    # Create rollouts
+    #################
     with policy.set_deterministic(args.deterministic):
         paths = rollouts(
             args.num_rollouts,
@@ -130,11 +145,12 @@ def simulate_policy(args):
             evaluation_environment,
         )
 
-    #### print rewards
+    ###############
+    # Print rewards
+    ###############
     rewards = [path['rewards'].sum() for path in paths]
     print('Rewards: {}'.format(rewards))
     print('Mean: {}'.format(np.mean(rewards)))
-    ####
     
     return paths
 
