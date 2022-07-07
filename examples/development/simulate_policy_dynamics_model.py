@@ -30,33 +30,86 @@ from softlearning.samplers.utils import get_sampler_from_variant
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 EPISODE_LENGTH = 1000
+PENALTY_COEFF = 0.0
 DETERMINISTIC_MODEL = True
 DETERMINISTIC_POLICY = True
 START_LOCS_FROM_POLICY_TRAINING = False
 
+assert EPISODE_LENGTH <= 1000
+
 cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
-def plot_rollouts(rollouts):
+def plot_cumulative_reward(rollouts):
     fig, ax = plt.subplots(1, 1, figsize=(20,10))
 
     n_rollouts = len(rollouts)
-    fake_rewards = np.stack([np.cumsum(rollouts[i]['fake']['rewards']) for i in range(n_rollouts)], axis=-1)
+    fake_unpen_rewards = np.stack([np.cumsum(rollouts[i]['fake']['unpen_rewards']) for i in range(n_rollouts)], axis=-1)
+    fake_pen_rewards = np.stack([np.cumsum(rollouts[i]['fake']['rewards']) for i in range(n_rollouts)], axis=-1)
+    fake_penalties = np.stack([np.cumsum(rollouts[i]['fake']['reward_pens']) for i in range(n_rollouts)], axis=-1)
     eval_rewards = np.stack([np.cumsum(rollouts[i]['eval']['rewards']) for i in range(n_rollouts)], axis=-1)
     gym_rewards  = np.stack([np.cumsum(rollouts[i]['gym']['rewards']) for i in range(n_rollouts)], axis=-1)
     
-    for i, (rewards, label) in enumerate([
-        (fake_rewards, 'Prediction'),
+    for i, (metric, label) in enumerate([
+        (fake_unpen_rewards, 'Unpenalised Prediction'),
+        (fake_pen_rewards, f'Penalised Prediction (coeff: {PENALTY_COEFF})'),
+        (fake_penalties, 'Reward Penalty'),
         (eval_rewards, 'True Value'),
         (gym_rewards, 'Real Environment'),
     ]):
-        mean_reward = rewards.mean(axis=-1)
-        std_reward = rewards.std(axis=-1)
-        ax.plot(mean_reward, c=cols[i], ls='-', label=label)
-        ax.fill_between(np.arange(EPISODE_LENGTH), mean_reward-2*std_reward, mean_reward+2*std_reward, color=cols[i], alpha=0.25)
+        mean = metric.mean(axis=-1)
+        min_v = metric.min(axis=-1)
+        max_v = metric.max(axis=-1)
+        ax.plot(mean, c=cols[i], label=label)
+        ax.fill_between(np.arange(EPISODE_LENGTH), min_v, max_v, color=cols[i], alpha=0.5)
 
     ax.legend()
 
-    plt.savefig('policy_model_rollout.jpeg')
+    plt.savefig('policy_cumulative_rewards.jpeg')
+
+def plot_reward(rollouts):
+    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+
+    n_rollouts = len(rollouts)
+
+    pen_rewards = np.stack([rollouts[i]['fake']['rewards'].flatten() for i in range(n_rollouts)], axis=-1)
+    unpen_rewards = np.stack([rollouts[i]['fake']['unpen_rewards'].flatten() for i in range(n_rollouts)], axis=-1)
+    penalties = np.stack([rollouts[i]['fake']['reward_pens'].flatten() for i in range(n_rollouts)], axis=-1)
+
+    for i, (metric, label) in enumerate([
+        (pen_rewards, 'Penalised Reward'),
+        (unpen_rewards, 'Unpenalised Reward'),
+        (penalties, 'Penalty'),
+    ]):
+        mean = metric.mean(axis=-1)
+        min_v = metric.min(axis=-1)
+        max_v = metric.max(axis=-1)
+        ax.plot(mean, c=cols[i], label=label)
+        ax.fill_between(np.arange(EPISODE_LENGTH), min_v, max_v, color=cols[i], alpha=0.5)
+
+    ax.legend()
+
+    plt.savefig('policy_rewards.jpeg')
+
+def plot_mse(rollouts, metric):
+    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+
+    n_rollouts = len(rollouts)
+
+    fake_metric = np.stack([rollouts[i]['fake'][metric] for i in range(n_rollouts)], axis=-1)
+    eval_metric = np.stack([rollouts[i]['eval'][metric] for i in range(n_rollouts)], axis=-1)
+
+    mse = (fake_metric-eval_metric)**2
+    mse_flat = mse.reshape((mse.shape[0],-1))
+    mse_mean = mse_flat.mean(axis=-1)
+    mse_max = mse_flat.max(axis=-1)
+
+    ax.plot(mse_mean)
+    ax.fill_between(np.arange(EPISODE_LENGTH), np.zeros_like(mse_max), mse_max, alpha=0.5)
+
+    # ax.legend()
+
+    plt.savefig(f'policy_{metric}_mse.jpeg')
+
 
 class RolloutCollector:
     def __init__(self) -> None:
@@ -86,14 +139,38 @@ class RolloutCollector:
             'rewards':  np.vstack(self.rews),
         }
 
+class MopoRolloutCollector(RolloutCollector):
+    def __init__(self) -> None:
+        super().__init__()
+        self.unpen_rews = []
+        self.rew_pens = []
+
+    def add_transition(self, obs, act, next_obs, rew, unpen_rew, rew_pen):
+        super().add_transition(obs, act, next_obs, rew)
+        self.unpen_rews.append(unpen_rew)
+        self.rew_pens.append(rew_pen)
+
+    def return_transitions(self):
+        trans = super().return_transitions()
+        trans.update({
+            'unpen_rewards': np.vstack(self.unpen_rews),
+            'reward_pens': np.vstack(self.rew_pens),
+        })
+        return trans
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('policy_experiment',
+    parser.add_argument('--policy-experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
-    parser.add_argument('dynamics_experiment',
+    parser.add_argument('--dynamics-experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
+    parser.add_argument('--penalty-coeff',
+                        type=float,
+                        default=0.0,
+                        help='The MOPO penalty coefficient.')
     # parser.add_argument('--max-path-length', '-l', type=int, default=1000)
     parser.add_argument('--num-rollouts', '-n', type=int, default=10)
     parser.add_argument('--render-mode', '-r',
@@ -115,7 +192,7 @@ def get_qpos_qvel(obs):
     return qpos, qvel
 
 def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
-    fake_collector = RolloutCollector()
+    fake_collector = MopoRolloutCollector()
     eval_collector = RolloutCollector()
     gym_collector = RolloutCollector()
 
@@ -135,8 +212,8 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
         act = policy.actions_np(obs)
 
         # Dynamics model - predicted next_obs and reward
-        next_obs, rew, _, _ = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
-        fake_collector.add_transition(obs, act, next_obs, rew)
+        next_obs, rew, _, info = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
+        fake_collector.add_transition(obs, act, next_obs, rew, info['unpenalized_rewards'], info['penalty'])
 
         # Evaluation environment - set the state to the current state, apply action, get true next obs and reward
         next_obs_real = np.ones_like(obs)*np.nan
@@ -223,7 +300,7 @@ def simulate_policy(args):
     domain = environment_params['domain']
     static_fns = mopo.static[domain.lower()]
     fake_env = FakeEnv(
-        dynamics_model, static_fns, penalty_coeff=0., penalty_learned_var=True
+        dynamics_model, static_fns, penalty_coeff=args.penalty_coeff, penalty_learned_var=True
     )
 
     #####################################
@@ -270,4 +347,11 @@ def simulate_policy(args):
 if __name__ == '__main__':
     args = parse_args()
     rollouts = simulate_policy(args)
-    plot_rollouts(rollouts)
+    plot_cumulative_reward(rollouts)
+    plot_reward(rollouts)
+    plot_mse(rollouts, 'next_obs')
+    plot_mse(rollouts, 'rewards')
+
+    n_rollouts = len(rollouts)
+    obs_fake = np.stack([np.cumsum(rollouts[i]['fake']['unpen_rewards']) for i in range(n_rollouts)], axis=-1)
+    np.save('policy_obs_fake.npy', obs_fake)
