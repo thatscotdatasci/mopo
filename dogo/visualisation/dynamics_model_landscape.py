@@ -27,6 +27,7 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 # - parameter deterministic is set to False in trining, which impacts the dynamics
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
+DATA_DIR = "/home/ajc348/rds/hpc-work/dogo_results/data"
 DETERMINISTIC_MODEL = True
 START_LOCS_FROM_POLICY_TRAINING = True
 
@@ -64,6 +65,10 @@ def parse_args():
     parser.add_argument('--dynamics-experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
+    parser.add_argument('--dataset',
+                        type=str,
+                        default=None,
+                        help='Dataset to load.')
     parser.add_argument('--penalty-coeff',
                         type=float,
                         default=0.0,
@@ -72,6 +77,13 @@ def parse_args():
     args = parser.parse_args()
 
     return args
+
+def get_qpos_qvel(obs):
+    # Return qpos and qvel values from the current obs
+    # These are necessary if setting the environment
+    qpos = np.hstack((np.zeros(1),obs[:8]))
+    qvel = obs[8:]
+    return qpos, qvel
 
 def sample_transitions(args):
 
@@ -82,10 +94,10 @@ def sample_transitions(args):
     dynamics_exp_details = get_experiment_details(args.dynamics_experiment, get_elites=True)
     dynamics_model_dir = os.path.join(dynamics_exp_details.results_dir, 'models')
     with open(PARAMETERS_PATH, 'r') as f:
-        dynamics_params = json.load(f)
-    dynamics_params["model_dir"] = dynamics_model_dir
+        dynamics_exp_params = json.load(f)
+    dynamics_exp_params["model_dir"] = dynamics_model_dir
 
-    dynamics_model = BNN(dynamics_params)
+    dynamics_model = BNN(dynamics_exp_params)
     dynamics_model.model_loaded = True
     dynamics_model.finalize(tf.train.AdamOptimizer, {"learning_rate": 0.001})
     dynamics_model._model_inds = dynamics_exp_details.elites
@@ -110,6 +122,12 @@ def sample_transitions(args):
     ##################################
     eval_env = get_environment_from_params(environment_params)
 
+    if args.dataset is not None:
+        replay_pool = get_replay_pool_from_variant(dynamics_exp_params, eval_env)
+        restore_pool_contiguous(replay_pool, os.path.join(DATA_DIR, f'{args.dataset}.npy'))
+    else:
+        replay_pool = None
+
     ####################
     # Create transitions
     ####################
@@ -117,8 +135,13 @@ def sample_transitions(args):
     eval_collector = RolloutCollector()
 
     for _ in range(10000):
-        obs = eval_env.reset()['observations']
-        act = eval_env.action_space.sample()
+        if replay_pool is not None:
+            batch = replay_pool.random_batch(1)
+            obs = batch['observations']
+            act = batch['actions']
+            eval_env._env.set_state(*get_qpos_qvel(obs.flatten()))
+        else:
+            obs = eval_env.reset()['observations']
 
         next_obs, rew, _, info = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
         fake_collector.add_transition(obs, act, next_obs, rew, info)
