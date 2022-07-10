@@ -30,6 +30,7 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 # - parameter eval_deterministic is True in training, which impacts the policy
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
+OUTPUT_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/analysis/policy"
 EPISODE_LENGTH = 1000
 DETERMINISTIC_MODEL = True
 DETERMINISTIC_POLICY = True
@@ -182,10 +183,6 @@ def parse_args():
     parser.add_argument('--dynamics-experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
-    parser.add_argument('--penalty-coeff',
-                        type=float,
-                        default=0.0,
-                        help='The MOPO penalty coefficient.')
     # parser.add_argument('--max-path-length', '-l', type=int, default=1000)
     parser.add_argument('--num-rollouts', '-n', type=int, default=10)
 
@@ -228,7 +225,7 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
 
         # Dynamics model - predicted next_obs and reward
         next_obs, rew, _, info = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
-        fake_collector.add_transition(obs, act, next_obs, rew, info['unpenalized_rewards'], info['penalty'])
+        fake_collector.add_transition(obs, act, next_obs, rew, info)
 
         # Evaluation environment - set the state to the current state, apply action, get true next obs and reward
         next_obs_real = np.ones_like(obs)*np.nan
@@ -290,20 +287,16 @@ def simulate_policy(args):
         with open(pickle_path, 'rb') as f:
             picklable = pickle.load(f)
 
-    policy = (
-        get_policy_from_variant(policy_exp_params, eval_env, Qs=[None]))
-    policy.set_weights(picklable['policy_weights'])
-
-    ######################################################
-    # Load evaluation and gym environments
-    # Note: the eval environment is also a gym environment
-    ######################################################
     environment_params = (
         policy_exp_params['environment_params']['evaluation']
         if 'evaluation' in policy_exp_params['environment_params']
         else policy_exp_params['environment_params']['training'])
     eval_env = get_environment_from_params(environment_params)
     gym_env = get_environment_from_params(environment_params)
+
+    policy = (
+        get_policy_from_variant(policy_exp_params, eval_env, Qs=[None]))
+    policy.set_weights(picklable['policy_weights'])
 
     #########################
     # Load the dynamics model
@@ -322,7 +315,7 @@ def simulate_policy(args):
     domain = environment_params['domain']
     static_fns = mopo.static[domain.lower()]
     fake_env = FakeEnv(
-        dynamics_model, static_fns, penalty_coeff=args.penalty_coeff, penalty_learned_var=True
+        dynamics_model, static_fns, penalty_coeff=1.0, penalty_learned_var=True
     )
 
     ############################################
@@ -367,23 +360,46 @@ def simulate_policy(args):
     
     return rollouts
 
+def get_file_prefix(args):
+    return f'{args.dynamics_experiment}_{args.policy_experiment}_dm{DETERMINISTIC_MODEL}_dp{DETERMINISTIC_POLICY}'
+
+def save_state_action(file_prefix, env, rollouts):
+    state_action_arr = np.stack([np.hstack((
+        ro[env]['obs'], ro[env]['acts']
+    )) for ro in rollouts])
+    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action.npy'), state_action_arr)
+
+def save_metric(file_prefix, rollouts, env, metric):
+    np.save(
+        os.path.join(
+            OUTPUT_DIR,
+            f'{file_prefix}_{env}_{metric}.npy'
+            ),
+        np.stack([ro[env][metric] for ro in rollouts], axis=-1)
+    )
+
 if __name__ == '__main__':
     args = parse_args()
     rollouts = simulate_policy(args)
-    plot_visitation_landscape(rollouts)
-    plot_cumulative_reward(rollouts, args.penalty_coeff)
-    plot_reward(rollouts, args.penalty_coeff)
-    plot_mse(rollouts, 'next_obs')
-    plot_mse(rollouts, 'rewards')
-    plot_gym_mse(rollouts, 'obs')
-    plot_gym_mse(rollouts, 'rewards')
-    plot_gym_cos(rollouts, 'obs')
-    plot_gym_cos(rollouts, 'rewards')
 
-    # n_rollouts = len(rollouts)
+    file_prefix = get_file_prefix(args)
 
-    # obs_fake = np.stack([np.cumsum(rollouts[i]['fake']['obs']) for i in range(n_rollouts)], axis=-1)
-    # np.save('policy_obs_fake.npy', obs_fake)
+    save_state_action(file_prefix, 'fake', rollouts)
+    save_state_action(file_prefix, 'gym', rollouts)
 
-    # obs_gym = np.stack([np.cumsum(rollouts[i]['gym']['obs']) for i in range(n_rollouts)], axis=-1)
-    # np.save('policy_obs_gym.npy', obs_fake)
+    save_metric(file_prefix, rollouts, 'fake', 'reward_pens')
+    save_metric(file_prefix, rollouts, 'fake', 'unpen_rewards')
+
+    save_metric(file_prefix, rollouts, 'eval', 'rewards')
+    
+    save_metric(file_prefix, rollouts, 'gym', 'rewards')
+
+    # plot_visitation_landscape(rollouts)
+    # plot_cumulative_reward(rollouts, args.penalty_coeff)
+    # plot_reward(rollouts, args.penalty_coeff)
+    # plot_mse(rollouts, 'next_obs')
+    # plot_mse(rollouts, 'rewards')
+    # plot_gym_mse(rollouts, 'obs')
+    # plot_gym_mse(rollouts, 'rewards')
+    # plot_gym_cos(rollouts, 'obs')
+    # plot_gym_cos(rollouts, 'rewards')

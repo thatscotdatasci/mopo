@@ -26,21 +26,19 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 # - choosing to be deterministic or not has a large impact
 # - parameter deterministic is set to False in trining, which impacts the dynamics
 
+STATE_DIMS = 17
+ACTION_DIMS = 6
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 DATA_DIR = "/home/ajc348/rds/hpc-work/dogo_results/data"
+OUTPUT_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/analysis/dynamics"
 DETERMINISTIC_MODEL = True
-START_LOCS_FROM_POLICY_TRAINING = True
 
 PCA_1D = 'pca/pca_1d.pkl'
-PCA_2D = 'pca/pca_2d.pkl'
 
 cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
-def plot_reward_landscape_2d(transitions, metric, red_op=None, red_axis=-1):
+def plot_reward_landscape_2d(pca_1d, transitions, metric, red_op=None, red_axis=-1):
     fig, ax = plt.subplots(1, 1, figsize=(10,10))
-
-    with open(PCA_1D, 'rb') as f:
-        pca_1d = pickle.load(f)
     
     obs = transitions['fake']['obs']
     acts = transitions['fake']['acts']
@@ -114,7 +112,7 @@ def sample_transitions(args):
     domain = environment_params['domain']
     static_fns = mopo.static[domain.lower()]
     fake_env = FakeEnv(
-        dynamics_model, static_fns, penalty_coeff=args.penalty_coeff, penalty_learned_var=True
+        dynamics_model, static_fns, penalty_coeff=1.0, penalty_learned_var=True
     )
 
     ##################################
@@ -123,10 +121,9 @@ def sample_transitions(args):
     eval_env = get_environment_from_params(environment_params)
 
     if args.dataset is not None:
-        replay_pool = get_replay_pool_from_variant(dynamics_exp_params, eval_env)
-        restore_pool_contiguous(replay_pool, os.path.join(DATA_DIR, f'{args.dataset}.npy'))
+        data_arr = np.load(os.path.join(DATA_DIR, f'{args.dataset}.npy'))
     else:
-        replay_pool = None
+        data_arr = None
 
     ####################
     # Create transitions
@@ -134,11 +131,10 @@ def sample_transitions(args):
     fake_collector = MopoRolloutCollector()
     eval_collector = RolloutCollector()
 
-    for _ in range(10000):
-        if replay_pool is not None:
-            batch = replay_pool.random_batch(1)
-            obs = batch['observations']
-            act = batch['actions']
+    for i in range(10000):
+        if data_arr is not None:
+            obs = data_arr[i,:STATE_DIMS]
+            act = data_arr[i,STATE_DIMS:STATE_DIMS+ACTION_DIMS]
             eval_env._env.set_state(*get_qpos_qvel(obs.flatten()))
         else:
             obs = eval_env.reset()['observations']
@@ -154,10 +150,31 @@ def sample_transitions(args):
         'eval': eval_collector.return_transitions(),
     }
 
+def get_file_prefix(args):
+    return f'{args.dynamics_experiment}_{args.dataset}'
+
+def save_metric(file_prefix, transitions, metric):
+    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{metric}.npy'), transitions['fake'][metric])
+
 if __name__ == '__main__':
     args = parse_args()
     transitions = sample_transitions(args)
-    plot_reward_landscape_2d(transitions, 'rewards')
-    plot_reward_landscape_2d(transitions, 'ensemble_means_std', red_op='mean')
-    plot_reward_landscape_2d(transitions, 'ensemble_vars_max', red_op='max')
+
+    file_prefix = get_file_prefix(args)
+
+    # save_metric(file_prefix, transitions, 'rewards')
+    save_metric(file_prefix, transitions, 'unpen_rewards')
+    save_metric(file_prefix, transitions, 'reward_pens')
+    # save_metric(file_prefix, transitions, 'ensemble_means_mean')
+    save_metric(file_prefix, transitions, 'ensemble_means_std')
+    # save_metric(file_prefix, transitions, 'ensemble_vars_mean')
+    # save_metric(file_prefix, transitions, 'ensemble_vars_std')
+    save_metric(file_prefix, transitions, 'ensemble_vars_max')
+
+    # with open(PCA_1D, 'rb') as f:
+    #     pca_1d = pickle.load(f)
+
+    # plot_reward_landscape_2d(pca_1d, transitions, 'rewards')
+    # plot_reward_landscape_2d(pca_1d, transitions, 'ensemble_means_std', red_op='mean')
+    # plot_reward_landscape_2d(pca_1d, transitions, 'ensemble_vars_max', red_op='max')
 
