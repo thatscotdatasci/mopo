@@ -188,16 +188,8 @@ def parse_args():
                         help='The MOPO penalty coefficient.')
     # parser.add_argument('--max-path-length', '-l', type=int, default=1000)
     parser.add_argument('--num-rollouts', '-n', type=int, default=10)
-    parser.add_argument('--render-mode', '-r',
-                        type=str,
-                        default=None,
-                        choices=('human', 'rgb_array', 'None'),
-                        help="Mode to render the rollouts in.")
 
     args = parser.parse_args()
-    
-    if args.render_mode == 'None':
-        args.render_mode = None
 
     return args
 

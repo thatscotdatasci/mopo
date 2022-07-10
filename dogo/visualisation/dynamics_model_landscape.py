@@ -68,16 +68,8 @@ def parse_args():
                         type=float,
                         default=0.0,
                         help='The MOPO penalty coefficient.')
-    parser.add_argument('--render-mode', '-r',
-                        type=str,
-                        default=None,
-                        choices=('human', 'rgb_array', 'None'),
-                        help="Mode to render the rollouts in.")
 
     args = parser.parse_args()
-    
-    if args.render_mode == 'None':
-        args.render_mode = None
 
     return args
 
