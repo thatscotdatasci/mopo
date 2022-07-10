@@ -7,7 +7,7 @@ from sklearn.decomposition import PCA
 
 STATE_DIMS = 17
 ACTION_DIMS = 6
-TARGET_DIMS = STATE_DIMS + ACTION_DIMS
+STATE_ACTION_DIMS = STATE_DIMS + ACTION_DIMS
 DATA_DIR = '../dogo_results/data/'
 PCA_DIR = 'pca'
 
@@ -38,7 +38,7 @@ pca_training_datasets = [
     'RAND-10.npy',
 ]
 
-data = np.vstack([np.load(os.path.join(DATA_DIR, tds))[:,:TARGET_DIMS] for tds in pca_training_datasets])
+data = np.vstack([np.load(os.path.join(DATA_DIR, tds))[:,:STATE_ACTION_DIMS] for tds in pca_training_datasets])
 
 ####
 # 1D
