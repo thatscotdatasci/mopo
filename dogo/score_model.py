@@ -141,11 +141,11 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
         with open(json_output_path, 'w') as f:
             json.dump(json_results, f, indent=4)
 
-        # Save the means and variances
-        # with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_means.npy'), 'wb') as f:
-        #     np.save(f, ensemble_model_means)
-        # with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_vars.npy'), 'wb') as f:
-        #     np.save(f, ensemble_model_vars)
+        # Save the means and variances
+        with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_means.npy'), 'wb') as f:
+            np.save(f, ensemble_model_means)
+        with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_vars.npy'), 'wb') as f:
+            np.save(f, ensemble_model_vars)
 
 if __name__ == "__main__":
     experiment = sys.argv[1]
