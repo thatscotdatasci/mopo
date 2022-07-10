@@ -1,5 +1,4 @@
 import argparse
-from distutils.util import strtobool
 import json
 import os
 import pickle
@@ -8,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from mujoco_py import MujocoException
+from sklearn.decomposition import PCA
 
 import mopo.static
 from mopo.models.bnn import BNN
@@ -16,9 +16,10 @@ from mopo.off_policy.loader import restore_pool_contiguous
 from softlearning.environments.utils import get_environment_from_params
 from softlearning.policies.utils import get_policy_from_variant
 from softlearning.replay_pools.utils import get_replay_pool_from_variant
-from dogo.results import get_experiment_details
 from softlearning.replay_pools import SimpleReplayPool
 from softlearning.samplers.utils import get_sampler_from_variant
+from dogo.results import get_experiment_details
+from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 
 
 # NOTE: Items to be aware of:
@@ -33,6 +34,9 @@ EPISODE_LENGTH = 1000
 DETERMINISTIC_MODEL = True
 DETERMINISTIC_POLICY = True
 START_LOCS_FROM_POLICY_TRAINING = True
+
+PCA_1D = 'pca/pca_1d.pkl'
+PCA_2D = 'pca/pca_2d.pkl'
 
 assert EPISODE_LENGTH <= 1000
 
@@ -149,54 +153,26 @@ def plot_gym_cos(rollouts, metric):
 
     plt.savefig(f'policy_gym_cos_{metric}.jpeg')
 
+def plot_visitation_landscape(rollouts):
+    with open(PCA_2D, 'rb') as f:
+        pca_2d = pickle.load(f)
 
-class RolloutCollector:
-    def __init__(self) -> None:
-        self.obs = []
-        self.acts = []
-        self.next_obs = []
-        self.rews = []
+    n_rollouts = len(rollouts)
+    
+    fake_obs = np.vstack([rollouts[i]['fake']['obs'] for i in range(n_rollouts)])
+    fake_acts = np.vstack([rollouts[i]['fake']['acts'] for i in range(n_rollouts)])
+    
+    gym_obs = np.vstack([rollouts[i]['gym']['obs'] for i in range(n_rollouts)])
+    gym_acts = np.vstack([rollouts[i]['gym']['acts'] for i in range(n_rollouts)])
 
-    def add_transition(self, obs, act, next_obs, rew):
-        if type(obs) == dict:
-            obs = obs['observations']
-        if type(next_obs) == dict:
-            next_obs = next_obs['observations']
-        if type(rew) == np.array:
-            rew = rew[0,0]
+    fake_pca = pca_2d.transform(np.hstack((fake_obs, fake_acts)))
+    gym_pca = pca_2d.transform(np.hstack((gym_obs, gym_acts)))
 
-        self.obs.append(obs)
-        self.acts.append(act)
-        self.next_obs.append(next_obs)
-        self.rews.append(rew)
-
-    def return_transitions(self):
-        return {
-            'obs':      np.vstack(self.obs),
-            'acts':     np.vstack(self.acts),
-            'next_obs': np.vstack(self.next_obs),
-            'rewards':  np.vstack(self.rews),
-        }
-
-class MopoRolloutCollector(RolloutCollector):
-    def __init__(self) -> None:
-        super().__init__()
-        self.unpen_rews = []
-        self.rew_pens = []
-
-    def add_transition(self, obs, act, next_obs, rew, unpen_rew, rew_pen):
-        super().add_transition(obs, act, next_obs, rew)
-        self.unpen_rews.append(unpen_rew)
-        self.rew_pens.append(rew_pen)
-
-    def return_transitions(self):
-        trans = super().return_transitions()
-        trans.update({
-            'unpen_rewards': np.vstack(self.unpen_rews),
-            'reward_pens': np.vstack(self.rew_pens),
-        })
-        return trans
-
+    fig, ax = plt.subplots(1, 1, figsize=(10,10))
+    ax.scatter(fake_pca[:,0], fake_pca[:,1], marker='x', s=10, label='Model')
+    ax.scatter(gym_pca[:,0], gym_pca[:,1], marker='x', s=10, label='Real Environment')
+    ax.legend()
+    plt.savefig(f'policy_s_a_pca_2d.jpeg')
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -226,15 +202,20 @@ def parse_args():
     return args
 
 def get_qpos_qvel(obs):
+    # Return qpos and qvel values from the current obs
+    # These are necessary if setting the environment
     qpos = np.hstack((np.zeros(1),obs[:8]))
     qvel = obs[8:]
     return qpos, qvel
 
 def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
+    # Instantiate collector objects
     fake_collector = MopoRolloutCollector()
     eval_collector = RolloutCollector()
     gym_collector = RolloutCollector()
 
+    # If a sampler is provided then sample from this
+    # Otherwise, sample from the gym environment
     if sampler is not None:
         batch = sampler.random_batch(1)
         obs = batch['observations']
@@ -245,9 +226,12 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
         obs_gym = gym_env.convert_to_active_observation(gym_env.reset())[None,:]
         obs = obs_gym
 
+    # Some policies can lead to instability in the real MuJoCo environment
+    # If this occurs, stop using the real environment
     real_env_broken = False
+
     for _ in range(EPISODE_LENGTH):
-        # Query policy for the action to take
+        # Query the policy for the action to take
         act = policy.actions_np(obs)
 
         # Dynamics model - predicted next_obs and reward
@@ -266,7 +250,7 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
                 real_env_broken = True
         eval_collector.add_transition(obs, act, next_obs_real, rew_real)
 
-        # Gym environment - follow the real dynamics, taking actions from the policy
+        # Gym environment - follow the real environment dynamics, taking actions from the policy
         act_gym = policy.actions_np(obs_gym)
         next_obs_gym, rew_gym, _, _ = gym_env.step(act_gym)
         gym_collector.add_transition(obs_gym, act_gym, next_obs_gym, rew_gym)
@@ -275,6 +259,7 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
         obs = next_obs
         obs_gym = next_obs_gym['observations'][None,:]
     
+    # Return the populated collectors
     return {
         'fake': fake_collector.return_transitions(),
         'eval': eval_collector.return_transitions(),
@@ -282,6 +267,7 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
     }
 
 def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler):
+    # Create the desired number of rollouts
     rollouts = [rollout_model(policy, fake_env, eval_env, gym_env, sampler) for _ in range(n_rollouts)]
     return rollouts
 
@@ -290,6 +276,7 @@ def simulate_policy(args):
 
     #######################
     # Load the policy model
+    # Create a FakeEnv
     #######################
     policy_exp_details = get_experiment_details(args.policy_experiment, get_elites=False)
     policy_experiment_path = policy_exp_details.results_dir
@@ -302,25 +289,29 @@ def simulate_policy(args):
         'checkpoint_501',
     )
 
-    variant_path = os.path.join(policy_experiment_path, 'params.json')
-    with open(variant_path, 'r') as f:
-        variant = json.load(f)
+    policy_exp_params_path = os.path.join(policy_experiment_path, 'params.json')
+    with open(policy_exp_params_path, 'r') as f:
+        policy_exp_params = json.load(f)
 
     with session.as_default():
         pickle_path = os.path.join(policy_checkpoint_path, 'checkpoint.pkl')
         with open(pickle_path, 'rb') as f:
             picklable = pickle.load(f)
 
+    policy = (
+        get_policy_from_variant(policy_exp_params, eval_env, Qs=[None]))
+    policy.set_weights(picklable['policy_weights'])
+
+    ######################################################
+    # Load evaluation and gym environments
+    # Note: the eval environment is also a gym environment
+    ######################################################
     environment_params = (
-        variant['environment_params']['evaluation']
-        if 'evaluation' in variant['environment_params']
-        else variant['environment_params']['training'])
+        policy_exp_params['environment_params']['evaluation']
+        if 'evaluation' in policy_exp_params['environment_params']
+        else policy_exp_params['environment_params']['training'])
     eval_env = get_environment_from_params(environment_params)
     gym_env = get_environment_from_params(environment_params)
-
-    policy = (
-        get_policy_from_variant(variant, eval_env, Qs=[None]))
-    policy.set_weights(picklable['policy_weights'])
 
     #########################
     # Load the dynamics model
@@ -342,14 +333,15 @@ def simulate_policy(args):
         dynamics_model, static_fns, penalty_coeff=args.penalty_coeff, penalty_learned_var=True
     )
 
-    #####################################
+    ############################################
     # Create and load replay pool/dataset
-    #####################################
+    # The pool used in policy training is loaded
+    ############################################
     if START_LOCS_FROM_POLICY_TRAINING:
-        replay_pool = get_replay_pool_from_variant(variant, eval_env)
-        restore_pool_contiguous(replay_pool, variant['algorithm_params']['kwargs']['pool_load_path'])
+        replay_pool = get_replay_pool_from_variant(policy_exp_params, eval_env)
+        restore_pool_contiguous(replay_pool, policy_exp_params['algorithm_params']['kwargs']['pool_load_path'])
 
-        sampler = get_sampler_from_variant(variant)
+        sampler = get_sampler_from_variant(policy_exp_params)
         sampler.initialize(eval_env, policy, replay_pool)
     else:
         sampler = None
@@ -386,6 +378,7 @@ def simulate_policy(args):
 if __name__ == '__main__':
     args = parse_args()
     rollouts = simulate_policy(args)
+    plot_visitation_landscape(rollouts)
     plot_cumulative_reward(rollouts, args.penalty_coeff)
     plot_reward(rollouts, args.penalty_coeff)
     plot_mse(rollouts, 'next_obs')
@@ -395,10 +388,10 @@ if __name__ == '__main__':
     plot_gym_cos(rollouts, 'obs')
     plot_gym_cos(rollouts, 'rewards')
 
-    n_rollouts = len(rollouts)
+    # n_rollouts = len(rollouts)
 
-    obs_fake = np.stack([np.cumsum(rollouts[i]['fake']['obs']) for i in range(n_rollouts)], axis=-1)
-    np.save('policy_obs_fake.npy', obs_fake)
+    # obs_fake = np.stack([np.cumsum(rollouts[i]['fake']['obs']) for i in range(n_rollouts)], axis=-1)
+    # np.save('policy_obs_fake.npy', obs_fake)
 
-    obs_gym = np.stack([np.cumsum(rollouts[i]['gym']['obs']) for i in range(n_rollouts)], axis=-1)
-    np.save('policy_obs_gym.npy', obs_fake)
+    # obs_gym = np.stack([np.cumsum(rollouts[i]['gym']['obs']) for i in range(n_rollouts)], axis=-1)
+    # np.save('policy_obs_gym.npy', obs_fake)
