@@ -30,29 +30,28 @@ from softlearning.samplers.utils import get_sampler_from_variant
 
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 EPISODE_LENGTH = 1000
-PENALTY_COEFF = 0.0
 DETERMINISTIC_MODEL = True
 DETERMINISTIC_POLICY = True
-START_LOCS_FROM_POLICY_TRAINING = False
+START_LOCS_FROM_POLICY_TRAINING = True
 
 assert EPISODE_LENGTH <= 1000
 
 cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
-def plot_cumulative_reward(rollouts):
+def plot_cumulative_reward(rollouts, penalty_coeff):
     fig, ax = plt.subplots(1, 1, figsize=(20,10))
 
     n_rollouts = len(rollouts)
+    fake_penalties = np.stack([np.cumsum(rollouts[i]['fake']['reward_pens']) for i in range(n_rollouts)], axis=-1)
     fake_unpen_rewards = np.stack([np.cumsum(rollouts[i]['fake']['unpen_rewards']) for i in range(n_rollouts)], axis=-1)
     fake_pen_rewards = np.stack([np.cumsum(rollouts[i]['fake']['rewards']) for i in range(n_rollouts)], axis=-1)
-    fake_penalties = np.stack([np.cumsum(rollouts[i]['fake']['reward_pens']) for i in range(n_rollouts)], axis=-1)
     eval_rewards = np.stack([np.cumsum(rollouts[i]['eval']['rewards']) for i in range(n_rollouts)], axis=-1)
     gym_rewards  = np.stack([np.cumsum(rollouts[i]['gym']['rewards']) for i in range(n_rollouts)], axis=-1)
     
     for i, (metric, label) in enumerate([
-        (fake_unpen_rewards, 'Unpenalised Prediction'),
-        (fake_pen_rewards, f'Penalised Prediction (coeff: {PENALTY_COEFF})'),
         (fake_penalties, 'Reward Penalty'),
+        (fake_unpen_rewards, 'Unpenalised Prediction'),
+        (fake_pen_rewards, f'Penalised Prediction (coeff: {penalty_coeff})'),
         (eval_rewards, 'True Value'),
         (gym_rewards, 'Real Environment'),
     ]):
@@ -66,19 +65,19 @@ def plot_cumulative_reward(rollouts):
 
     plt.savefig('policy_cumulative_rewards.jpeg')
 
-def plot_reward(rollouts):
+def plot_reward(rollouts, penalty_coeff):
     fig, ax = plt.subplots(1, 1, figsize=(20,10))
 
     n_rollouts = len(rollouts)
 
+    penalties = np.stack([rollouts[i]['fake']['reward_pens'].flatten() for i in range(n_rollouts)], axis=-1)
     pen_rewards = np.stack([rollouts[i]['fake']['rewards'].flatten() for i in range(n_rollouts)], axis=-1)
     unpen_rewards = np.stack([rollouts[i]['fake']['unpen_rewards'].flatten() for i in range(n_rollouts)], axis=-1)
-    penalties = np.stack([rollouts[i]['fake']['reward_pens'].flatten() for i in range(n_rollouts)], axis=-1)
 
     for i, (metric, label) in enumerate([
-        (pen_rewards, 'Penalised Reward'),
-        (unpen_rewards, 'Unpenalised Reward'),
         (penalties, 'Penalty'),
+        (pen_rewards, f'Penalised Prediction (coeff: {penalty_coeff})'),
+        (unpen_rewards, 'Unpenalised Reward'),
     ]):
         mean = metric.mean(axis=-1)
         min_v = metric.min(axis=-1)
@@ -109,6 +108,46 @@ def plot_mse(rollouts, metric):
     # ax.legend()
 
     plt.savefig(f'policy_{metric}_mse.jpeg')
+
+def plot_gym_mse(rollouts, metric):
+    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+
+    n_rollouts = len(rollouts)
+
+    fake_metric = np.stack([rollouts[i]['fake'][metric] for i in range(n_rollouts)], axis=-1)
+    gym_metric = np.stack([rollouts[i]['gym'][metric] for i in range(n_rollouts)], axis=-1)
+
+    mse = (fake_metric-gym_metric)**2
+    mse_flat = mse.reshape((mse.shape[0],-1))
+    mse_mean = mse_flat.mean(axis=-1)
+    mse_max = mse_flat.max(axis=-1)
+
+    ax.plot(mse_mean)
+    ax.fill_between(np.arange(EPISODE_LENGTH), np.zeros_like(mse_max), mse_max, alpha=0.5)
+
+    # ax.legend()
+
+    plt.savefig(f'policy_gym_mse_{metric}.jpeg')
+
+def plot_gym_cos(rollouts, metric):
+    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+
+    n_rollouts = len(rollouts)
+
+    fake_metric = np.stack([rollouts[i]['fake'][metric] for i in range(n_rollouts)], axis=-1)
+    gym_metric = np.stack([rollouts[i]['gym'][metric] for i in range(n_rollouts)], axis=-1)
+
+    cos = np.einsum('ijk,ijk->ik', fake_metric, gym_metric)/(np.linalg.norm(fake_metric, axis=1) * np.linalg.norm(gym_metric, axis=1))
+    cos_mean = cos.mean(axis=-1)
+    cos_min = cos.min(axis=-1)
+    cos_max = cos.max(axis=-1)
+
+    ax.plot(cos_mean)
+    ax.fill_between(np.arange(EPISODE_LENGTH), cos_min, cos_max, alpha=0.5)
+
+    # ax.legend()
+
+    plt.savefig(f'policy_gym_cos_{metric}.jpeg')
 
 
 class RolloutCollector:
@@ -347,11 +386,19 @@ def simulate_policy(args):
 if __name__ == '__main__':
     args = parse_args()
     rollouts = simulate_policy(args)
-    plot_cumulative_reward(rollouts)
-    plot_reward(rollouts)
+    plot_cumulative_reward(rollouts, args.penalty_coeff)
+    plot_reward(rollouts, args.penalty_coeff)
     plot_mse(rollouts, 'next_obs')
     plot_mse(rollouts, 'rewards')
+    plot_gym_mse(rollouts, 'obs')
+    plot_gym_mse(rollouts, 'rewards')
+    plot_gym_cos(rollouts, 'obs')
+    plot_gym_cos(rollouts, 'rewards')
 
     n_rollouts = len(rollouts)
-    obs_fake = np.stack([np.cumsum(rollouts[i]['fake']['unpen_rewards']) for i in range(n_rollouts)], axis=-1)
+
+    obs_fake = np.stack([np.cumsum(rollouts[i]['fake']['obs']) for i in range(n_rollouts)], axis=-1)
     np.save('policy_obs_fake.npy', obs_fake)
+
+    obs_gym = np.stack([np.cumsum(rollouts[i]['gym']['obs']) for i in range(n_rollouts)], axis=-1)
+    np.save('policy_obs_gym.npy', obs_fake)
