@@ -18,5 +18,5 @@ MP338 \
 MP339 \
 MP340
 do
-    .env/bin/python dogo/score_model_orig.py $model
+    .env/bin/python dogo/score_model_new.py $model
 done
