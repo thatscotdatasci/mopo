@@ -70,9 +70,9 @@ class BNN:
         
         # REx parameters
         self.rex = params.get('rex', False)
-        self.rex_beta = params.get('rex_beta', 10.0)
+        self.rex_beta = float(params.get('rex_beta', 10.0))
         self.rex_multiply = params.get('rex_multiply', False)
-        self.lr_decay = params.get('lr_decay', 1.0)
+        self.lr_decay = float(params.get('lr_decay', 1.0))
 
         # Training objects
         self.optimizer = None
