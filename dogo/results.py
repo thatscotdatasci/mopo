@@ -14,7 +14,7 @@ from dogo.constants import (
 ########
 # Tuples
 ########
-experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites'.split()
+experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites penalty_coeff rollout_length rollout_batch_size'.split()
 ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
@@ -58,14 +58,17 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         experiment_dir = experiment_dir,
         results_dir = results_dir,
         environment = environment,
-        dataset = params["algorithm_params"]["kwargs"]["pool_load_path"].split("/")[-1][:-4],
+        dataset = params["algorithm_params"]["kwargs"]["pool_load_path"].split("/")[-1].replace('.npy', ''),
         params=params,
         seed = params["run_params"]["seed"],
         rex = params["algorithm_params"]["kwargs"].get("rex", False),
         rex_beta = params["algorithm_params"]["kwargs"].get("rex_beta", None),
         lr_decay = params["algorithm_params"]["kwargs"].get("lr_decay", None),
         holdout_policy = params["algorithm_params"]["kwargs"].get("holdout_policy", None),
-        elites = elites
+        elites = elites,
+        penalty_coeff = params["algorithm_params"]["kwargs"].get("penalty_coeff", None),
+        rollout_length = params["algorithm_params"]["kwargs"].get("rollout_length", None),
+        rollout_batch_size = params["algorithm_params"]["kwargs"].get("rollout_batch_size", None),
     )
 
 def get_results(experiment: str):
