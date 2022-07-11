@@ -67,10 +67,6 @@ def parse_args():
                         type=str,
                         default=None,
                         help='Dataset to load.')
-    parser.add_argument('--penalty-coeff',
-                        type=float,
-                        default=0.0,
-                        help='The MOPO penalty coefficient.')
 
     args = parser.parse_args()
 
@@ -167,8 +163,8 @@ if __name__ == '__main__':
     save_metric(file_prefix, transitions, 'reward_pens')
     # save_metric(file_prefix, transitions, 'ensemble_means_mean')
     save_metric(file_prefix, transitions, 'ensemble_means_std')
-    # save_metric(file_prefix, transitions, 'ensemble_vars_mean')
-    # save_metric(file_prefix, transitions, 'ensemble_vars_std')
+    save_metric(file_prefix, transitions, 'ensemble_vars_mean')
+    save_metric(file_prefix, transitions, 'ensemble_vars_std')
     save_metric(file_prefix, transitions, 'ensemble_vars_max')
 
     # with open(PCA_1D, 'rb') as f:
