@@ -3,9 +3,9 @@ DEFAULT_SEED = 1443
 #######
 # Paths
 #######
-MOPO_RESULTS_MAP_PATH = "../dogo_results/mopo/results_map.json"
-RESULTS_BASEDIR = "../dogo_results/mopo"
-SCORING_BASEDIR = "../dogo_results/mopo/model_scoring"
+MOPO_RESULTS_MAP_PATH = "/home/ajc348/rds/hpc-work/dogo_results/mopo/results_map.json"
+RESULTS_BASEDIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo"
+SCORING_BASEDIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/model_scoring"
 
 #######
 # Docs
