@@ -36,13 +36,13 @@ def policy_dynamics_plot_title(dynamics_exp, policy_exp):
     
     return f'{dynamics_title}\n{policy_title}'
 
-def plot_cumulative_reward(dynamics_exp, policy_exp):
+def plot_cumulative_reward(dynamics_exp, policy_exp, deterministic_model=True, deterministic_policy=True):
     fig, ax = plt.subplots(1, 1, figsize=(20,10))
 
-    fake_unpen_rewards = retrieve_metric(dynamics_exp, policy_exp, True, True, 'fake', 'unpen_rewards')
-    fake_pen = retrieve_metric(dynamics_exp, policy_exp, True, True, 'fake', 'reward_pens')
-    eval_rewards = retrieve_metric(dynamics_exp, policy_exp, True, True, 'eval', 'rewards')
-    gym_rewards = retrieve_metric(dynamics_exp, policy_exp, True, True, 'gym', 'rewards')
+    fake_unpen_rewards = retrieve_metric(dynamics_exp, policy_exp, deterministic_model, deterministic_policy, 'fake', 'unpen_rewards')
+    fake_pen = retrieve_metric(dynamics_exp, policy_exp, deterministic_model, deterministic_policy, 'fake', 'reward_pens')
+    eval_rewards = retrieve_metric(dynamics_exp, policy_exp, deterministic_model, deterministic_policy, 'eval', 'rewards')
+    gym_rewards = retrieve_metric(dynamics_exp, policy_exp, deterministic_model, deterministic_policy, 'gym', 'rewards')
 
     n_records = len(fake_unpen_rewards)
 

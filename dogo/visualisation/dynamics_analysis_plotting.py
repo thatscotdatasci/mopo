@@ -8,7 +8,7 @@ from dogo.results import get_experiment_details
 cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
 def retrieve_metric(metric, exp, dataset):
-    return np.load(os.path.join('dynamics', f'{exp}_{dataset}_{metric}.npy'), allow_pickle=True)
+    return np.load(os.path.join('dynamics', f'{exp}_{dataset}_{metric}.npy'))
 
 def plot_metric_2d(experiment_names, metric, dataset):
     fig, ax = plt.subplots(1, 1, figsize=(10,10))
@@ -23,6 +23,8 @@ def plot_metric_2d(experiment_names, metric, dataset):
         if metric == 'reward_pens':
             ax.axhline(exp.max_penalty, ls='--', color=cols[i])
 
+    ax.set_xlabel('PCA Dimension 1')
+    ax.set_ylabel(' '.join(metric.split('_')).title())
     ax.legend()
 
 def plot_metric_3d(experiment_names, metric, dataset):
@@ -41,4 +43,7 @@ def plot_metric_3d(experiment_names, metric, dataset):
         ax[1].view_init(90, 0)
     
     for i in range(2):
+        ax.set_xlabel('PCA Dimension 1')
+        ax.set_ylabel('PCA Dimension 2')
+        ax.set_zlabel(metric)
         ax[i].legend()
