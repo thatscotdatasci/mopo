@@ -32,8 +32,6 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 OUTPUT_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/analysis/policy"
 EPISODE_LENGTH = 1000
-DETERMINISTIC_MODEL = True
-DETERMINISTIC_POLICY = True
 START_LOCS_FROM_POLICY_TRAINING = True
 
 PCA_1D = 'pca/pca_1d.pkl'
@@ -183,10 +181,19 @@ def parse_args():
     parser.add_argument('--dynamics-experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
+    parser.add_argument('--stochastic-policy',
+                        action='store_true',
+                        help='Run stochastic policy.')
+    parser.add_argument('--stochastic-model',
+                        action='store_true',
+                        help='Run stochastic model.')
     # parser.add_argument('--max-path-length', '-l', type=int, default=1000)
     parser.add_argument('--num-rollouts', '-n', type=int, default=10)
 
     args = parser.parse_args()
+
+    args.deterministic_policy = not args.stochastic_policy 
+    args.deterministic_model = not args.stochastic_model
 
     return args
 
@@ -197,7 +204,7 @@ def get_qpos_qvel(obs):
     qvel = obs[8:]
     return qpos, qvel
 
-def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
+def rollout_model(policy, fake_env, eval_env, gym_env, sampler, deterministic_model=True):
     # Instantiate collector objects
     fake_collector = MopoRolloutCollector()
     eval_collector = RolloutCollector()
@@ -224,7 +231,7 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
         act = policy.actions_np(obs)
 
         # Dynamics model - predicted next_obs and reward
-        next_obs, rew, _, info = fake_env.step(obs, act, deterministic=DETERMINISTIC_MODEL)
+        next_obs, rew, _, info = fake_env.step(obs, act, deterministic=deterministic_model)
         fake_collector.add_transition(obs, act, next_obs, rew, info)
 
         # Evaluation environment - set the state to the current state, apply action, get true next obs and reward
@@ -255,9 +262,9 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler):
         'gym':  gym_collector.return_transitions()
     }
 
-def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler):
+def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler, deterministic_model):
     # Create the desired number of rollouts
-    rollouts = [rollout_model(policy, fake_env, eval_env, gym_env, sampler) for _ in range(n_rollouts)]
+    rollouts = [rollout_model(policy, fake_env, eval_env, gym_env, sampler, deterministic_model) for _ in range(n_rollouts)]
     return rollouts
 
 def simulate_policy(args):
@@ -334,7 +341,7 @@ def simulate_policy(args):
     #################
     # Create rollouts
     #################
-    with policy.set_deterministic(DETERMINISTIC_POLICY):
+    with policy.set_deterministic(args.deterministic_policy):
         rollouts = generate_rollouts(
             args.num_rollouts,
             policy,
@@ -342,6 +349,7 @@ def simulate_policy(args):
             eval_env,
             gym_env,
             sampler,
+            args.deterministic_model
         )
 
     ###############
@@ -350,6 +358,10 @@ def simulate_policy(args):
     fake_rewards = [ro['fake']['rewards'].sum() for ro in rollouts]
     eval_rewards = [ro['eval']['rewards'].sum() for ro in rollouts]
     gym_rewards = [ro['gym']['rewards'].sum() for ro in rollouts]
+    print('---')
+    print(f'Dynamics Model: {args.dynamics_experiment} - Deterministic: {args.deterministic_model}')
+    print(f'Policy: {args.policy_experiment} - Deterministic: {args.deterministic_policy}')
+    print('---')
     print('Fake Rewards: {}'.format(fake_rewards))
     print('Eval Rewards: {}'.format(eval_rewards))
     print('Gym Rewards: {}'.format(gym_rewards))
@@ -361,13 +373,23 @@ def simulate_policy(args):
     return rollouts
 
 def get_file_prefix(args):
-    return f'{args.dynamics_experiment}_{args.policy_experiment}_dm{DETERMINISTIC_MODEL}_dp{DETERMINISTIC_POLICY}'
+    return f'{args.dynamics_experiment}_{args.policy_experiment}_dm{args.deterministic_model}_dp{args.deterministic_policy}'
 
 def save_state_action(file_prefix, env, rollouts):
     state_action_arr = np.stack([np.hstack((
         ro[env]['obs'], ro[env]['acts']
     )) for ro in rollouts])
     np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action.npy'), state_action_arr)
+
+    with open(PCA_1D, 'rb') as f:
+        pca_1d = pickle.load(f)
+    state_action_pca_1d = np.stack([pca_1d.transform(i) for i in state_action_arr], axis=-1)
+    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action_pca_1d.npy'), state_action_pca_1d)
+
+    with open(PCA_2D, 'rb') as f:
+        pca_2d = pickle.load(f)
+    state_action_pca_2d = np.stack([pca_2d.transform(i) for i in state_action_arr], axis=-1)
+    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action_pca_2d.npy'), state_action_pca_2d)
 
 def save_metric(file_prefix, rollouts, env, metric):
     np.save(
