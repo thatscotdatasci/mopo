@@ -165,7 +165,7 @@ if __name__ == '__main__':
     save_metric(file_prefix, transitions, 'ensemble_means_std')
     save_metric(file_prefix, transitions, 'ensemble_vars_mean')
     save_metric(file_prefix, transitions, 'ensemble_vars_std')
-    save_metric(file_prefix, transitions, 'ensemble_vars_max')
+    save_metric(file_prefix, transitions, 'ensemble_stds_norm')
 
     # with open(PCA_1D, 'rb') as f:
     #     pca_1d = pickle.load(f)

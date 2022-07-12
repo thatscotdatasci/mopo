@@ -37,7 +37,7 @@ class MopoRolloutCollector(RolloutCollector):
         self.ensemble_means_std = []
         self.ensemble_vars_mean = []
         self.ensemble_vars_std = []
-        self.ensemble_vars_max = []
+        self.ensemble_stds_norm = []
 
     def add_transition(self, obs, act, next_obs, rew, info):
         super().add_transition(obs, act, next_obs, rew)
@@ -47,7 +47,7 @@ class MopoRolloutCollector(RolloutCollector):
         self.ensemble_means_std.append(info['ensemble_means_std'])
         self.ensemble_vars_mean.append(info['ensemble_vars_mean'])
         self.ensemble_vars_std.append(info['ensemble_vars_std'])
-        self.ensemble_vars_max.append(info['ensemble_vars_max'])
+        self.ensemble_stds_norm.append(info['ensemble_stds_norm'])
 
     def return_transitions(self):
         trans = super().return_transitions()
@@ -58,6 +58,6 @@ class MopoRolloutCollector(RolloutCollector):
             'ensemble_means_std': np.vstack(self.ensemble_means_std),
             'ensemble_vars_mean': np.vstack(self.ensemble_vars_mean),
             'ensemble_vars_std': np.vstack(self.ensemble_vars_std),
-            'ensemble_vars_max': np.vstack(self.ensemble_vars_max),
+            'ensemble_stds_norm': np.vstack(self.ensemble_stds_norm),
         })
         return trans
