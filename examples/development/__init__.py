@@ -18,7 +18,10 @@ def get_trainable_class(*args, **kwargs):
 #     variant_spec = get_variant_spec(command_line_args, *args, **kwargs)
 #     return variant_spec
 
-def get_params_from_file(filepath, seed=None, exp_name=None, dataset=None, dynamics_model_exp=None, params_name='params'):
+def get_params_from_file(
+    filepath, seed=None, exp_name=None, dataset=None, dynamics_model_exp=None, penalty_coeff=None,
+    rollout_length=None, rollout_batch_size=None, params_name='params'
+):
 	import importlib
 	from dotmap import DotMap
 	module = importlib.import_module(filepath)
@@ -38,6 +41,15 @@ def get_params_from_file(filepath, seed=None, exp_name=None, dataset=None, dynam
 
 	if dataset is not None:
 		params['kwargs']['pool_load_path'] = f'/home/ajc348/rds/hpc-work/dogo_results/data/{dataset}.npy'
+
+	if penalty_coeff is not None:
+		params['kwargs']['penalty_coeff'] = penalty_coeff
+
+	if rollout_length is not None:
+		params['kwargs']['rollout_length'] = rollout_length
+
+	if rollout_batch_size is not None:
+		params['kwargs']['rollout_batch_size'] = rollout_batch_size
 
 	params['kwargs']['dynamics_model_exp'] = dynamics_model_exp
 	if dynamics_model_exp is not None:
@@ -59,6 +71,9 @@ def get_variant_spec(command_line_args, *args, **kwargs):
         exp_name=command_line_args.exp_name,
         dataset=command_line_args.dataset,
         dynamics_model_exp=command_line_args.dynamics_model_exp,
+        penalty_coeff=command_line_args.penalty_coeff,
+        rollout_length=command_line_args.rollout_length,
+        rollout_batch_size=command_line_args.rollout_batch_size,
     )
     # import pdb	
     # pdb.set_trace()
