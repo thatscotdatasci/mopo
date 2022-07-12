@@ -6,6 +6,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
+from scipy.io import loadmat
 
 from dogo.constants import (
     RESULTS_BASEDIR, SCORING_BASEDIR, MOPO_RESULTS_MAP_PATH, DYNAMICS_TRAINING_FILES, SAC_TRAINING_FILES, DEFAULT_SEED
@@ -14,7 +15,7 @@ from dogo.constants import (
 ########
 # Tuples
 ########
-experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites penalty_coeff rollout_length rollout_batch_size'.split()
+experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites penalty_coeff rollout_length rollout_batch_size dynamics_model_exp max_penalty'.split()
 ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
@@ -52,6 +53,13 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
     else:
         elites = None
 
+    model_weights_path = os.path.join(results_dir, 'models', "BNN_0.mat")
+    if os.path.isfile(model_weights_path):
+        params_dict = loadmat(model_weights_path)
+        max_penalty = np.linalg.norm(np.sqrt(np.exp(params_dict['14'])))
+    else:
+        max_penalty = None
+
     return ExperimentDetails(
         name = experiment,
         base_dir = base_dir,
@@ -69,6 +77,8 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         penalty_coeff = params["algorithm_params"]["kwargs"].get("penalty_coeff", None),
         rollout_length = params["algorithm_params"]["kwargs"].get("rollout_length", None),
         rollout_batch_size = params["algorithm_params"]["kwargs"].get("rollout_batch_size", None),
+        dynamics_model_exp = params["algorithm_params"]["kwargs"].get("dynamics_model_exp", None),
+        max_penalty = max_penalty
     )
 
 def get_results(experiment: str):
