@@ -15,7 +15,7 @@ from dogo.constants import (
 ########
 # Tuples
 ########
-experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites penalty_coeff rollout_length rollout_batch_size dynamics_model_exp max_penalty'.split()
+experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites penalty_coeff rollout_length rollout_batch_size dynamics_model_exp max_penalty min_penalty'.split()
 ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
@@ -57,8 +57,10 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
     if os.path.isfile(model_weights_path):
         params_dict = loadmat(model_weights_path)
         max_penalty = np.linalg.norm(np.sqrt(np.exp(params_dict['14'])))
+        min_penalty = np.linalg.norm(np.sqrt(np.exp(params_dict['15'])))
     else:
         max_penalty = None
+        min_penalty = None
 
     return ExperimentDetails(
         name = experiment,
@@ -78,7 +80,8 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         rollout_length = params["algorithm_params"]["kwargs"].get("rollout_length", None),
         rollout_batch_size = params["algorithm_params"]["kwargs"].get("rollout_batch_size", None),
         dynamics_model_exp = params["algorithm_params"]["kwargs"].get("dynamics_model_exp", None),
-        max_penalty = max_penalty
+        max_penalty = max_penalty,
+        min_penalty = min_penalty
     )
 
 def get_results(experiment: str):
@@ -165,3 +168,20 @@ def average_scores_over_seeds(exps: list):
             else:
                 results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric)[-50:].values.mean())
     return results
+
+def get_sac_pools(exp_name, subsample_size=100000):
+    exp_details = get_experiment_details(exp_name)
+    models_dir = os.path.join(exp_details.results_dir, 'models')
+    orig_results = np.vstack([
+        np.load(i) for i in glob(os.path.join(models_dir, 'model_pool_*.npy')) if 'pca' not in i
+    ])
+    pca_1d_sa = np.vstack([
+        np.load(i) for i in glob(os.path.join(models_dir, 'model_pool_*_pca_1d.npy'))
+    ])
+    pca_2d_sa = np.vstack([
+        np.load(i) for i in glob(os.path.join(models_dir, 'model_pool_*_pca_2d.npy'))
+    ])
+
+    subsample_idxs = np.random.choice(np.arange(orig_results.shape[0]), subsample_size, replace=False)
+
+    return orig_results[subsample_idxs,:], pca_1d_sa[subsample_idxs,:], pca_2d_sa[subsample_idxs,:]
