@@ -116,7 +116,7 @@ class FakeEnv:
             'ensemble_means_std': ensemble_model_means.std(axis=0),
             'ensemble_vars_mean': ensemble_model_vars.mean(axis=0),
             'ensemble_vars_std': ensemble_model_vars.std(axis=0),
-            'ensemble_stds_norm': np.linalg.norm(ensemble_model_stds, axis=2),
+            'ensemble_stds_norm': np.linalg.norm(ensemble_model_stds, axis=2).flatten(),
             'log_prob': log_prob,
             'dev': dev,
             'unpenalized_rewards': unpenalized_rewards,
