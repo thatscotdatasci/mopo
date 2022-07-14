@@ -8,8 +8,10 @@ import numpy as np
 import pandas as pd
 from scipy.io import loadmat
 
+from dogo.pca.project import project_arr
 from dogo.constants import (
-    RESULTS_BASEDIR, SCORING_BASEDIR, MOPO_RESULTS_MAP_PATH, DYNAMICS_TRAINING_FILES, SAC_TRAINING_FILES, DEFAULT_SEED
+    RESULTS_BASEDIR, SCORING_BASEDIR, MOPO_RESULTS_MAP_PATH, DYNAMICS_TRAINING_FILES, SAC_TRAINING_FILES, DEFAULT_SEED,
+    STATE_DIMS, ACTION_DIMS
 )
 
 ########
@@ -173,15 +175,23 @@ def get_sac_pools(exp_name, subsample_size=100000):
     exp_details = get_experiment_details(exp_name)
     models_dir = os.path.join(exp_details.results_dir, 'models')
     orig_results = np.vstack([
-        np.load(i) for i in glob(os.path.join(models_dir, 'model_pool_*.npy')) if 'pca' not in i
-    ])
-    pca_1d_sa = np.vstack([
-        np.load(i) for i in glob(os.path.join(models_dir, 'model_pool_*_pca_1d.npy'))
-    ])
-    pca_2d_sa = np.vstack([
-        np.load(i) for i in glob(os.path.join(models_dir, 'model_pool_*_pca_2d.npy'))
+        np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*.npy')))) if 'pca' not in i and '_0.npy ' not in i
     ])
 
+    # Subsample the results
     subsample_idxs = np.random.choice(np.arange(orig_results.shape[0]), subsample_size, replace=False)
+    results =  orig_results[subsample_idxs,:]
+    
+    #######################
+    # Load pre-existing PCA
+    #######################
+    # pca_1d_sa = np.vstack([
+    #     np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*_pca_1d.npy'))))
+    # ])[subsample_idxs,:]
+    # pca_2d_sa = np.vstack([
+    #     np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*_pca_2d.npy'))))
+    # ])[subsample_idxs,:]
 
-    return orig_results[subsample_idxs,:], pca_1d_sa[subsample_idxs,:], pca_2d_sa[subsample_idxs,:]
+    pca_1d_sa, pca_2d_sa = project_arr(results[:,:STATE_DIMS+ACTION_DIMS])
+
+    return results, pca_1d_sa, pca_2d_sa
