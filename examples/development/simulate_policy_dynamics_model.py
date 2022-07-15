@@ -378,18 +378,18 @@ def get_file_prefix(args):
 def save_state_action(file_prefix, env, rollouts):
     state_action_arr = np.stack([np.hstack((
         ro[env]['obs'], ro[env]['acts']
-    )) for ro in rollouts])
+    )) for ro in rollouts], axis=0)
     np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action.npy'), state_action_arr)
 
-    with open(PCA_1D, 'rb') as f:
-        pca_1d = pickle.load(f)
-    state_action_pca_1d = np.stack([pca_1d.transform(i) for i in state_action_arr], axis=-1)
-    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action_pca_1d.npy'), state_action_pca_1d)
+    # with open(PCA_1D, 'rb') as f:
+    #     pca_1d = pickle.load(f)
+    # state_action_pca_1d = np.stack([pca_1d.transform(i) for i in state_action_arr], axis=-1)
+    # np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action_pca_1d.npy'), state_action_pca_1d)
 
-    with open(PCA_2D, 'rb') as f:
-        pca_2d = pickle.load(f)
-    state_action_pca_2d = np.stack([pca_2d.transform(i) for i in state_action_arr], axis=-1)
-    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action_pca_2d.npy'), state_action_pca_2d)
+    # with open(PCA_2D, 'rb') as f:
+    #     pca_2d = pickle.load(f)
+    # state_action_pca_2d = np.stack([pca_2d.transform(i) for i in state_action_arr], axis=-1)
+    # np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{env}_state_action_pca_2d.npy'), state_action_pca_2d)
 
 def save_metric(file_prefix, rollouts, env, metric):
     np.save(
@@ -397,7 +397,7 @@ def save_metric(file_prefix, rollouts, env, metric):
             OUTPUT_DIR,
             f'{file_prefix}_{env}_{metric}.npy'
             ),
-        np.stack([ro[env][metric] for ro in rollouts], axis=-1)
+        np.stack([ro[env][metric] for ro in rollouts], axis=0)
     )
 
 if __name__ == '__main__':
@@ -411,6 +411,10 @@ if __name__ == '__main__':
 
     save_metric(file_prefix, rollouts, 'fake', 'reward_pens')
     save_metric(file_prefix, rollouts, 'fake', 'unpen_rewards')
+    save_metric(file_prefix, rollouts, 'fake', 'ensemble_means_std')
+    save_metric(file_prefix, rollouts, 'fake', 'ensemble_vars_mean')
+    save_metric(file_prefix, rollouts, 'fake', 'ensemble_vars_std')
+    save_metric(file_prefix, rollouts, 'fake', 'ensemble_stds_norm')
 
     save_metric(file_prefix, rollouts, 'eval', 'rewards')
     
