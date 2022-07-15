@@ -32,6 +32,7 @@ PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 DATA_DIR = "/home/ajc348/rds/hpc-work/dogo_results/data"
 OUTPUT_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/analysis/dynamics"
 DETERMINISTIC_MODEL = True
+N_RECORDS = 10000
 
 PCA_1D = 'pca/pca_1d.pkl'
 
@@ -117,9 +118,9 @@ def sample_transitions(args):
     eval_env = get_environment_from_params(environment_params)
 
     if args.dataset is not None:
-        data_arr = np.load(os.path.join(DATA_DIR, f'{args.dataset}.npy'))
+        sa_arr = np.load(os.path.join(DATA_DIR, f'{args.dataset}.npy'))[:N_RECORDS,:STATE_DIMS+ACTION_DIMS]
     else:
-        data_arr = None
+        sa_arr = None
 
     ####################
     # Create transitions
@@ -127,10 +128,10 @@ def sample_transitions(args):
     fake_collector = MopoRolloutCollector()
     eval_collector = RolloutCollector()
 
-    for i in range(10000):
-        if data_arr is not None:
-            obs = data_arr[i,:STATE_DIMS]
-            act = data_arr[i,STATE_DIMS:STATE_DIMS+ACTION_DIMS]
+    for i in range(N_RECORDS):
+        if sa_arr is not None:
+            obs = sa_arr[i,:STATE_DIMS]
+            act = sa_arr[i,STATE_DIMS:STATE_DIMS+ACTION_DIMS]
             eval_env._env.set_state(*get_qpos_qvel(obs.flatten()))
         else:
             obs = eval_env.reset()['observations']
@@ -144,19 +145,32 @@ def sample_transitions(args):
     return {
         'fake': fake_collector.return_transitions(),
         'eval': eval_collector.return_transitions(),
-    }
+    }, sa_arr
 
 def get_file_prefix(args):
     return f'{args.dynamics_experiment}_{args.dataset}'
 
+def save_state_action(file_prefix, state_action_arr):
+    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_state_action.npy'), state_action_arr)
+
 def save_metric(file_prefix, transitions, metric):
     np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_{metric}.npy'), transitions['fake'][metric])
 
+def save_rewards_mse(file_prefix, transitions):
+    fake_rews = transitions['fake']['unpen_rewards']
+    true_rews = transitions['eval']['rewards']
+    rews_mse = ((fake_rews-true_rews)**2)
+    np.save(os.path.join(OUTPUT_DIR, f'{file_prefix}_rews_mse.npy'), rews_mse)
+
 if __name__ == '__main__':
     args = parse_args()
-    transitions = sample_transitions(args)
+    transitions, sa_arr = sample_transitions(args)
 
     file_prefix = get_file_prefix(args)
+
+    save_state_action(file_prefix, sa_arr)
+
+    save_rewards_mse(file_prefix, transitions)
 
     # save_metric(file_prefix, transitions, 'rewards')
     save_metric(file_prefix, transitions, 'unpen_rewards')
