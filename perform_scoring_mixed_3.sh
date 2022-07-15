@@ -16,7 +16,10 @@ MP336 \
 MP337 \
 MP338 \
 MP339 \
-MP340
+MP340 \
+MP723 \
+MP724 \
+MP725
 do
     .env/bin/python dogo/score_model_new.py $model
 done
