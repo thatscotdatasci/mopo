@@ -24,5 +24,5 @@ MP292 \
 MP293 \
 MP294
 do
-    .env/bin/python dogo/visualisation/dynamics_model_landscape.py --dynamics-experiment=$model --dataset=MIXED-2
+    .env/bin/python dogo/visualisation/dynamics_model_landscape.py --dynamics-experiment=$model --dataset=D4RL-HC-MR_100000
 done
