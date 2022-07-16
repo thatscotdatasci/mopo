@@ -299,6 +299,11 @@ class MOPO(RLAlgorithm):
                     gt.stamp('epoch_rollout_model')
                     self._training_progress.resume()
 
+                    # Save the model pool every 100 epochs
+                    # Do not save initial pool - this is just the training data
+                    if self._epoch > 0 and self._epoch % 100 == 0:
+                        self._log_model_pool()
+
                 ## train actor and critic
                 if self.ready_to_train:
                     self._do_training_repeats(timestep=timestep)
@@ -397,6 +402,22 @@ class MOPO(RLAlgorithm):
             print('[ MOPO ] Saving model to: {}'.format(save_path))
             self._model.save(save_path, self._total_timestep)
 
+    def _log_model_pool(self):
+        # Save 100k random records from the model pool
+        save_path = os.path.join(self._log_dir, 'models')
+        filesystem.mkdir(save_path)
+        full_path = os.path.join(save_path, 'model_pool_{}.npy'.format(self._total_timestep))
+        pool_samples = self._model_pool.random_batch(100000)
+        pool_arr = np.hstack([
+            pool_samples['observations'],
+            pool_samples['actions'],
+            pool_samples['next_observations'],
+            pool_samples['rewards'],
+            pool_samples['terminals'],
+            pool_samples['policies'],
+        ])
+        np.save(full_path, pool_arr)
+
     def _set_rollout_length(self):
         min_epoch, max_epoch, min_length, max_length = self._rollout_schedule
         if self._epoch <= min_epoch:
@@ -415,6 +436,10 @@ class MOPO(RLAlgorithm):
         obs_space = self._pool._observation_space
         act_space = self._pool._action_space
 
+        # For standard HalfCheetah _epoch_length is 1000 and model_train_freq is 1000
+        # This, we create one batch of rollouts per epoch
+        # _rollout_length is 5, _rollout_batch_size is 50,0000 and _model_retain_epochs is 5
+        # Thus, we get a pool size of 1.25e+06
         rollouts_per_epoch = self._rollout_batch_size * self._epoch_length / self._model_train_freq
         model_steps_per_epoch = int(self._rollout_length * rollouts_per_epoch)
         new_pool_size = self._model_retain_epochs * model_steps_per_epoch
@@ -452,6 +477,9 @@ class MOPO(RLAlgorithm):
         batch = self.sampler.random_batch(rollout_batch_size)
         obs = batch['observations']
         steps_added = []
+        unpenalised_rewards = []
+        penalised_rewards = []
+        penalties = []
         for i in range(self._rollout_length):
             if not self._rollout_random:
                 act = self._policy.actions_np(obs)
@@ -467,6 +495,9 @@ class MOPO(RLAlgorithm):
             else:
                 next_obs, rew, term, info = self.fake_env.step(obs, act, **kwargs)
             steps_added.append(len(obs))
+            unpenalised_rewards.append(info['unpenalized_rewards'].flatten())
+            penalised_rewards.append(info['penalized_rewards'].flatten())
+            penalties.append(info['penalty'].flatten() if info['penalty'] is not None else 0.0)
 
             # Alan: Add policy identifier to the rollouts
             # This will not be used during SAC training
@@ -483,7 +514,21 @@ class MOPO(RLAlgorithm):
             obs = next_obs[nonterm_mask]
 
         mean_rollout_length = sum(steps_added) / rollout_batch_size
-        rollout_stats = {'mean_rollout_length': mean_rollout_length}
+        rollout_stats = {
+            'mean_rollout_length': mean_rollout_length,
+            'mean_unpenalized_rewards': np.mean(unpenalised_rewards),
+            'std_unpenalized_rewards': np.std(unpenalised_rewards),
+            'min_unpenalized_rewards': np.min(unpenalised_rewards),
+            'max_unpenalized_rewards': np.max(unpenalised_rewards),
+            'mean_penalized_rewards': np.mean(penalised_rewards),
+            'std_penalized_rewards': np.std(penalised_rewards),
+            'min_penalized_rewards': np.min(penalised_rewards),
+            'max_penalized_rewards': np.max(penalised_rewards),
+            'mean_penalty': np.mean(penalties),
+            'std_penalty': np.std(penalties),
+            'min_penalty': np.min(penalties),
+            'max_penalty': np.max(penalties),
+        }
         print('[ Model Rollout ] Added: {:.1e} | Model pool: {:.1e} (max {:.1e}) | Length: {} | Train rep: {}'.format(
             sum(steps_added), self._model_pool.size, self._model_pool._max_size, mean_rollout_length, self._n_train_repeat
         ))
