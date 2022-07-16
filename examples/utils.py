@@ -308,6 +308,24 @@ def get_parser(allow_policy_list=False):
         type=str,
         default=None,
         help="The experiment whose dynamics model should be loaded.")
+    
+    parser.add_argument(
+        '--penalty-coeff',
+        type=float,
+        default=None,
+        help="The MOPO penalty coefficient to use.")
+    
+    parser.add_argument(
+        '--rollout-length',
+        type=int,
+        default=None,
+        help="Length of model rollouts to use in offline SAC training.")
+    
+    parser.add_argument(
+        '--rollout-batch-size',
+        type=int,
+        default=None,
+        help="Rollout batch size to use in offline SAC training.")
 
     parser = add_ray_init_args(parser)
     parser = add_ray_tune_args(parser)
