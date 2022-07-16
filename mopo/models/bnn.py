@@ -260,7 +260,7 @@ class BNN:
                                                     name="training_rex_loop")
 
             if not self.deterministic:
-                self.train_core_losses, _, _, _ = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=True)
+                self.train_core_losses, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=True)
                 self.train_core_loss = tf.reduce_sum(self.train_core_losses)
                 self.train_decay_loss = tf.add_n(self.decays)
                 self.train_var_lim_loss = 0.01 * tf.reduce_sum(self.max_logvar) - 0.01 * tf.reduce_sum(self.min_logvar)
@@ -396,18 +396,27 @@ class BNN:
         mean_elite_loss = np.sort(losses)[:self.num_elites].mean()
         return mean_elite_loss
 
-    def _save_training_losses(self, train_loss, train_core_loss, train_decay_loss, train_var_lim_loss):
+    def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss):
         """Save the current training losses.
         """
-        train_loss_history_path         = os.path.join(self._log_dir, 'model_train_loss_history.txt')
-        train_core_loss_history_path    = os.path.join(self._log_dir, 'model_train_core_loss_history.txt')
-        train_decay_loss_history_path   = os.path.join(self._log_dir, 'model_train_decay_loss_history.txt')
-        train_var_lim_loss_history_path = os.path.join(self._log_dir, 'model_train_var_lim_loss_history.txt')
+        train_loss_history_path           = os.path.join(self._log_dir, 'model_train_loss_history.txt')
+        train_core_loss_history_path      = os.path.join(self._log_dir, 'model_train_core_loss_history.txt')
+        train_pol_total_loss_history_path = os.path.join(self._log_dir, 'model_train_pol_total_loss_history.txt')
+        train_pol_var_loss_history_path   = os.path.join(self._log_dir, 'model_train_pol_var_loss_history.txt')
+        train_mean_pol_loss_history_path  = os.path.join(self._log_dir, 'model_train_mean_pol_loss_history.txt')
+        train_decay_loss_history_path     = os.path.join(self._log_dir, 'model_train_decay_loss_history.txt')
+        train_var_lim_loss_history_path   = os.path.join(self._log_dir, 'model_train_var_lim_loss_history.txt')
 
         with open(train_loss_history_path, 'a') as f:
             f.write(train_loss.astype(str)+"\n")
         with open(train_core_loss_history_path, 'a') as f:
             f.write(train_core_loss.astype(str)+"\n")
+        with open(train_pol_total_loss_history_path, 'a') as f:
+            f.write(",".join(list(train_pol_tot_loss.astype(str)))+"\n")
+        with open(train_pol_var_loss_history_path, 'a') as f:
+            f.write(",".join(list(train_pol_var_loss.astype(str)))+"\n")
+        with open(train_mean_pol_loss_history_path, 'a') as f:
+            f.write(",".join(list(train_mean_pol_loss.astype(str)))+"\n")
         with open(train_decay_loss_history_path, 'a') as f:
             f.write(train_decay_loss.astype(str)+"\n")
         with open(train_var_lim_loss_history_path, 'a') as f:
@@ -538,8 +547,8 @@ class BNN:
             for epoch in epoch_iter:
                 for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
-                    _, train_loss, train_core_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
-                        (self.train_op, self.train_loss, self.train_core_loss, self.train_decay_loss, self.train_var_lim_loss),
+                    _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
+                        (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
                         feed_dict={
                             self.sy_train_in: inputs[batch_idxs],
                             self.sy_train_targ: targets[batch_idxs],
@@ -547,7 +556,7 @@ class BNN:
                             self.sy_rex_training_loop: rex_training_loop,
                         }
                     )
-                    self._save_training_losses(train_loss, train_core_loss, train_decay_loss, train_var_lim_loss)
+                    self._save_training_losses(train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss)
                     grad_updates += 1
 
                 idxs = shuffle_rows(idxs)
