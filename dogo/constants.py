@@ -22,6 +22,8 @@ DYNAMICS_TRAINING_FILES = {
     "model_holdout_mean_pol_loss_history"  : "model_holdout_mean_pol_loss_history.txt",
     "model_train_loss_history"             : "model_train_loss_history.txt",
     "model_train_core_loss_history"        : "model_train_core_loss_history.txt",
+    "model_train_pol_total_loss_history"   : "model_train_pol_total_loss_history.txt",
+    "model_train_pol_var_loss_history"     : "model_train_pol_var_loss_history.txt",
     "model_train_decay_loss_history"       : "model_train_decay_loss_history.txt",
     "model_train_var_lim_loss_history"     : "model_train_var_lim_loss_history.txt",
 }
