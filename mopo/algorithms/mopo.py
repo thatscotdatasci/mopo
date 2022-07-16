@@ -91,6 +91,7 @@ class MOPO(RLAlgorithm):
             train_bnn_only=False,
             repeat_dynamics_epochs=1,
             lr_decay=1.0,
+            bnn_batch_size=256,
 
             **kwargs,
     ):
@@ -163,6 +164,7 @@ class MOPO(RLAlgorithm):
         self._repeat_dynamics_epochs = repeat_dynamics_epochs
 
         self._train_bnn_only = train_bnn_only
+        self._bnn_batch_size = bnn_batch_size
 
         self._training_environment = training_environment
         self._evaluation_environment = evaluation_environment
@@ -256,7 +258,7 @@ class MOPO(RLAlgorithm):
 
         max_epochs = 1 if self._model.model_loaded else None
         model_train_metrics = self._train_model(
-            batch_size=256,
+            batch_size=self._bnn_batch_size,
             max_epochs=max_epochs,
             holdout_ratio=0.2,
             max_t=self._max_model_t,
