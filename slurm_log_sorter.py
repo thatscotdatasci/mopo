@@ -16,7 +16,6 @@ def main(results_dir: str):
         es_logdir = os.path.abspath(exp_state['checkpoints'][-1]['logdir'])
 
         os.rename(es_path, os.path.join(es_logdir, os.path.basename(es_path)))
-        pass
     
     ############
     # SLURM Logs
