@@ -17,7 +17,7 @@ from dogo.constants import (
 ########
 # Tuples
 ########
-experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites penalty_coeff rollout_length rollout_batch_size dynamics_model_exp max_penalty min_penalty'.split()
+experiment_details = 'name base_dir experiment_dir results_dir environment dataset params seed rex rex_beta lr_decay holdout_policy elites penalty_coeff rollout_length rollout_batch_size dynamics_model_exp max_logvars min_logvars max_penalty min_penalty'.split()
 ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
@@ -58,9 +58,13 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
     model_weights_path = os.path.join(results_dir, 'models', "BNN_0.mat")
     if os.path.isfile(model_weights_path):
         params_dict = loadmat(model_weights_path)
-        max_penalty = np.linalg.norm(np.sqrt(np.exp(params_dict['14'])))
-        min_penalty = np.linalg.norm(np.sqrt(np.exp(params_dict['15'])))
+        max_logvars = params_dict['14']
+        min_logvars = params_dict['15']
+        max_penalty = np.linalg.norm(np.sqrt(np.exp(max_logvars)))
+        min_penalty = np.linalg.norm(np.sqrt(np.exp(min_logvars)))
     else:
+        max_logvars = None
+        min_logvars = None
         max_penalty = None
         min_penalty = None
 
@@ -82,6 +86,8 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         rollout_length = params["algorithm_params"]["kwargs"].get("rollout_length", None),
         rollout_batch_size = params["algorithm_params"]["kwargs"].get("rollout_batch_size", None),
         dynamics_model_exp = params["algorithm_params"]["kwargs"].get("dynamics_model_exp", None),
+        max_logvars = max_logvars,
+        min_logvars = min_logvars,
         max_penalty = max_penalty,
         min_penalty = min_penalty
     )
@@ -171,16 +177,36 @@ def average_scores_over_seeds(exps: list):
                 results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric)[-50:].values.mean())
     return results
 
-def get_sac_pools(exp_name, subsample_size=100000):
+def get_sac_pools(exp_name, pool=None, subsample_size=100000):
     exp_details = get_experiment_details(exp_name)
     models_dir = os.path.join(exp_details.results_dir, 'models')
-    orig_results = np.vstack([
-        np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*.npy')))) if 'pca' not in i and '_0.npy ' not in i
-    ])
+    
+    if pool is not None:
+        orig_results = np.load(os.path.join(models_dir, f'model_pool_{pool}.npy'))
+        if os.path.isfile(os.path.join(models_dir, f'mse_{pool}.npy')):
+            orig_mse_results = np.load(os.path.join(models_dir, f'mse_{pool}.npy'))
+        else:
+            orig_mse_results = None
+    else:
+        model_pool_files = sorted(list(glob(os.path.join(models_dir, 'model_pool_*.npy'))))
+        orig_results = np.vstack([
+            np.load(i) for i in model_pool_files if 'pca' not in i
+        ])
+
+        if os.path.isfile(os.path.join(models_dir, f'mse_{os.path.basename(model_pool_files[0]).split("_")[-1]}')):
+            model_mse_files = [
+                os.path.join(models_dir, f'mse_{os.path.basename(i).split("_")[-1]}') for i in model_pool_files
+            ]
+            orig_mse_results = np.vstack([
+                np.load(i) for i in model_mse_files
+            ])
+        else:
+            orig_mse_results = None
 
     # Subsample the results
     subsample_idxs = np.random.choice(np.arange(orig_results.shape[0]), subsample_size, replace=False)
     results =  orig_results[subsample_idxs,:]
+    mse_results = orig_mse_results[subsample_idxs,:] if orig_mse_results is not None else None
     
     #######################
     # Load pre-existing PCA
@@ -194,4 +220,4 @@ def get_sac_pools(exp_name, subsample_size=100000):
 
     pca_1d_sa, pca_2d_sa = project_arr(results[:,:STATE_DIMS+ACTION_DIMS])
 
-    return results, pca_1d_sa, pca_2d_sa
+    return results, pca_1d_sa, pca_2d_sa, mse_results
