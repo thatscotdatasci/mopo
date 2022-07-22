@@ -98,26 +98,32 @@ def plot_grouped_evaluation_returns(exp_set_steps: list):
     feature = 'evaluation/return-average'
     for i, (exp_set, steps) in enumerate(exp_set_steps):
         exp_results = []
-        exp_break_points = []
+        exp_end_points = []
 
         for exp in exp_set:
-            latest_start = np.where(exp.sac.result['timesteps_total'].values==1000)[0][-1]
-            break_points = np.where(exp.sac.result['timesteps_total'].values[1:]==1000)[0]
+            exp_timesteps = exp.sac.result['timesteps_total'].values
+            start_points = np.hstack([np.where(exp_timesteps==1000)[0], len(exp_timesteps)])
+            exp_end_points.append(exp_timesteps[start_points[1:]-1])
 
-            exp_results.append(exp.sac.result[feature][latest_start:])
-            exp_break_points.append(break_points)
+            if len(start_points) > 1:
+                training_lengths = np.ediff1d(start_points)
+                training_start_ind = np.argmax(training_lengths)
+                training_start = start_points[training_start_ind]
+                training_end = len(exp_timesteps) if training_start_ind == len(start_points) else start_points[training_start_ind+1]
+
+                exp_results.append(exp.sac.result[feature][training_start:training_end])
         
         comb_arr = np.vstack(list(zip_longest(*[
             exp_res for exp_res in exp_results
             ], fillvalue=np.NaN
         )))
-        exp_break_points = np.hstack(exp_break_points)
+        exp_end_points = np.hstack(exp_end_points)
 
         mean_arr = np.nanmean(comb_arr, axis=-1)
         min_arr = np.nanmin(comb_arr, axis=-1)
         max_arr = np.nanmax(comb_arr, axis=-1)
         std_arr = np.nanstd(comb_arr, axis=-1)
-        x_vals = np.arange(len(mean_arr))*100
+        x_vals = np.arange(len(mean_arr))*1000
 
         ax.plot(x_vals, mean_arr, c=cols[i], label=f'Beta: {steps}M')
         ax.fill_between(x_vals, min_arr, max_arr, color=cols[i], alpha=0.5)
@@ -125,7 +131,8 @@ def plot_grouped_evaluation_returns(exp_set_steps: list):
         terminal_points = np.where(np.sort((comb_arr==np.NaN).argmin(axis=0))>0)[0]
         ax.scatter(x_vals[terminal_points], mean_arr[terminal_points], color=cols[i], s=100)
 
-        ax.scatter(x_vals[exp_break_points], -2000*np.ones_like(exp_break_points), marker='x', color=cols[i], s=100)
+        exp_end_points = exp_end_points[exp_end_points<x_vals[-1]]
+        ax.scatter(exp_end_points, -2000*np.ones_like(exp_end_points), marker='x', color=cols[i], s=100)
 
         summary_metrics[steps] = {
             'mean': mean_arr[-1],
