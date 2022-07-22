@@ -20,7 +20,7 @@ def get_trainable_class(*args, **kwargs):
 
 def get_params_from_file(
     filepath, seed=None, exp_name=None, dataset=None, dynamics_model_exp=None, penalty_coeff=None,
-    rollout_length=None, rollout_batch_size=None, params_name='params'
+    rollout_length=None, rollout_batch_size=None, bnn_retrain_epochs=None, params_name='params'
 ):
 	import importlib
 	from dotmap import DotMap
@@ -51,6 +51,9 @@ def get_params_from_file(
 	if rollout_batch_size is not None:
 		params['kwargs']['rollout_batch_size'] = rollout_batch_size
 
+	if bnn_retrain_epochs is not None:
+		params['kwargs']['bnn_retrain_epochs'] = bnn_retrain_epochs
+
 	params['kwargs']['dynamics_model_exp'] = dynamics_model_exp
 	if dynamics_model_exp is not None:
 		# Identify the experiment folder from the provided name
@@ -74,6 +77,7 @@ def get_variant_spec(command_line_args, *args, **kwargs):
         penalty_coeff=command_line_args.penalty_coeff,
         rollout_length=command_line_args.rollout_length,
         rollout_batch_size=command_line_args.rollout_batch_size,
+        bnn_retrain_epochs=command_line_args.bnn_retrain_epochs,
     )
     # import pdb	
     # pdb.set_trace()
