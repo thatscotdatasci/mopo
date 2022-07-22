@@ -85,7 +85,7 @@ def plot_min_max_penalty(exp_set_label_collection: list):
             max_vals.append(np.max(vals_arr))
             labels.append(label)
 
-        ax.errorbar(labels, mean_vals, np.vstack((min_vals, max_vals)), label=f'{"Maximum" if i==0 else "Minumum"} Penalty')
+        ax.errorbar(labels, mean_vals, np.abs(np.vstack((min_vals, max_vals))-mean_vals), label=f'{"Maximum" if i==0 else "Minumum"} Penalty')
 
     ax.set_xlabel('Experiment Set')
     ax.set_ylabel('Penalty')
