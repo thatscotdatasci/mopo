@@ -22,3 +22,9 @@ ENDS = np.cumsum(DIMS)
 TransRecords = namedtuple('TransRecords', 'states actions next_states rewards dones policies penalties')
 def split_halfcheetah_v2_trans_arr(arr: str):
     return TransRecords(*np.split(arr, ENDS, axis=1))
+
+REG_DIMS = [STATE_DIMS, ACTION_DIMS, STATE_DIMS, REWARD_DIMS]
+REG_ENDS = np.cumsum(REG_DIMS)
+RegRecords = namedtuple('RegRecords', 'states actions next_states rewards dones')
+def split_halfcheetah_v2_reg_arr(arr: str):
+    return RegRecords(*np.split(arr, REG_ENDS, axis=1))
