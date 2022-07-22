@@ -27,7 +27,7 @@ def main(results_dir: str):
         with open(train_log_path, 'r') as f:
             log_dir_res = re.findall("(?<=\[ MOPO \] log_dir: ).*(?= \|)", f.read())
             if len(log_dir_res) == 0:
-                print(f'Cound not find log_dir in {train_log_path}')
+                print(f'Could not find log_dir in {train_log_path}')
                 continue
             log_dir = log_dir_res[0]
 
