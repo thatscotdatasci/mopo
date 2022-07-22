@@ -71,6 +71,10 @@ class SimpleReplayPool(FlexibleReplayPool):
                 'shape': (1, ),
                 'dtype': 'float32'
             },
+            'penalties': {
+                'shape': (1, ),
+                'dtype': 'float32'
+            },
         }
 
         super(SimpleReplayPool, self).__init__(

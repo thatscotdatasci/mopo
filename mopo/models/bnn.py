@@ -539,7 +539,7 @@ class BNN:
                 # Complete as much training as was performed in the first training loop again
                 # Unless a pre-trained model has been loaded, in which case do not perform any further training
                 epoch_iter = range(0) if self.model_loaded else range(repeat_dynamics_epochs*(epoch+1))
-                print('[ BNN ] Begginning further {} epochs of training'.format(epoch+1))
+                print('[ BNN ] Begginning further {} epochs of training'.format(0 if self.model_loaded else epoch+1))
                 rex_training_loop = True
             else:
                 raise RuntimeError('Attempting to complete unexpected training loop')

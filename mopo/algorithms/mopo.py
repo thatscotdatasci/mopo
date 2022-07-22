@@ -92,6 +92,7 @@ class MOPO(RLAlgorithm):
             repeat_dynamics_epochs=1,
             lr_decay=1.0,
             bnn_batch_size=256,
+            bnn_retrain_epochs=1,
 
             **kwargs,
     ):
@@ -128,6 +129,8 @@ class MOPO(RLAlgorithm):
                 training to repeat again after convergence condition is met.
             lr_decay ('float'): (optional) Multiply the core loss by this number
                 before returning. Applies in REx training loop.
+            bnn_retrain_epochs ('int'): (optional) Number of epochs to retrain
+                loaded BNN model for.
         """
 
         super(MOPO, self).__init__(**kwargs)
@@ -165,6 +168,7 @@ class MOPO(RLAlgorithm):
 
         self._train_bnn_only = train_bnn_only
         self._bnn_batch_size = bnn_batch_size
+        self._bnn_retrain_epochs = bnn_retrain_epochs
 
         self._training_environment = training_environment
         self._evaluation_environment = evaluation_environment
@@ -256,7 +260,7 @@ class MOPO(RLAlgorithm):
             self._epoch, self._model_train_freq, self._timestep, self._total_timestep)
         )
 
-        max_epochs = 1 if self._model.model_loaded else None
+        max_epochs = self._bnn_retrain_epochs if self._model.model_loaded else None
         model_train_metrics = self._train_model(
             batch_size=self._bnn_batch_size,
             max_epochs=max_epochs,
@@ -301,9 +305,8 @@ class MOPO(RLAlgorithm):
                     gt.stamp('epoch_rollout_model')
                     self._training_progress.resume()
 
-                    # Save the model pool every 100 epochs
-                    # Do not save initial pool - this is just the training data
-                    if self._epoch > 0 and self._epoch % 100 == 0:
+                    # Save the model pool every 100 epochs, including the zeroeth
+                    if self._epoch % 100 == 0:
                         self._log_model_pool()
 
                 ## train actor and critic
@@ -372,6 +375,9 @@ class MOPO(RLAlgorithm):
 
             yield diagnostics
 
+        # Save the final model pool
+        self._log_model_pool()
+
         self.sampler.terminate()
 
         self._training_after_hook()
@@ -396,8 +402,8 @@ class MOPO(RLAlgorithm):
         print('MODEL: {}'.format(self._model_type))
         if self._model_type == 'identity':
             print('[ MOPO ] Identity model, skipping save')
-        elif self._model.model_loaded:
-            print('[ MOPO ] Loaded model, skipping save')
+        # elif self._model.model_loaded:
+        #     print('[ MOPO ] Loaded model, skipping save')
         else:
             save_path = os.path.join(self._log_dir, 'models')
             filesystem.mkdir(save_path)
@@ -417,6 +423,7 @@ class MOPO(RLAlgorithm):
             pool_samples['rewards'],
             pool_samples['terminals'],
             pool_samples['policies'],
+            pool_samples['penalties'],
         ])
         np.save(full_path, pool_arr)
 
@@ -499,13 +506,15 @@ class MOPO(RLAlgorithm):
             steps_added.append(len(obs))
             unpenalised_rewards.append(info['unpenalized_rewards'].flatten())
             penalised_rewards.append(info['penalized_rewards'].flatten())
-            penalties.append(info['penalty'].flatten() if info['penalty'] is not None else 0.0)
+
+            pen = info['penalty'] if info['penalty'] is not None else np.zeros_like(rew)
+            penalties.append(pen.flatten())
 
             # Alan: Add policy identifier to the rollouts
             # This will not be used during SAC training
             pol = np.zeros((len(obs), 1))
 
-            samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol}
+            samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol, 'penalties': pen}
             self._model_pool.add_samples(samples)
 
             nonterm_mask = ~term.squeeze(-1)

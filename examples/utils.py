@@ -326,6 +326,12 @@ def get_parser(allow_policy_list=False):
         type=int,
         default=None,
         help="Rollout batch size to use in offline SAC training.")
+    
+    parser.add_argument(
+        '--bnn-retrain-epochs',
+        type=int,
+        default=None,
+        help="Number of epochs to retrain loaded BNN model for.")
 
     parser = add_ray_init_args(parser)
     parser = add_ray_tune_args(parser)

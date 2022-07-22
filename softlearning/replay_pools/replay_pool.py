@@ -35,6 +35,10 @@ class ReplayPool(object):
         # Alan: Add policy identifier to the rollout
         # This will not be used during SAC training
         path["policies"] = np.zeros((len(path["observations"]), 1))
+
+        if 'penalties' not in path:
+            path["penalties"] = np.zeros((len(path["observations"]), 1))
+        
         self.add_samples(path)
         self.terminate_episode()
 

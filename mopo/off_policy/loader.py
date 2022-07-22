@@ -32,6 +32,7 @@ def restore_pool_d4rl(replay_pool, name):
 
     # Treat all data as having come from the same policy
     data['policies'] = np.zeros_like(data['rewards'])
+    data['penalties'] = np.zeros_like(data['rewards'])
 
     replay_pool.add_samples(data)
 
@@ -138,5 +139,6 @@ def restore_pool_contiguous(replay_pool, load_path):
         'next_observations': next_states,
         'rewards': rewards,
         'terminals': dones.astype(bool),
-        'policies': policies
+        'policies': policies,
+        'penalties': np.zeros_like(rewards)
     })
