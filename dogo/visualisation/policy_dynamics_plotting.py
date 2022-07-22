@@ -187,9 +187,7 @@ def plot_returns_comparison(dynamics_exps, policy_exps):
         ax[i].set_xlabel('Policy')
         ax[i].set_ylabel('Dynamics')
 
-def plot_returns_comparison_pol_dep(dynamics_exps, policy_exps):
-    fig, ax = plt.subplots(1, 3, figsize=(33,10))
-    
+def get_dyanmics_pol_scores(dynamics_exps, policy_exps):
     dynamics_exps_labels = []
     policy_exps_labels = []
     fake_returns = np.zeros((len(dynamics_exps), len(policy_exps), 2))
@@ -197,13 +195,13 @@ def plot_returns_comparison_pol_dep(dynamics_exps, policy_exps):
     gym_returns = np.zeros((len(dynamics_exps), len(policy_exps), 2))
     for i, dynamics_exp in enumerate(dynamics_exps):
         dynamics_exp_details = get_experiment_details(dynamics_exp)
-        dynamics_exps_labels.append(f'{D4RL_NAME_DICT[dynamics_exp_details.dataset]}\nSeed: {dynamics_exp_details.seed}')
+        dynamics_exps_labels.append(f'{dynamics_exp_details.dataset}\nSeed: {dynamics_exp_details.seed}')
         
         for j, policy_exp in enumerate(policy_exps):
             if i == 0:
                 policy_exp_details = get_experiment_details(policy_exp)
                 policy_dynamics_exp_details = get_experiment_details(policy_exp_details.dynamics_model_exp) if policy_exp_details.dynamics_model_exp else policy_exp_details
-                policy_exps_labels.append(f'{D4RL_NAME_DICT[policy_dynamics_exp_details.dataset]}\nSeed: {policy_dynamics_exp_details.seed}')
+                policy_exps_labels.append(f'{policy_dynamics_exp_details.dataset}\nSeed: {policy_dynamics_exp_details.seed}')
 
             fake_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'fake', 'unpen_rewards').cumsum(axis=1)[:,-1,0]
             fake_returns[i,j,0], fake_returns[i,j,1] = fake_metric_arrs.mean(), fake_metric_arrs.std()
@@ -213,6 +211,14 @@ def plot_returns_comparison_pol_dep(dynamics_exps, policy_exps):
 
             gym_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'gym', 'rewards').cumsum(axis=1)[:,-1,0]
             gym_returns[i,j,0], gym_returns[i,j,1] = gym_metric_arrs.mean(), gym_metric_arrs.std()
+
+    return fake_returns, eval_returns, gym_returns, dynamics_exps_labels, policy_exps_labels
+
+
+def plot_returns_comparison_pol_dep(dynamics_exps, policy_exps):
+    fig, ax = plt.subplots(1, 3, figsize=(33,10))
+    
+    fake_returns, eval_returns, gym_returns, dynamics_exps_labels, policy_exps_labels = get_dyanmics_pol_scores(dynamics_exps, policy_exps)
     
     for i, (res_arr, title) in enumerate([
         (fake_returns, 'Learned Dynamics'),
