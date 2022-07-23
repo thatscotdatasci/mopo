@@ -55,6 +55,8 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
     else:
         elites = None
 
+    dynamics_model_exp = params["algorithm_params"]["kwargs"].get("dynamics_model_exp", None)
+
     model_weights_path = os.path.join(results_dir, 'models', "BNN_0.mat")
     if os.path.isfile(model_weights_path):
         params_dict = loadmat(model_weights_path)
@@ -62,6 +64,12 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         min_logvars = params_dict['15']
         max_penalty = np.linalg.norm(np.sqrt(np.exp(max_logvars)))
         min_penalty = np.linalg.norm(np.sqrt(np.exp(min_logvars)))
+    elif dynamics_model_exp:
+        dynamics_model_exp_details = get_experiment_details(dynamics_model_exp)
+        max_logvars = dynamics_model_exp_details.max_logvars
+        min_logvars = dynamics_model_exp_details.min_logvars
+        max_penalty = dynamics_model_exp_details.max_penalty
+        min_penalty = dynamics_model_exp_details.min_penalty
     else:
         max_logvars = None
         min_logvars = None
@@ -85,7 +93,7 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         penalty_coeff = params["algorithm_params"]["kwargs"].get("penalty_coeff", None),
         rollout_length = params["algorithm_params"]["kwargs"].get("rollout_length", None),
         rollout_batch_size = params["algorithm_params"]["kwargs"].get("rollout_batch_size", None),
-        dynamics_model_exp = params["algorithm_params"]["kwargs"].get("dynamics_model_exp", None),
+        dynamics_model_exp = dynamics_model_exp,
         max_logvars = max_logvars,
         min_logvars = min_logvars,
         max_penalty = max_penalty,
@@ -200,6 +208,7 @@ def get_sac_pools(exp_name, pool=None, subsample_size=100000):
             orig_mse_results = np.vstack([
                 np.load(i) for i in model_mse_files
             ])
+            orig_mse_results[np.isposinf(orig_mse_results)] = np.NaN
         else:
             orig_mse_results = None
 
