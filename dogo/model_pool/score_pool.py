@@ -29,6 +29,7 @@ def get_qpos_qvel(obs):
     return qpos, qvel
 
 def score_pool(policy_experiment):
+    print(f'Scoring experiment: {policy_experiment}')
 
     ##################################
     # Create an evaluation environment
@@ -69,6 +70,9 @@ def score_pool(policy_experiment):
         obs, act, _, rew, _, _, pen = split_halfcheetah_v2_trans_arr(model_pool)
         rew_mse = np.zeros_like(rew)
         for i in range(len(model_pool)):
+            pen_rew_val = rew[i,:]
+            pen_val = pen[i,:]
+            unpen_rew_val = pen_rew_val + penalty_coeff*pen_val
             try:
                 eval_env._env.set_state(*get_qpos_qvel(obs[i,:].flatten()))
                 _, rew_real, _, _ = eval_env.step(act[i,:])
@@ -76,7 +80,8 @@ def score_pool(policy_experiment):
                 rew_mse[i,:] = np.inf
                 mujoco_exception_count += 1
             else:
-                rew_mse[i,:] = (rew_real-rew[i,:]+penalty_coeff*pen[i,:])**2
+                rew_mse_val = (rew_real-unpen_rew_val)**2
+                rew_mse[i,:] = rew_mse_val
         print(f'Encountered {mujoco_exception_count} MujocoExceptions')
         np.save(os.path.join(policy_exp_details.results_dir, 'models', f'mse_{os.path.basename(model_pool_path).split("_")[-1]}'), rew_mse)
 
