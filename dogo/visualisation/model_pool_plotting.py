@@ -22,7 +22,7 @@ def _model_pool_2dhist(results_arr, exp_list_label_set, mode, vmin=None, vmax=No
 
             if mode=='visitation':
                 weights = np.ones_like(rew).flatten()
-                sum_vals.append(None)
+                # Added below
             elif mode=='pen-rewards':
                 weights = rew.flatten()
                 sum_vals.append(rew.sum()/len(rew))
@@ -34,12 +34,15 @@ def _model_pool_2dhist(results_arr, exp_list_label_set, mode, vmin=None, vmax=No
                 sum_vals.append(pen.sum()/len(rew))
             elif mode=='rmse':
                 weights = np.sqrt(results_arr[exp].mse_results).flatten()
-                sum_vals.append(None)
+                sum_vals.append(np.sqrt(results_arr[exp].mse_results).mean())
             
             hist_arr, _, _ = np.histogram2d(results_arr[exp].pca_sa_2d[:,0], results_arr[exp].pca_sa_2d[:,1], weights=weights, bins=bin_vals)
             hist_arrs.append(hist_arr)
             min_val = min(hist_arr.min(), min_val)
             max_val = max(hist_arr.max(), max_val)
+
+            if mode=='visitation':
+                sum_vals.append(hist_arr.std())
 
     for i, (exp_list, label) in enumerate(exp_list_label_set):
         for j, exp in enumerate(exp_list):
@@ -53,10 +56,14 @@ def _model_pool_2dhist(results_arr, exp_list_label_set, mode, vmin=None, vmax=No
             )
             ax[i,j].axhline(0, color='k', ls='--')
             ax[i,j].axvline(0, color='k', ls='--')
-            if mode in ['pen-rewards', 'unpen-rewards']:
+            if mode == 'visitation':
+                ax[i,j].set_title(f'{exp} - Beta: {label} - Standard Deviation: {sum_vals[i*n_cols+j]:,.2f}')
+            elif mode in ['pen-rewards', 'unpen-rewards']:
                 ax[i,j].set_title(f'{exp} - Beta: {label} - Normalised Reward Sum: {sum_vals[i*n_cols+j]:,.2f}')
             elif mode == 'penalties':
                 ax[i,j].set_title(f'{exp} - Beta: {label} - Normalised Penalty Sum: {sum_vals[i*n_cols+j]:,.2f}')
+            elif mode == 'rmse':
+                ax[i,j].set_title(f'{exp} - Beta: {label} - Mean RMSE: {sum_vals[i*n_cols+j]:,.2f}')
             else:
                 ax[i,j].set_title(f'{exp} - Beta: {label}')
             ax[i,j].set_xlabel('First Principle Component')
