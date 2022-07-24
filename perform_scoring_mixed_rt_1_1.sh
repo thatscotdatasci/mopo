@@ -14,17 +14,63 @@
 # MP756 \
 # MP757 \
 # MP758 \
-# MP759
-
-# First larger batch size run - unlikely to rescore
+# MP759 \
 # MP772 \
 # MP773 \
 # MP774
 
+# First larger batch size run - unlikely to rescore
+# MP775 \
+# MP776 \
+# MP777
+
+# 1 Epoch of Retraining
+# MP862 \
+# MP863 \
+# MP864 \
+# MP865 \
+# MP866 \
+# MP867
+
+# 1 Epoch of Retraining - D4RL MR
+# MP898 \
+# MP899 \
+# MP900 \
+# MP901 \
+# MP902 \
+# MP903
+
 for model in \
+MP748 \
+MP749 \
+MP750 \
+MP751 \
+MP752 \
+MP753 \
+MP754 \
+MP755 \
+MP756 \
+MP757 \
+MP758 \
+MP759 \
+MP772 \
+MP773 \
+MP774 \
 MP775 \
 MP776 \
-MP777
+MP777 \
+MP862 \
+MP863 \
+MP864 \
+MP865 \
+MP866 \
+MP867 \
+MP898 \
+MP899 \
+MP900 \
+MP901 \
+MP902 \
+MP903
 do
     .env/bin/python dogo/score_model_rt.py $model
 done

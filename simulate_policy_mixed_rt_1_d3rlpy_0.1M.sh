@@ -1,7 +1,8 @@
 #! /bin/bash
 
 ########################################
-# D3RLPY - 0.1M
+# D3RLPY - 0.1M Policies
+# MIXED-RT-1 Dynamics
 ########################################
 
 policy_experiments=(\
@@ -23,21 +24,15 @@ policy_experiments=(\
 )
 
 dynamics_experiments=(\
-"MP449" \
-"MP450" \
-"MP451" \
-"MP452" \
-"MP453" \
-"MP454" \
-"MP455" \
-"MP456" \
-"MP457" \
-"MP458" \
-"MP459" \
-"MP460" \
-"MP533" \
-"MP534" \
-"MP535"
+"MP748" \
+"MP749" \
+"MP750" \
+"MP772" \
+"MP773" \
+"MP774" \
+"MP757" \
+"MP758" \
+"MP759"
 )
 
 for i in ${policy_experiments[@]}

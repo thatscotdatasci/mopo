@@ -21,5 +21,5 @@ MP533 \
 MP534 \
 MP535
 do
-    .env/bin/python dogo/score_model_d3rlpy.py $model
+    .env/bin/python dogo/score_model_rt.py $model
 done

@@ -33,7 +33,7 @@ source /home/ajc348/rds/hpc-work/mopo/README.mopo.activate
 application="/bin/bash"
 
 #! Run options for the application:
-options="perform_scoring_mixed_rt_2.sh"
+options="score_pool_mixed_rt_1.sh"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory

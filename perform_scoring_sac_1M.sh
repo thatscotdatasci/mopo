@@ -24,5 +24,5 @@ MP593 \
 MP594 \
 MP595
 do
-    .env/bin/python dogo/score_model_sac.py $model
+    .env/bin/python dogo/score_model_rt.py $model
 done
