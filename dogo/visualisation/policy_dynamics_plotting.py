@@ -16,10 +16,10 @@ def retrieve_metric(dynamics_exp, policy_exp, deterministic_model, deterministic
 def retrieve_metric_stats(dynamics_exp, policy_exp, deterministic_model, deterministic_policy, env, metric):
     arr = retrieve_metric(dynamics_exp, policy_exp, deterministic_model, deterministic_policy, env, metric)
     return {
-        'mean': arr.mean(axis=-1).flatten(),
-        'min': arr.min(axis=-1).flatten(),
-        'max': arr.max(axis=-1).flatten(),
-        'std': arr.std(axis=-1).flatten()
+        'mean': np.nanmean(arr, axis=-1).flatten(),
+        'min': np.nanmin(arr, axis=-1).flatten(),
+        'max': np.nanmax(arr, axis=-1).flatten(),
+        'std': np.nanstd(arr, axis=-1).flatten()
     }
 
 def policy_dynamics_plot_title(dynamics_exp, policy_exp, deterministic_model, deterministic_policy):
@@ -159,13 +159,15 @@ def plot_returns_comparison(dynamics_exps, policy_exps):
                     policy_exps_labels.append(f'{policy_dynamics_exp_details.name} - REx: {policy_dynamics_exp_details.rex}\nSeed: {dynamics_exp_details.seed}')
 
             fake_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'fake', 'unpen_rewards').cumsum(axis=1)[:,-1,0]
-            fake_returns[i,j,0], fake_returns[i,j,1] = fake_metric_arrs.mean(), fake_metric_arrs.std()
+            fake_metric_arrs = fake_metric_arrs[np.abs(fake_metric_arrs)<=50000]
+            fake_returns[i,j,0], fake_returns[i,j,1] = np.nanmean(fake_metric_arrs), np.nanstd(fake_metric_arrs)
 
             eval_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'eval', 'rewards').cumsum(axis=1)[:,-1,0]
-            eval_returns[i,j,0], eval_returns[i,j,1] = eval_metric_arrs.mean(), eval_metric_arrs.std()
+            eval_metric_arrs = eval_metric_arrs[np.abs(eval_metric_arrs)<=50000]
+            eval_returns[i,j,0], eval_returns[i,j,1] = np.nanmean(eval_metric_arrs), np.nanstd(eval_metric_arrs)
 
             gym_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'gym', 'rewards').cumsum(axis=1)[:,-1,0]
-            gym_returns[i,j,0], gym_returns[i,j,1] = gym_metric_arrs.mean(), gym_metric_arrs.std()
+            gym_returns[i,j,0], gym_returns[i,j,1] = np.nanmean(gym_metric_arrs), np.nanstd(gym_metric_arrs)
     
     for i, (res_arr, title) in enumerate([
         (fake_returns, 'Learned Dynamics'),
@@ -204,13 +206,15 @@ def get_dyanmics_pol_scores(dynamics_exps, policy_exps):
                 policy_exps_labels.append(f'{policy_dynamics_exp_details.dataset}\nSeed: {policy_dynamics_exp_details.seed}')
 
             fake_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'fake', 'unpen_rewards').cumsum(axis=1)[:,-1,0]
-            fake_returns[i,j,0], fake_returns[i,j,1] = fake_metric_arrs.mean(), fake_metric_arrs.std()
+            fake_metric_arrs = fake_metric_arrs[np.abs(fake_metric_arrs)<=50000]
+            fake_returns[i,j,0], fake_returns[i,j,1] = np.nanmean(fake_metric_arrs), np.nanstd(fake_metric_arrs)
 
             eval_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'eval', 'rewards').cumsum(axis=1)[:,-1,0]
-            eval_returns[i,j,0], eval_returns[i,j,1] = eval_metric_arrs.mean(), eval_metric_arrs.std()
+            eval_metric_arrs = eval_metric_arrs[np.abs(eval_metric_arrs)<=50000]
+            eval_returns[i,j,0], eval_returns[i,j,1] = np.nanmean(eval_metric_arrs), np.nanstd(eval_metric_arrs)
 
             gym_metric_arrs = retrieve_metric(dynamics_exp, policy_exp, True, True, 'gym', 'rewards').cumsum(axis=1)[:,-1,0]
-            gym_returns[i,j,0], gym_returns[i,j,1] = gym_metric_arrs.mean(), gym_metric_arrs.std()
+            gym_returns[i,j,0], gym_returns[i,j,1] = np.nanmean(gym_metric_arrs), np.nanstd(gym_metric_arrs)
 
     return fake_returns, eval_returns, gym_returns, dynamics_exps_labels, policy_exps_labels
 
@@ -232,6 +236,45 @@ def plot_returns_comparison_pol_dep(dynamics_exps, policy_exps):
 
         if title != 'Gym Rollout':
             ax[i].set_yticklabels(dynamics_exps_labels, rotation=45)
+        else:
+            ax[i].set_yticklabels([])
+        ax[i].set_title(title)
+
+        for (j,k), z in np.ndenumerate(res_arr[:,:,0]):
+            if z != 0:
+                ax[i].text(k, j, '{:.2f}\n±{:.2f}'.format(res_arr[j,k,0], res_arr[j,k,1]), ha="center", va="center", color='w' if z < 1000 else 'k')
+
+    for i in range(3):
+        ax[i].set_xlabel('Policy')
+        ax[i].set_ylabel('Dynamics')
+
+def plot_returns_comparison_pol_dep_groups(dynamics_exp_groups_labels, policy_exp_groups_labels):
+    fig, ax = plt.subplots(1, 3, figsize=(33,10))
+    
+    n_dynamics_groups = len(dynamics_exp_groups_labels)
+    n_policy_groups = len(policy_exp_groups_labels)
+    fake_returns = np.zeros((n_dynamics_groups, n_policy_groups, 2))
+    eval_returns = np.zeros((n_dynamics_groups, n_policy_groups, 2))
+    gym_returns = np.zeros((n_dynamics_groups, n_policy_groups, 2))
+    for i, (dynamic_exp_group, _) in enumerate(dynamics_exp_groups_labels):
+        for j, (policy_exp_group, _) in enumerate(policy_exp_groups_labels):
+            group_fake_returns, group_eval_returns, group_gym_returns, _, _ = get_dyanmics_pol_scores(dynamic_exp_group, policy_exp_group)
+            fake_returns[i,j,0], fake_returns[i,j,1] = np.nanmean(group_fake_returns[:,:,0]), np.nanmean(group_fake_returns[:,:,1])
+            eval_returns[i,j,0], eval_returns[i,j,1] = np.nanmean(group_eval_returns[:,:,0]), np.nanmean(group_eval_returns[:,:,1])
+            gym_returns[i,j,0], gym_returns[i,j,1]   = np.nanmean(group_gym_returns[:,:,0]), np.nanmean(group_gym_returns[:,:,1])
+    
+    for i, (res_arr, title) in enumerate([
+        (fake_returns, 'Learned Dynamics'),
+        (eval_returns, 'True Dynamics'),
+        (gym_returns, 'Gym Rollout')
+    ]):
+        mat = ax[i].matshow(res_arr[:,:,0], cmap='viridis')
+        ax[i].set_xticks(range(n_policy_groups))
+        ax[i].set_yticks(range(n_dynamics_groups))
+        ax[i].set_xticklabels([i[1] for i in policy_exp_groups_labels], rotation=45)
+
+        if title != 'Gym Rollout':
+            ax[i].set_yticklabels([i[1] for i in dynamics_exp_groups_labels], rotation=45)
         else:
             ax[i].set_yticklabels([])
         ax[i].set_title(title)
