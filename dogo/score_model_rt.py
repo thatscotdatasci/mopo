@@ -22,6 +22,7 @@ DATA_PATHS = [
     "D4RL-HC-ME_10000.npy",
     "D4RL-HC-MR_10000.npy",
     "D4RL-HC-R_10000.npy",
+    "SAC-RT-0.1M-4-P0_10000.npy",
     "SAC-RT-0.25M-4-P0_10000.npy",
     "SAC-RT-0.5M-4-P0_10000.npy",
     "SAC-RT-1M-4-P0_10000.npy",
@@ -37,9 +38,9 @@ DATA_PATHS = [
     "SAC-RT-1M-3-P0_10000.npy",
     "SAC-RT-2M-3-P0_10000.npy",
     "SAC-RT-3M-3-P0_10000.npy",
-    "RAND-1.npy",
-    "RAND-2.npy",
-    "RAND-3.npy",
+    "RAND-1_10000.npy",
+    "RAND-2_10000.npy",
+    "RAND-3_10000.npy",
 ]
 
 if __name__ == "__main__":
