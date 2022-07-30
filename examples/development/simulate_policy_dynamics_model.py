@@ -177,7 +177,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--policy-experiment',
                         type=str,
-                        help='Experiment whose dynamics model should be used.')
+                        help='Experiment whose policy model should be used.')
     parser.add_argument('--dynamics-experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
@@ -308,7 +308,8 @@ def simulate_policy(args):
     #########################
     # Load the dynamics model
     #########################
-    dynamics_exp_details = get_experiment_details(args.dynamics_experiment, get_elites=True)
+    dynamics_exp = args.dynamics_experiment or policy_exp_details.dynamics_model_exp
+    dynamics_exp_details = get_experiment_details(dynamics_exp, get_elites=True)
     dynamics_model_dir = os.path.join(dynamics_exp_details.results_dir, 'models')
     with open(PARAMETERS_PATH, 'r') as f:
         dynamics_params = json.load(f)
@@ -355,25 +356,30 @@ def simulate_policy(args):
     ###############
     # Print rewards
     ###############
-    fake_rewards = [ro['fake']['rewards'].sum() for ro in rollouts]
+    fake_pen_rewards = [ro['fake']['rewards'].sum() for ro in rollouts]
+    fake_unpen_rewards = [ro['fake']['unpen_rewards'].sum() for ro in rollouts]
     eval_rewards = [ro['eval']['rewards'].sum() for ro in rollouts]
     gym_rewards = [ro['gym']['rewards'].sum() for ro in rollouts]
     print('---')
-    print(f'Dynamics Model: {args.dynamics_experiment} - Deterministic: {args.deterministic_model}')
+    print(f'Dynamics Model: {dynamics_exp} - Deterministic: {args.deterministic_model}')
     print(f'Policy: {args.policy_experiment} - Deterministic: {args.deterministic_policy}')
     print('---')
-    print('Fake Rewards: {}'.format(fake_rewards))
+    print('Fake Pen Rewards: {}'.format(fake_pen_rewards))
+    print('Fake Unpen Rewards: {}'.format(fake_unpen_rewards))
     print('Eval Rewards: {}'.format(eval_rewards))
     print('Gym Rewards: {}'.format(gym_rewards))
     print('---')
-    print('Fake Mean: {}'.format(np.mean(fake_rewards)))
+    print('Fake Pen Mean: {}'.format(np.mean(fake_pen_rewards)))
+    print('Fake Unpen Mean: {}'.format(np.mean(fake_unpen_rewards)))
     print('Eval Mean: {}'.format(np.mean(eval_rewards)))
     print('Gym Mean: {}'.format(np.mean(gym_rewards)))
-    
-    return rollouts
 
-def get_file_prefix(args):
-    return f'{args.dynamics_experiment}_{args.policy_experiment}_dm{args.deterministic_model}_dp{args.deterministic_policy}'
+    file_prefix = get_file_prefix(args, dynamics_exp)
+    
+    return rollouts, file_prefix
+
+def get_file_prefix(args, dynamics_exp):
+    return f'{dynamics_exp}_{args.policy_experiment}_dm{args.deterministic_model}_dp{args.deterministic_policy}'
 
 def save_state_action(file_prefix, env, rollouts):
     state_action_arr = np.stack([np.hstack((
@@ -402,9 +408,7 @@ def save_metric(file_prefix, rollouts, env, metric):
 
 if __name__ == '__main__':
     args = parse_args()
-    rollouts = simulate_policy(args)
-
-    file_prefix = get_file_prefix(args)
+    rollouts, file_prefix = simulate_policy(args)
 
     save_state_action(file_prefix, 'fake', rollouts)
     save_state_action(file_prefix, 'gym', rollouts)
