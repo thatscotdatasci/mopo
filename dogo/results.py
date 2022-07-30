@@ -22,6 +22,7 @@ ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
 SacTrainingResults = namedtuple('DynamicsTrainingResults', SAC_TRAINING_FILES.keys())
+PoolArrs = namedtuple('PoolArrs', 'pool pca_sa_1d pca_sa_2d mse_results explained_var_2d')
 
 #########
 # Helpers
@@ -185,7 +186,7 @@ def average_scores_over_seeds(exps: list):
                 results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric)[-50:].values.mean())
     return results
 
-def get_sac_pools(exp_name, pool=None, subsample_size=100000):
+def get_sac_pools(exp_name, pool=None, subsample_size=10000):
     exp_details = get_experiment_details(exp_name)
     models_dir = os.path.join(exp_details.results_dir, 'models')
     
@@ -227,6 +228,6 @@ def get_sac_pools(exp_name, pool=None, subsample_size=100000):
     #     np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*_pca_2d.npy'))))
     # ])[subsample_idxs,:]
 
-    pca_1d_sa, pca_2d_sa = project_arr(results[:,:STATE_DIMS+ACTION_DIMS])
+    pca_1d_sa, pca_2d_sa, explained_var_2d = project_arr(results[:,:STATE_DIMS+ACTION_DIMS])
 
-    return results, pca_1d_sa, pca_2d_sa, mse_results
+    return results, pca_1d_sa, pca_2d_sa, mse_results, explained_var_2d
