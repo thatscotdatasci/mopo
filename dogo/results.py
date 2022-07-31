@@ -10,7 +10,7 @@ from scipy.io import loadmat
 
 from dogo.pca.project import project_arr
 from dogo.constants import (
-    RESULTS_BASEDIR, SCORING_BASEDIR, MOPO_RESULTS_MAP_PATH, DYNAMICS_TRAINING_FILES, SAC_TRAINING_FILES, DEFAULT_SEED,
+    MOPO_BASEDIR, RESULTS_BASEDIR, SCORING_BASEDIR, MOPO_RESULTS_MAP_PATH, DYNAMICS_TRAINING_FILES, SAC_TRAINING_FILES, DEFAULT_SEED,
     STATE_DIMS, ACTION_DIMS
 )
 
@@ -27,14 +27,7 @@ PoolArrs = namedtuple('PoolArrs', 'pool pca_sa_1d pca_sa_2d mse_results explaine
 #########
 # Helpers
 #########
-def get_results_path(local_path: str):
-    results_repo_path = os.path.join(RESULTS_BASEDIR, local_path)
-    if os.path.isfile(results_repo_path):
-        return results_repo_path
-    else:
-        return local_path
-
-def get_experiment_details(experiment: str, get_elites: bool = False):
+def get_results_path(experiment: str):
     with open(MOPO_RESULTS_MAP_PATH, 'r') as f:
         mopo_results_map = json.load(f)
 
@@ -42,21 +35,25 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
     base_dir = mopo_results_map[experiment]["base_dir"]
     experiment_dir = mopo_results_map[experiment]["experiment_dir"]
 
-    results_dir = os.path.join("ray_mopo", environment, base_dir, experiment_dir)
-    repo_results_dir = os.path.join(RESULTS_BASEDIR, results_dir)
-    if os.path.isdir(repo_results_dir):
-        results_dir = repo_results_dir
+    relative_path = os.path.join("ray_mopo", environment, base_dir, experiment_dir)
+    local_path = os.path.join(MOPO_BASEDIR, relative_path)
+    results_repo_path = os.path.join(RESULTS_BASEDIR, relative_path)
+    if os.path.isdir(results_repo_path):
+        return results_repo_path, environment, base_dir, experiment_dir
+    elif os.path.isdir(local_path):
+        return local_path, environment, base_dir, experiment_dir
+    else:
+        raise FileNotFoundError(f'Could not find results directory at {results_repo_path} or {local_path}')
+
+def get_experiment_details(experiment: str, get_elites: bool = False):    
+    results_dir, environment, base_dir, experiment_dir = get_results_path(experiment)
 
     with open(os.path.join(results_dir, "params.json"), 'r') as f:
         params = json.load(f)
 
-    if get_elites:
-        with open(glob(os.path.join(results_dir, "train-log.*"))[0], 'r') as f:
-            elites = json.loads(re.findall("(?<=Using 5 / 7 models: ).*", f.read())[0])
-    else:
-        elites = None
-
     dynamics_model_exp = params["algorithm_params"]["kwargs"].get("dynamics_model_exp", None)
+    if dynamics_model_exp is not None:
+        dynamics_model_exp_details = get_experiment_details(dynamics_model_exp, get_elites=get_elites)
 
     model_weights_path = os.path.join(results_dir, 'models', "BNN_0.mat")
     if os.path.isfile(model_weights_path):
@@ -66,7 +63,6 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         max_penalty = np.linalg.norm(np.sqrt(np.exp(max_logvars)))
         min_penalty = np.linalg.norm(np.sqrt(np.exp(min_logvars)))
     elif dynamics_model_exp:
-        dynamics_model_exp_details = get_experiment_details(dynamics_model_exp)
         max_logvars = dynamics_model_exp_details.max_logvars
         min_logvars = dynamics_model_exp_details.min_logvars
         max_penalty = dynamics_model_exp_details.max_penalty
@@ -77,6 +73,23 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         max_penalty = None
         min_penalty = None
 
+    if dynamics_model_exp is not None:
+        elites = dynamics_model_exp_details.elites
+        rex = dynamics_model_exp_details.rex
+        rex_beta = dynamics_model_exp_details.rex_beta
+        lr_decay = dynamics_model_exp_details.lr_decay
+        holdout_policy = dynamics_model_exp_details.holdout_policy
+    else:
+        if get_elites:
+            with open(glob(os.path.join(results_dir, "train-log.*"))[0], 'r') as f:
+                elites = json.loads(re.findall("(?<=Using 5 / 7 models: ).*", f.read())[0])
+        else:
+            elites = None
+        rex = params["algorithm_params"]["kwargs"].get("rex", False)
+        rex_beta = params["algorithm_params"]["kwargs"].get("rex_beta", None)
+        lr_decay = params["algorithm_params"]["kwargs"].get("lr_decay", None)
+        holdout_policy = params["algorithm_params"]["kwargs"].get("holdout_policy", None)
+
     return ExperimentDetails(
         name = experiment,
         base_dir = base_dir,
@@ -86,10 +99,10 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
         dataset = params["algorithm_params"]["kwargs"]["pool_load_path"].split("/")[-1].replace('.npy', ''),
         params=params,
         seed = params["run_params"]["seed"],
-        rex = params["algorithm_params"]["kwargs"].get("rex", False),
-        rex_beta = params["algorithm_params"]["kwargs"].get("rex_beta", None),
-        lr_decay = params["algorithm_params"]["kwargs"].get("lr_decay", None),
-        holdout_policy = params["algorithm_params"]["kwargs"].get("holdout_policy", None),
+        rex = rex,
+        rex_beta = rex_beta,
+        lr_decay = lr_decay,
+        holdout_policy = holdout_policy,
         elites = elites,
         penalty_coeff = params["algorithm_params"]["kwargs"].get("penalty_coeff", None),
         rollout_length = params["algorithm_params"]["kwargs"].get("rollout_length", None),
