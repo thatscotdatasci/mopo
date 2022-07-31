@@ -7,6 +7,9 @@ from scipy.ndimage import uniform_filter1d
 lss = ['-', '--']
 cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
+FEATURE_LABEL_DICT = {
+    'evaluation/return-average': 'Evaluation Return Average'
+}
 
 def plot_experiment_metrics(metric_collection: list, exp_set_label_collection: list, fig_shape: tuple, starting_epoch=50, running_avg_size=None, x_label='Epochs'):
     fig, ax = plt.subplots(*fig_shape, figsize=(fig_shape[1]*10,fig_shape[0]*10))
@@ -91,12 +94,26 @@ def plot_min_max_penalty(exp_set_label_collection: list):
     ax.set_ylabel('Penalty')
     ax.legend()
 
-def plot_grouped_evaluation_returns(exp_set_steps: list):
+def plot_evaluation_returns(exps: list, title: str = None, ymin=None, ymax=None, feature: str = 'evaluation/return-average'):
     fig, ax = plt.subplots(1, 1, figsize=(20,10))
 
+    for exp in exps:
+        ax.plot(
+            exp.sac.result['timesteps_total'], exp.sac.result[feature], ls='--' if not exp.rex else '-', label=f'{exp.name} - {exp.dataset} - REx: {exp.rex} - Beta: {exp.rex_beta} - Seed: {exp.seed}'
+        )
+    ax.set_xlabel('Steps')
+    ax.set_ylabel(FEATURE_LABEL_DICT[feature])
+    ax.set_ylim(bottom=ymin, top=ymax)
+    if title is not None:
+        ax.set_title(title)
+    ax.legend()
+
+def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, xmax=501000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average'):
+    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+    plt.rcParams.update({'font.size': 18})
+
     summary_metrics = {}
-    feature = 'evaluation/return-average'
-    for i, (exp_set, steps) in enumerate(exp_set_steps):
+    for i, (exp_set, label) in enumerate(exp_set_labels):
         exp_results = []
         exp_end_points = []
 
@@ -125,7 +142,7 @@ def plot_grouped_evaluation_returns(exp_set_steps: list):
         std_arr = np.nanstd(comb_arr, axis=-1)
         x_vals = np.arange(len(mean_arr))*1000
 
-        ax.plot(x_vals, mean_arr, c=cols[i], label=f'Beta: {steps}M')
+        ax.plot(x_vals, mean_arr, c=cols[i], label=label)
         ax.fill_between(x_vals, min_arr, max_arr, color=cols[i], alpha=0.5)
 
         terminal_points = np.where(np.sort((comb_arr==np.NaN).argmin(axis=0))>0)[0]
@@ -133,17 +150,19 @@ def plot_grouped_evaluation_returns(exp_set_steps: list):
 
         exp_end_points = exp_end_points[exp_end_points<x_vals[-1]]
         ax.scatter(exp_end_points, -2000*np.ones_like(exp_end_points), marker='x', color=cols[i], s=100)
-
-        summary_metrics[steps] = {
+        
+        summary_metrics[label] = {
             'mean': mean_arr[-1],
             'std': std_arr[-1]
         }
         
 
     ax.set_xlabel('Steps')
-    ax.set_ylabel('Evaluation Return Average')
-    # ax.set_xlim(-1000,501000)
-    # ax.set_ylim(-3000,12500)
+    ax.set_ylabel(FEATURE_LABEL_DICT[feature])
+    ax.set_xlim(left=xmin, right=xmax)
+    ax.set_ylim(bottom=ymin, top=ymax)
+    if title is not None:
+        ax.set_title(title)
     ax.legend(loc='upper left')
 
     return summary_metrics
