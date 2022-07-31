@@ -55,5 +55,5 @@ def main(results_dir: str):
 
 if __name__ == "__main__":
     # results_dir = sys.argv[1]
-    results_dir = os.path.abspath('ray_mopo/halfcheetah/halfcheetah_medium_replay_101e3')
+    results_dir = os.path.abspath('ray_mopo/HalfCheetah/halfcheetah_mixed_rt_1_101e3')
     main(results_dir)
