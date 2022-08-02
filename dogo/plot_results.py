@@ -43,8 +43,8 @@ def plot_experiment_metrics(metric_collection: list, exp_set_label_collection: l
                 get_ax(i).plot(x_vals, mean_arr, c=cols[k], ls=lss[j], label=legend_label)
                 get_ax(i).fill_between(x_vals, min_arr, max_arr, color=cols[k], alpha=0.25)
 
-                terminal_points = np.sort(comb_arr.argmin(axis=0))[:-1]
-                get_ax(i).scatter(x_vals[terminal_points], mean_arr[terminal_points], color=cols[k], s=100)
+                terminal_points = np.sort(np.argmax(np.isnan(comb_arr), axis=0))[1:]
+                get_ax(i).scatter(x_vals[terminal_points], mean_arr[terminal_points], color='r', s=100)
 
         get_ax(i).set_xlabel(x_label)
         get_ax(i).set_ylabel(y_label)

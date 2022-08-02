@@ -2,9 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from dogo.rollouts.split import split_halfcheetah_v2_trans_arr
+from dogo.results import PoolArrs, get_sac_pools
 
 
-def _model_pool_2dhist(results_arr, exp_list_label_set, mode, vmin=None, vmax=None, pen_coeff=None):
+def _model_pool_2dhist(exp_list_label_set, mode, vmin=None, vmax=None, pen_coeff=None, pool=None, pca_model=None, results_arr=None):
+    if results_arr is None:
+        exp_lists = [i[0] for i in exp_list_label_set]
+        exps = [item for sublist in exp_lists for item in sublist]
+        results_arr = {exp: PoolArrs(*get_sac_pools(exp, pool=pool, pca_model=pca_model)) for exp in exps}
+
     n_rows = len(exp_list_label_set)
     n_cols = len(exp_list_label_set[0][0])
     bin_vals = np.linspace(-40,40,250)
@@ -18,6 +24,11 @@ def _model_pool_2dhist(results_arr, exp_list_label_set, mode, vmin=None, vmax=No
 
     for i, (exp_list, label) in enumerate(exp_list_label_set):
         for j, exp in enumerate(exp_list):
+            if results_arr[exp] is None:
+                hist_arrs.append(None)
+                sum_vals.append(None)
+                continue
+
             _, _, _, rew, _, _, pen = split_halfcheetah_v2_trans_arr(results_arr[exp].pool)
 
             if mode=='visitation':
@@ -50,6 +61,11 @@ def _model_pool_2dhist(results_arr, exp_list_label_set, mode, vmin=None, vmax=No
 
     for i, (exp_list, label) in enumerate(exp_list_label_set):
         for j, exp in enumerate(exp_list):
+            if results_arr[exp] is None:
+                ax[i,j].set_aspect('equal')
+                ax[i,j].set_title(f'{exp} - Beta: {label} ')
+                continue
+
             im = ax[i,j].imshow(
                 hist_arrs[i*n_cols+j].T,
                 origin='lower',
@@ -77,17 +93,17 @@ def _model_pool_2dhist(results_arr, exp_list_label_set, mode, vmin=None, vmax=No
     plt.colorbar(im, ax=ax.ravel().tolist())
 
 
-def model_pool_visitation_2dhist(results_arr, exp_list_label_set, vmin=None, vmax=None):
-    return _model_pool_2dhist(results_arr, exp_list_label_set, mode='visitation', vmin=vmin, vmax=vmax)
+def model_pool_visitation_2dhist(exp_list_label_set, vmin=None, vmax=None, pool=None, pca_model=None, results_arr=None):
+    return _model_pool_2dhist(exp_list_label_set, mode='visitation', vmin=vmin, vmax=vmax, pool=pool, pca_model=pca_model, results_arr=results_arr)
 
-def model_pool_pen_rewards_2dhist(results_arr, exp_list_label_set, vmin=None, vmax=None):
-    return _model_pool_2dhist(results_arr, exp_list_label_set, mode='pen-rewards', vmin=vmin, vmax=vmax)
+def model_pool_pen_rewards_2dhist(exp_list_label_set, vmin=None, vmax=None, pool=None, pca_model=None, results_arr=None):
+    return _model_pool_2dhist(exp_list_label_set, mode='pen-rewards', vmin=vmin, vmax=vmax, pool=pool, pca_model=pca_model, results_arr=results_arr)
 
-def model_pool_unpen_rewards_2dhist(results_arr, exp_list_label_set, vmin=None, vmax=None, pen_coeff=None):
-    return _model_pool_2dhist(results_arr, exp_list_label_set, mode='unpen-rewards', vmin=vmin, vmax=vmax, pen_coeff=pen_coeff)
+def model_pool_unpen_rewards_2dhist(exp_list_label_set, vmin=None, vmax=None, pen_coeff=None, pool=None, pca_model=None, results_arr=None):
+    return _model_pool_2dhist(exp_list_label_set, mode='unpen-rewards', vmin=vmin, vmax=vmax, pen_coeff=pen_coeff, pool=pool, pca_model=pca_model, results_arr=results_arr)
 
-def model_pool_penalties_2dhist(results_arr, exp_list_label_set, vmin=None, vmax=None):
-    return _model_pool_2dhist(results_arr, exp_list_label_set, mode='penalties', vmin=vmin, vmax=vmax)
+def model_pool_penalties_2dhist(exp_list_label_set, vmin=None, vmax=None, pool=None, pca_model=None, results_arr=None):
+    return _model_pool_2dhist(exp_list_label_set, mode='penalties', vmin=vmin, vmax=vmax, pool=pool, pca_model=pca_model, results_arr=results_arr)
 
-def model_pool_rmse_2dhist(results_arr, exp_list_label_set, vmin=None, vmax=None):
-    return _model_pool_2dhist(results_arr, exp_list_label_set, mode='rmse', vmin=vmin, vmax=vmax)
+def model_pool_rmse_2dhist(exp_list_label_set, vmin=None, vmax=None, pool=None, pca_model=None, results_arr=None):
+    return _model_pool_2dhist(exp_list_label_set, mode='rmse', vmin=vmin, vmax=vmax, pool=pool, pca_model=pca_model, results_arr=results_arr)
