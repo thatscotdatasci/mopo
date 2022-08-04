@@ -1,14 +1,20 @@
+import os
 from itertools import zip_longest
 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import uniform_filter1d
 
+from dogo.constants import FIG_DIR
+
 lss = ['-', '--']
 cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
 FEATURE_LABEL_DICT = {
-    'evaluation/return-average': 'Evaluation Return Average'
+    'evaluation/return-average': 'Evaluation Return Average',
+    'Q_loss': 'Q Loss',
+    'Q-avg': 'Average Q-Value',
+    'model/mean_unpenalized_rewards': 'Treaning Mean Unpenalised Reward'
 }
 
 def plot_experiment_metrics(metric_collection: list, exp_set_label_collection: list, fig_shape: tuple, starting_epoch=50, running_avg_size=None, x_label='Epochs'):
@@ -108,8 +114,8 @@ def plot_evaluation_returns(exps: list, title: str = None, ymin=None, ymax=None,
         ax.set_title(title)
     ax.legend()
 
-def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, xmax=501000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average'):
-    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, xmax=501000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average', save_path=None):
+    fig, ax = plt.subplots(1, 1, figsize=(18,10))
     plt.rcParams.update({'font.size': 18})
 
     summary_metrics = {}
@@ -148,21 +154,25 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
         terminal_points = np.where(np.sort((comb_arr==np.NaN).argmin(axis=0))>0)[0]
         ax.scatter(x_vals[terminal_points], mean_arr[terminal_points], color=cols[i], s=100)
 
-        exp_end_points = exp_end_points[exp_end_points<x_vals[-1]]
-        ax.scatter(exp_end_points, -2000*np.ones_like(exp_end_points), marker='x', color=cols[i], s=100)
+        if show_ends:
+            exp_end_points = exp_end_points[exp_end_points<x_vals[-1]]
+            ax.scatter(exp_end_points, -2000*np.ones_like(exp_end_points), marker='x', color=cols[i], s=100)
         
         summary_metrics[label] = {
-            'mean': mean_arr[-1],
-            'std': std_arr[-1]
+            'mean': np.round(mean_arr[-1],0).astype(int),
+            'std': np.round(std_arr[-1],0).astype(int)
         }
         
 
-    ax.set_xlabel('Steps')
+    ax.set_xlabel('Training Steps')
     ax.set_ylabel(FEATURE_LABEL_DICT[feature])
     ax.set_xlim(left=xmin, right=xmax)
     ax.set_ylim(bottom=ymin, top=ymax)
     if title is not None:
         ax.set_title(title)
     ax.legend(loc='upper left')
+
+    if save_path is not None:
+        fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
 
     return summary_metrics

@@ -199,7 +199,7 @@ def average_scores_over_seeds(exps: list):
                 results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric)[-50:].values.mean())
     return results
 
-def get_sac_pools(exp_name, pool=None, subsample_size=10000):
+def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
     exp_details = get_experiment_details(exp_name)
     models_dir = os.path.join(exp_details.results_dir, 'models')
     
@@ -207,6 +207,7 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000):
         orig_results = np.load(os.path.join(models_dir, f'model_pool_{pool}.npy'))
         if os.path.isfile(os.path.join(models_dir, f'mse_{pool}.npy')):
             orig_mse_results = np.load(os.path.join(models_dir, f'mse_{pool}.npy'))
+            orig_mse_results[np.isposinf(orig_mse_results)] = np.nan
         else:
             orig_mse_results = None
     else:
@@ -222,14 +223,18 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000):
             orig_mse_results = np.vstack([
                 np.load(i) for i in model_mse_files
             ])
-            orig_mse_results[np.isposinf(orig_mse_results)] = np.NaN
+            orig_mse_results[np.isposinf(orig_mse_results)] = np.nan
         else:
             orig_mse_results = None
 
     # Subsample the results
-    subsample_idxs = np.random.choice(np.arange(orig_results.shape[0]), subsample_size, replace=False)
-    results =  orig_results[subsample_idxs,:]
-    mse_results = orig_mse_results[subsample_idxs,:] if orig_mse_results is not None else None
+    if subsample_size is not None:
+        subsample_idxs = np.random.choice(np.arange(orig_results.shape[0]), subsample_size, replace=False)
+        results =  orig_results[subsample_idxs,:]
+        mse_results = orig_mse_results[subsample_idxs,:] if orig_mse_results is not None else None
+    else:
+        results = orig_results
+        mse_results = orig_mse_results
     
     #######################
     # Load pre-existing PCA
@@ -241,6 +246,6 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000):
     #     np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*_pca_2d.npy'))))
     # ])[subsample_idxs,:]
 
-    pca_1d_sa, pca_2d_sa, explained_var_2d = project_arr(results[:,:STATE_DIMS+ACTION_DIMS])
+    pca_1d_sa, pca_2d_sa, explained_var_2d = project_arr(results[:,:STATE_DIMS+ACTION_DIMS], pca_2d=pca_model)
 
     return results, pca_1d_sa, pca_2d_sa, mse_results, explained_var_2d

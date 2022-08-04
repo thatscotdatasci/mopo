@@ -233,7 +233,7 @@ def plot_metric_landscape_comp(dynamics_policy_exps_list, metric):
         ax[i].set_zlabel((' '.join(metric.split('_'))).title())
         ax[i].legend()
 
-def get_policy_values(policy_exps, expected_records, deterministic_model=True, deterministic_policy=True):
+def get_policy_values(policy_exps, expected_records, deterministic_model=True, deterministic_policy=True, custom_dynamics_exp=None):
     xtick_labels = []
     fake_pen_returns_arr = []
     fake_unpen_returns_arr = []
@@ -241,7 +241,11 @@ def get_policy_values(policy_exps, expected_records, deterministic_model=True, d
     gym_returns_arr = []
     for i, policy_exp in enumerate(policy_exps):
         policy_exp_details = get_experiment_details(policy_exp)
-        dynamics_exp = policy_exp_details.dynamics_model_exp
+
+        if custom_dynamics_exp is None:
+            dynamics_exp = policy_exp_details.dynamics_model_exp
+        else:
+            dynamics_exp = custom_dynamics_exp
         mopo_pen_coeff = policy_exp_details.penalty_coeff
 
         if policy_exp_details.rex:
@@ -299,6 +303,48 @@ def plot_policy_values(policy_exps, expected_records, deterministic_model=True, 
 
     ax.legend()
 
+def plot_dynamics_group_values(dynamics_exp_label_groups, policy_exps, expected_records, deterministic_model=True, deterministic_policy=True, show_penalised=True, ymin=None, ymax=None):
+    fig, ax = plt.subplots(1, 1, figsize=(10,10))
+
+    xtick_labels = []
+    grouped_fake_pen_returns = np.zeros((len(dynamics_exp_label_groups),2))
+    grouped_fake_unpen_returns = np.zeros((len(dynamics_exp_label_groups),2))
+    grouped_eval_returns = np.zeros((len(dynamics_exp_label_groups),2))
+    grouped_gym_returns = np.zeros((len(dynamics_exp_label_groups),2))
+    for i, (dynamics_exps, label) in enumerate(dynamics_exp_label_groups):
+        xtick_labels.append(label)
+        fake_pen_returns_arr = np.zeros((len(dynamics_exps), len(policy_exps), expected_records))
+        fake_unpen_returns_arr = np.zeros((len(dynamics_exps), len(policy_exps), expected_records))
+        eval_returns_arr = np.zeros((len(dynamics_exps), len(policy_exps), expected_records))
+        gym_returns_arr = np.zeros((len(dynamics_exps), len(policy_exps), expected_records))
+        for j, dynamics_exp in enumerate(dynamics_exps):
+            fake_pen_returns_arr[j,:,:], fake_unpen_returns_arr[j,:,:], eval_returns_arr[j,:,:], gym_returns_arr[j,:,:], _ = get_policy_values(policy_exps, expected_records, deterministic_model, deterministic_policy, custom_dynamics_exp=dynamics_exp)
+        grouped_fake_pen_returns[i,0], grouped_fake_pen_returns[i,1] = np.nanmean(fake_pen_returns_arr), np.nanstd(fake_pen_returns_arr)
+        grouped_fake_unpen_returns[i,0], grouped_fake_unpen_returns[i,1] = np.nanmean(fake_unpen_returns_arr), np.nanstd(fake_unpen_returns_arr)
+        grouped_eval_returns[i,0], grouped_eval_returns[i,1] = np.nanmean(eval_returns_arr), np.nanstd(eval_returns_arr)
+        grouped_gym_returns[i,0], grouped_gym_returns[i,1] = np.nanmean(gym_returns_arr), np.nanstd(gym_returns_arr)
+
+    sc = 0
+    if show_penalised:
+        sc = 1
+        ax.errorbar(np.arange(len(dynamics_exp_label_groups)), grouped_fake_pen_returns[:,0], grouped_fake_pen_returns[:,1], color=cols[0], ls='', marker='x', capsize=10, label='Learned Dynamics - Penalised')
+    ax.errorbar(np.arange(len(dynamics_exp_label_groups)), grouped_fake_unpen_returns[:,0], grouped_fake_unpen_returns[:,1], color=cols[sc], ls='', marker='x', capsize=10, label='Learned Dynamics - Unpenalised')
+    ax.errorbar(np.arange(len(dynamics_exp_label_groups)), grouped_eval_returns[:,0], grouped_eval_returns[:,1], color=cols[sc+1], ls='', marker='x', capsize=10, label='Evaluation Environment')
+
+    ax.axhline(grouped_gym_returns[:,0].mean(), color=cols[sc+2], label='Real Environment - Mean')
+    ax.axhline(grouped_gym_returns[:,0].mean()-grouped_gym_returns[:,1].mean(), color=cols[sc+2], ls='--')
+    ax.axhline(grouped_gym_returns[:,0].mean()+grouped_gym_returns[:,1].mean(), color=cols[sc+2], ls='--')
+    # ax.errorbar(np.arange(len(dynamics_exp_label_groups)), grouped_gym_returns[:,0], grouped_gym_returns[:,1], color=cols[sc+2], ls='', marker='x', label='Real Environment')
+
+    # ax.set_title(policy_dynamics_plot_title(dynamics_exp, policy_exp, deterministic_model, deterministic_policy))
+    ax.set_xlabel('Dynamics Model')
+    ax.set_ylabel('Average Return')
+    ax.set_ylim(ymin, ymax)
+    ax.set_xticks(np.arange(len(dynamics_exp_label_groups)))
+    ax.set_xticklabels(xtick_labels, rotation=45)
+
+    ax.legend()
+
 def plot_policy_group_values(policy_exp_label_groups, expected_records, deterministic_model=True, deterministic_policy=True, show_penalised=True):
     fig, ax = plt.subplots(1, 1, figsize=(20,10))
 
@@ -316,13 +362,13 @@ def plot_policy_group_values(policy_exp_label_groups, expected_records, determin
         grouped_gym_returns[i,0], grouped_gym_returns[i,1] = np.nanmean(gym_returns_arr), np.nanstd(gym_returns_arr)
 
     if show_penalised:
-        ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_pen_returns[:,0], grouped_fake_pen_returns[:,1], ls='', marker='x', label='Learned Dynamics - Penalised')
-    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_unpen_returns[:,0], grouped_fake_unpen_returns[:,1], ls='', marker='x', label='Learned Dynamics - Unpenalised')
-    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_eval_returns[:,0], grouped_eval_returns[:,1], ls='', marker='x', label='Evaluation Environment')
-    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_gym_returns[:,0], grouped_gym_returns[:,1], ls='', marker='x', label='Real Environment')
+        ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_pen_returns[:,0], grouped_fake_pen_returns[:,1], ls='', marker='x', capsize=10, label='Learned Dynamics - Penalised')
+    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_unpen_returns[:,0], grouped_fake_unpen_returns[:,1], ls='', marker='x', capsize=10, label='Learned Dynamics - Unpenalised')
+    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_eval_returns[:,0], grouped_eval_returns[:,1], ls='', marker='x', capsize=10, label='Evaluation Environment')
+    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_gym_returns[:,0], grouped_gym_returns[:,1], ls='', marker='x', capsize=10, label='Real Environment')
 
     # ax.set_title(policy_dynamics_plot_title(dynamics_exp, policy_exp, deterministic_model, deterministic_policy))
-    ax.set_xlabel('Experiment')
+    ax.set_xlabel('Policy')
     ax.set_ylabel('Average Return')
     ax.set_xticks(np.arange(len(policy_exp_label_groups)))
     ax.set_xticklabels(xtick_labels)
