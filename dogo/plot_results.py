@@ -3,6 +3,7 @@ from itertools import zip_longest
 
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid.inset_locator import mark_inset
 from scipy.ndimage import uniform_filter1d
 
 from dogo.constants import FIG_DIR
@@ -14,11 +15,20 @@ FEATURE_LABEL_DICT = {
     'evaluation/return-average': 'Evaluation Return Average',
     'Q_loss': 'Q Loss',
     'Q-avg': 'Average Q-Value',
-    'model/mean_unpenalized_rewards': 'Treaning Mean Unpenalised Reward'
+    'model/mean_unpenalized_rewards': 'Average Unpenalised Rewards',
+    'model/mean_penalized_rewards': 'Average Penalised Reward',
+    'model/mean_penalty': 'Average Penalty'
 }
 
-def plot_experiment_metrics(metric_collection: list, exp_set_label_collection: list, fig_shape: tuple, starting_epoch=50, running_avg_size=None, x_label='Epochs'):
-    fig, ax = plt.subplots(*fig_shape, figsize=(fig_shape[1]*10,fig_shape[0]*10))
+def plot_experiment_metrics(
+    metric_collection: list, exp_set_label_collection: list, fig_shape: tuple, starting_epoch=50, 
+    running_avg_size=None, x_label='Epochs', fig_size=None, loc='upper left', show_terminals=True, 
+    save_path=None, terminals_size=100, ins_loc=None, ins_range=None, legend_font_size=18, epoch_limit=None
+):
+    fig_size = fig_size or (fig_shape[1]*10,fig_shape[0]*10)
+    fig, ax = plt.subplots(*fig_shape, figsize=fig_size)
+
+    plt.rcParams.update({'font.size': 18})
 
     if fig_shape[0] > 1 and fig_shape[1] > 1:
         get_ax =lambda i: ax[i//fig_shape[1], i%fig_shape[1]]
@@ -26,6 +36,10 @@ def plot_experiment_metrics(metric_collection: list, exp_set_label_collection: l
         get_ax =lambda i: ax[i]
     else:
         get_ax = lambda i: ax
+
+    if ins_loc:
+        ins_x_min, ins_x_max, ins_y_min, ins_y_max = ins_range
+        ins = get_ax(None).inset_axes(ins_loc)
 
     for i, (metric, y_label, y_lim) in enumerate(metric_collection):
         for j, exp_set_lables in enumerate(exp_set_label_collection):
@@ -46,16 +60,29 @@ def plot_experiment_metrics(metric_collection: list, exp_set_label_collection: l
                     min_arr = uniform_filter1d(min_arr, size=running_avg_size, mode='reflect')
                     max_arr = uniform_filter1d(max_arr, size=running_avg_size, mode='reflect')
 
-                get_ax(i).plot(x_vals, mean_arr, c=cols[k], ls=lss[j], label=legend_label)
-                get_ax(i).fill_between(x_vals, min_arr, max_arr, color=cols[k], alpha=0.25)
+                get_ax(i).plot(x_vals[:epoch_limit], mean_arr[:epoch_limit], c=cols[k], ls=lss[j], label=legend_label)
+                get_ax(i).fill_between(x_vals[:epoch_limit], min_arr[:epoch_limit], max_arr[:epoch_limit], color=cols[k], alpha=0.25)
 
-                terminal_points = np.sort(np.argmax(np.isnan(comb_arr), axis=0))[1:]
-                get_ax(i).scatter(x_vals[terminal_points], mean_arr[terminal_points], color='r', s=100)
+                if show_terminals:
+                    terminal_points = np.sort(np.argmax(np.isnan(comb_arr), axis=0))[1:]
+                    get_ax(i).scatter(x_vals[terminal_points], mean_arr[terminal_points], color='r', s=terminals_size, zorder=1000+i)
+
+                if ins_range:
+                    ins.plot(x_vals, mean_arr, c=cols[k], ls=lss[j], label=legend_label)
+                    ins.fill_between(x_vals, min_arr, max_arr, color=cols[k], alpha=0.25)
+                    ins.set_xlim(ins_x_min, ins_x_max)
+                    ins.set_ylim(ins_y_min, ins_y_max)
 
         get_ax(i).set_xlabel(x_label)
         get_ax(i).set_ylabel(y_label)
         get_ax(i).set_ylim(y_lim)
-        get_ax(i).legend(loc='upper left')
+        get_ax(i).legend(loc=loc, prop={'size': legend_font_size})
+
+    if ins_loc:
+        mark_inset(get_ax(None), ins, loc1=1, loc2=3, fc="none", lw=2, ec='r')
+
+    if save_path is not None:
+        fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
 
 
 def plot_min_max_logvars(exp_set_label_collection: list):
@@ -94,27 +121,52 @@ def plot_min_max_penalty(exp_set_label_collection: list):
             max_vals.append(np.max(vals_arr))
             labels.append(label)
 
+            print(f'{label}: {np.mean(vals_arr)}')
+
         ax.errorbar(labels, mean_vals, np.abs(np.vstack((min_vals, max_vals))-mean_vals), label=f'{"Maximum" if i==0 else "Minumum"} Penalty')
 
     ax.set_xlabel('Experiment Set')
     ax.set_ylabel('Penalty')
     ax.legend()
 
-def plot_evaluation_returns(exps: list, title: str = None, ymin=None, ymax=None, feature: str = 'evaluation/return-average'):
-    fig, ax = plt.subplots(1, 1, figsize=(20,10))
+def plot_evaluation_returns(exps: list, title: str = None, ymin=None, ymax=None, feature: str = 'evaluation/return-average', fig_size=(20,10), labels=None, legend=True, save_path=None, erm_dashed=True, loc='upper left', ncol=1):
+    plt.rc('font', size=22)
+    fig, ax = plt.subplots(1, 1, figsize=fig_size)
 
-    for exp in exps:
+    for i, exp in enumerate(exps):
+        if labels is not None:
+            label = labels[i]
+        else:
+            label = f'{exp.name} - {exp.dataset} - REx: {exp.rex} - Beta: {exp.rex_beta} - Seed: {exp.seed}'
+
+        if erm_dashed:
+            ls='--' if not exp.rex else '-'
+        else:
+            ls='-'
+
         ax.plot(
-            exp.sac.result['timesteps_total'], exp.sac.result[feature], ls='--' if not exp.rex else '-', label=f'{exp.name} - {exp.dataset} - REx: {exp.rex} - Beta: {exp.rex_beta} - Seed: {exp.seed}'
+            exp.sac.result['timesteps_total'], exp.sac.result[feature], c=cols[i], ls=ls, label=label
         )
+        print(f'{exp.name}: {exp.sac.result[feature].values[-1]}')
+
+        # if feature == 'model/mean_penalty':
+        #     ax.axhline(exp.min_penalty, ls=':', c=cols[i])
+        #     ax.axhline(exp.max_penalty, ls=':', c=cols[i])
+
     ax.set_xlabel('Steps')
     ax.set_ylabel(FEATURE_LABEL_DICT[feature])
     ax.set_ylim(bottom=ymin, top=ymax)
+    
     if title is not None:
         ax.set_title(title)
-    ax.legend()
+    
+    if legend:
+        ax.legend(loc=loc, ncol=ncol)
 
-def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, xmax=501000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average', save_path=None):
+    if save_path is not None:
+        fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
+
+def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, xmax=501000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average', save_path=None, loc='upper left'):
     fig, ax = plt.subplots(1, 1, figsize=(18,10))
     plt.rcParams.update({'font.size': 18})
 
@@ -146,10 +198,12 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
         min_arr = np.nanmin(comb_arr, axis=-1)
         max_arr = np.nanmax(comb_arr, axis=-1)
         std_arr = np.nanstd(comb_arr, axis=-1)
+        count_arr = np.sum(~np.isnan(comb_arr), axis=-1)
         x_vals = np.arange(len(mean_arr))*1000
 
         ax.plot(x_vals, mean_arr, c=cols[i], label=label)
-        ax.fill_between(x_vals, min_arr, max_arr, color=cols[i], alpha=0.5)
+        # ax.fill_between(x_vals, min_arr, max_arr, color=cols[i], alpha=0.5)
+        ax.fill_between(x_vals, mean_arr-std_arr, mean_arr+std_arr, color=cols[i], alpha=0.5)
 
         terminal_points = np.where(np.sort((comb_arr==np.NaN).argmin(axis=0))>0)[0]
         ax.scatter(x_vals[terminal_points], mean_arr[terminal_points], color=cols[i], s=100)
@@ -160,7 +214,8 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
         
         summary_metrics[label] = {
             'mean': np.round(mean_arr[-1],0).astype(int),
-            'std': np.round(std_arr[-1],0).astype(int)
+            'std': np.round(std_arr[-1],0).astype(int),
+            'count': count_arr[-2]
         }
         
 
@@ -170,7 +225,7 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
     ax.set_ylim(bottom=ymin, top=ymax)
     if title is not None:
         ax.set_title(title)
-    ax.legend(loc='upper left')
+    ax.legend(loc=loc)
 
     if save_path is not None:
         fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
