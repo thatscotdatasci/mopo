@@ -282,6 +282,7 @@ class MOPO(RLAlgorithm):
             self._epoch_before_hook()
             gt.stamp('epoch_before_hook')
 
+            # _n_train_repeat is 1
             self._training_progress = Progress(self._epoch_length * self._n_train_repeat)
             start_samples = self.sampler._total_samples
             for timestep in count():
@@ -295,6 +296,7 @@ class MOPO(RLAlgorithm):
                 gt.stamp('timestep_before_hook')
 
                 ## model rollouts
+                # _real_ratio is 0.05
                 if timestep % self._model_train_freq == 0 and self._real_ratio < 1.0:
                     self._training_progress.pause()
                     self._set_rollout_length()

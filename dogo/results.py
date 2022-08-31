@@ -205,8 +205,8 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
     
     if pool is not None:
         orig_results = np.load(os.path.join(models_dir, f'model_pool_{pool}.npy'))
-        if os.path.isfile(os.path.join(models_dir, f'mse_{pool}.npy')):
-            orig_mse_results = np.load(os.path.join(models_dir, f'mse_{pool}.npy'))
+        if os.path.isfile(os.path.join(models_dir, f'overall_mse_{pool}.npy')):
+            orig_mse_results = np.load(os.path.join(models_dir, f'overall_mse_{pool}.npy'))
             orig_mse_results[np.isposinf(orig_mse_results)] = np.nan
         else:
             orig_mse_results = None
@@ -216,9 +216,9 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
             np.load(i) for i in model_pool_files if 'pca' not in i
         ])
 
-        if os.path.isfile(os.path.join(models_dir, f'mse_{os.path.basename(model_pool_files[0]).split("_")[-1]}')):
+        if os.path.isfile(os.path.join(models_dir, f'overall_mse_{os.path.basename(model_pool_files[0]).split("_")[-1]}')):
             model_mse_files = [
-                os.path.join(models_dir, f'mse_{os.path.basename(i).split("_")[-1]}') for i in model_pool_files
+                os.path.join(models_dir, f'overall_mse_{os.path.basename(i).split("_")[-1]}') for i in model_pool_files
             ]
             orig_mse_results = np.vstack([
                 np.load(i) for i in model_mse_files

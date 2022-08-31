@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import numpy as np
+from mujoco_py import MujocoException
 
 from .base_sampler import BaseSampler
 
@@ -49,7 +50,11 @@ class SimpleSampler(BaseSampler):
                 self._current_observation)[None]
         ])[0]
 
-        next_observation, reward, terminal, info = self.env.step(action)
+        try:
+            next_observation, reward, terminal, info = self.env.step(action)
+        except MujocoException as e:
+            # Except branch used in debugging
+            raise e
         self._path_length += 1
         self._path_return += reward
         self._total_samples += 1

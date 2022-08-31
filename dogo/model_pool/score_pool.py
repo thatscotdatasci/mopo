@@ -67,7 +67,8 @@ def score_pool(policy_experiment):
         mujoco_exception_count = 0
 
         model_pool = np.load(model_pool_path)
-        obs, act, _, rew, _, _, pen = split_halfcheetah_v2_trans_arr(model_pool)
+        obs, act, next_obs, rew, _, _, pen = split_halfcheetah_v2_trans_arr(model_pool)
+        overall_mse = np.zeros_like(rew)
         rew_mse = np.zeros_like(rew)
         for i in range(len(model_pool)):
             pen_rew_val = rew[i,:]
@@ -75,15 +76,23 @@ def score_pool(policy_experiment):
             unpen_rew_val = pen_rew_val + penalty_coeff*pen_val
             try:
                 eval_env._env.set_state(*get_qpos_qvel(obs[i,:].flatten()))
-                _, rew_real, _, _ = eval_env.step(act[i,:])
+                next_obs_real, rew_real, _, _ = eval_env.step(act[i,:])
             except MujocoException:
                 rew_mse[i,:] = np.inf
+                overall_mse[i,:] = np.inf
                 mujoco_exception_count += 1
             else:
                 rew_mse_val = (rew_real-unpen_rew_val)**2
                 rew_mse[i,:] = rew_mse_val
+
+                next_obs_rew = np.hstack((next_obs[i,:], unpen_rew_val))
+                next_obs_rew_real = np.hstack((next_obs_real['observations'], rew_real))
+                next_obs_rew_mse = np.linalg.norm((next_obs_rew_real-next_obs_rew)**2)
+                overall_mse[i,:] = next_obs_rew_mse
+
         print(f'Encountered {mujoco_exception_count} MujocoExceptions')
         np.save(os.path.join(policy_exp_details.results_dir, 'models', f'mse_{os.path.basename(model_pool_path).split("_")[-1]}'), rew_mse)
+        np.save(os.path.join(policy_exp_details.results_dir, 'models', f'overall_mse_{os.path.basename(model_pool_path).split("_")[-1]}'), overall_mse)
 
 if __name__ == '__main__':
     args = parse_args()

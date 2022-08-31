@@ -368,10 +368,10 @@ def plot_policy_group_values(policy_exp_label_groups, expected_records, determin
         grouped_gym_returns[i,0], grouped_gym_returns[i,1] = np.nanmean(gym_returns_arr), np.nanstd(gym_returns_arr)
 
     if show_penalised:
-        ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_pen_returns[:,0], grouped_fake_pen_returns[:,1], ls='', marker='x', capsize=10, label='Learned Dynamics - Penalised')
-    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_unpen_returns[:,0], grouped_fake_unpen_returns[:,1], ls='', marker='x', capsize=10, label='Learned Transitions, Learned Rewards')
-    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_eval_returns[:,0], grouped_eval_returns[:,1], ls='', marker='x', capsize=10, label='Learned Transitions, Real Rewards')
-    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_gym_returns[:,0], grouped_gym_returns[:,1], ls='', marker='x', capsize=10, label='Real Transitions, Real Rewards')
+        ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_pen_returns[:,0], grouped_fake_pen_returns[:,1], ls='', marker='x', markersize=10, capsize=10, label='Learned Dynamics - Penalised')
+    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_fake_unpen_returns[:,0], grouped_fake_unpen_returns[:,1], ls='', marker='x', markersize=10, capsize=10, label='Learned Dynamics, Learned Rewards')
+    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_eval_returns[:,0], grouped_eval_returns[:,1], ls='', marker='x', markersize=10, capsize=10, label='Learned Dynamics, Real Rewards')
+    ax.errorbar(np.arange(len(policy_exp_label_groups)), grouped_gym_returns[:,0], grouped_gym_returns[:,1], ls='', marker='x', markersize=10, capsize=10, label='Real Dynamics, Real Rewards')
 
     # ax.set_title(policy_dynamics_plot_title(dynamics_exp, policy_exp, deterministic_model, deterministic_policy))
     ax.set_xlabel(x_label or 'REx and MOPO Penalty Coefficients')
@@ -584,7 +584,53 @@ def plot_returns_comparison_pol_dep_groups(dynamics_exp_groups_labels, policy_ex
 
     if save_path is not None:
         fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
-        
+    
+def plot_returns_comparison_pol_dep_groups_first(dynamics_exp_groups_labels, policy_exp_groups_labels, w_lim=1000, save_path=None, fig_size=(10,10)):
+    plt.rc('font', size=24)
+    fig, ax = plt.subplots(1, 1, figsize=fig_size)
+    
+    n_dynamics_groups = len(dynamics_exp_groups_labels)
+    n_policy_groups = len(policy_exp_groups_labels)
+
+    fake_returns = np.zeros((n_policy_groups, n_dynamics_groups, 2))
+    eval_returns = np.zeros((n_policy_groups, n_dynamics_groups, 2))
+    for i, (dynamic_exp_group, _) in enumerate(dynamics_exp_groups_labels):
+        for j, (policy_exp_group, _) in enumerate(policy_exp_groups_labels):
+            group_fake_return_stats, group_eval_return_stats, _ = get_dyanmics_overall_metrics(dynamic_exp_group, policy_exp_group)
+            fake_returns[j,i,0], fake_returns[j,i,1] = group_fake_return_stats
+            eval_returns[j,i,0], eval_returns[j,i,1] = group_eval_return_stats
+
+    all_dynamics_exps = [item for sublist in [i[0] for i in dynamics_exp_groups_labels] for item in sublist]
+    gym_returns = np.zeros((n_policy_groups, 1, 2))
+    for i, (policy_exp_group, _) in enumerate(policy_exp_groups_labels):
+        _, _, group_gym_return_stats = get_dyanmics_overall_metrics(all_dynamics_exps, policy_exp_group, gym=True)
+        gym_returns[i,0,0], gym_returns[i,0,1] = group_gym_return_stats
+    
+    for i, (ax, res_arr, title) in enumerate([
+        (ax, fake_returns, 'Learned Transitions\nLearned Rewards'),
+    ]):
+        mat = ax.matshow(res_arr[:,:,0], cmap='viridis')
+        ax.tick_params(axis='both', which='major', labelbottom = True, bottom=False, top = False, labeltop=False)
+        ax.set_yticks(range(n_policy_groups))
+        ax.set_yticklabels([i[1] for i in policy_exp_groups_labels], rotation=0)
+        ax.set_ylabel('Policy Demonstrator Steps')
+
+        if i != 2:
+            ax.set_xlabel('Dynamics Demonstrator Steps')
+            ax.set_xticks(range(n_dynamics_groups))
+            ax.set_xticklabels([i[1] for i in dynamics_exp_groups_labels], rotation=0)
+        else:
+            ax.set_xticks(range(1))
+            ax.set_xticklabels([' '], rotation=0)
+        # ax.set_title(title)
+
+        for (j,k), z in np.ndenumerate(res_arr[:,:,0]):
+            if z != 0 and z != np.nan:
+                ax.text(k, j, '{:.0f}\n±{:.0f}'.format(res_arr[j,k,0], res_arr[j,k,1]), ha="center", va="center", color='w' if z < w_lim else 'k', fontsize=20)
+
+
+    if save_path is not None:
+        fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
 
 def plot_pen_reward_landscape_comp(dynamics_policy_exps_list, pen_coeff=1.0):
     fig, ax = plt.subplots(1, 2, figsize=(20,10), subplot_kw={"projection": "3d"})
