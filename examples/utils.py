@@ -332,6 +332,12 @@ def get_parser(allow_policy_list=False):
         type=int,
         default=None,
         help="Number of epochs to retrain loaded BNN model for.")
+    
+    parser.add_argument(
+        '--rex-beta',
+        type=float,
+        default=None,
+        help="The REx penalty coefficient to use.")
 
     parser = add_ray_init_args(parser)
     parser = add_ray_tune_args(parser)
