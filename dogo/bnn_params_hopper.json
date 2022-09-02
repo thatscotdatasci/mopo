@@ -1,0 +1,32 @@
+{
+    "name": "BNN",
+    "num_networks": 7,
+    "num_elites": 5,
+    "separate_mean_var": true,
+    "deterministic": false,
+    "log_dir": "/rds/user/ajc348/hpc-work/mopo",
+    "model_dir": null,
+    "load_model": true,
+    "environment_params": {
+        "training": {
+            "domain": "Hopper",
+            "task": "v2",
+            "universe": "gym",
+            "kwargs": {}
+        },
+        "evaluation": {
+            "domain": "Hopper",
+            "task": "v2",
+            "universe": "gym",
+            "kwargs": {}
+        }
+    },
+    "replay_pool_params": {
+        "type": "SimpleReplayPool",
+        "kwargs": {
+            "max_size": 1000000
+        },
+        "pool_load_path": null
+    },
+    "seed": 1443
+}

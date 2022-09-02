@@ -17,7 +17,9 @@ from dogo.results import get_experiment_details
 DATA_BASEDIR = "/home/ajc348/rds/hpc-work/dogo_results/data"
 DATA_PATHS = []
 
-PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
+PARAMETERS_PATH_HC = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params_halfcheetah.json"
+PARAMETERS_PATH_H = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params_hopper.json"
+PARAMETERS_PATH_W = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params_walker2d.json"
 OUTPUT_BASE_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/model_scoring"
 
 
@@ -27,7 +29,16 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
     elites = exp_details.elites
 
     # Load parameters - the mininal needed give we are loading a pre-trained model
-    with open(PARAMETERS_PATH, 'r') as f:
+    if exp_details.environment == 'HalfCheetah':
+        parameters_path = PARAMETERS_PATH_HC
+    elif exp_details.environment == 'Hopper':
+        parameters_path = PARAMETERS_PATH_H
+    elif exp_details.environment == 'Walker2d':
+        parameters_path = PARAMETERS_PATH_HC
+    else:
+        raise RuntimeError(f'No parameters file for environment: {exp_details.environment}')
+    
+    with open(parameters_path, 'r') as f:
         params = json.load(f)
     params["model_dir"] = model_dir
 
