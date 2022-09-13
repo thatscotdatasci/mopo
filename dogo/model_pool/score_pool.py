@@ -8,7 +8,7 @@ from mujoco_py import MujocoException
 
 from softlearning.environments.utils import get_environment_from_params
 from dogo.results import get_experiment_details
-from dogo.rollouts.split import split_halfcheetah_v2_trans_arr
+from dogo.rollouts.split import split_halfcheetah_v2_trans_arr, split_hopper_v2_trans_arr
 
 
 def parse_args():
@@ -16,20 +16,27 @@ def parse_args():
     parser.add_argument('--policy-experiment',
                         type=str,
                         help='Experiment whose dynamics model should be used.')
+    parser.add_argument('--env-name',
+                        type=str,
+                        choices=['HalfCheetah', 'Walker2d', 'Hopper'],
+                        default='HalfCheetah',
+                        help='Environment')
 
     args = parser.parse_args()
 
     return args
 
-def get_qpos_qvel(obs):
+def get_qpos_qvel(obs, env_name):
     # Return qpos and qvel values from the current obs
     # These are necessary if setting the environment
-    qpos = np.hstack((np.zeros(1),obs[:8]))
-    qvel = obs[8:]
+    pos_vel_split_ind = 5 if env_name == 'Hopper' else 8
+    qpos = np.hstack((np.zeros(1),obs[:pos_vel_split_ind]))
+    qvel = obs[pos_vel_split_ind:]
     return qpos, qvel
 
-def score_pool(policy_experiment):
+def score_pool(policy_experiment, env_name):
     print(f'Scoring experiment: {policy_experiment}')
+    print(f'Environment: {env_name}')
 
     ##################################
     # Create an evaluation environment
@@ -67,7 +74,12 @@ def score_pool(policy_experiment):
         mujoco_exception_count = 0
 
         model_pool = np.load(model_pool_path)
-        obs, act, next_obs, rew, _, _, pen = split_halfcheetah_v2_trans_arr(model_pool)
+
+        if env_name == 'Hopper':
+            obs, act, next_obs, rew, _, _, pen = split_hopper_v2_trans_arr(model_pool)
+        else:
+            obs, act, next_obs, rew, _, _, pen = split_halfcheetah_v2_trans_arr(model_pool)
+        
         overall_mse = np.zeros_like(rew)
         rew_mse = np.zeros_like(rew)
         for i in range(len(model_pool)):
@@ -75,7 +87,7 @@ def score_pool(policy_experiment):
             pen_val = pen[i,:]
             unpen_rew_val = pen_rew_val + penalty_coeff*pen_val
             try:
-                eval_env._env.set_state(*get_qpos_qvel(obs[i,:].flatten()))
+                eval_env._env.set_state(*get_qpos_qvel(obs[i,:].flatten(), env_name))
                 next_obs_real, rew_real, _, _ = eval_env.step(act[i,:])
             except MujocoException:
                 rew_mse[i,:] = np.inf
@@ -97,4 +109,9 @@ def score_pool(policy_experiment):
 if __name__ == '__main__':
     args = parse_args()
     policy_experiment = args.policy_experiment
-    score_pool(policy_experiment)
+    env_name = args.env_name
+
+    # policy_experiment = 'HO265'
+    # env_name = 'Hopper'
+
+    score_pool(policy_experiment, env_name)
