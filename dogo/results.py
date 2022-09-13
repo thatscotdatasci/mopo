@@ -22,7 +22,7 @@ ExperimentDetails = namedtuple('ExperimentDetails', experiment_details)
 ExperimentResults = namedtuple('ExperimentResults', [*experiment_details, 'dynamics', 'sac'])
 DynamicsTrainingResults = namedtuple('DynamicsTrainingResults', DYNAMICS_TRAINING_FILES.keys())
 SacTrainingResults = namedtuple('DynamicsTrainingResults', SAC_TRAINING_FILES.keys())
-PoolArrs = namedtuple('PoolArrs', 'pool pca_sa_1d pca_sa_2d mse_results explained_var_2d')
+PoolArrs = namedtuple('PoolArrs', 'pool pca_sa_1d pca_sa_2d mse_results rew_mse_results explained_var_2d')
 
 #########
 # Helpers
@@ -205,11 +205,18 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
     
     if pool is not None:
         orig_results = np.load(os.path.join(models_dir, f'model_pool_{pool}.npy'))
+
         if os.path.isfile(os.path.join(models_dir, f'overall_mse_{pool}.npy')):
             orig_mse_results = np.load(os.path.join(models_dir, f'overall_mse_{pool}.npy'))
             orig_mse_results[np.isposinf(orig_mse_results)] = np.nan
         else:
             orig_mse_results = None
+
+        if os.path.isfile(os.path.join(models_dir, f'mse_{pool}.npy')):
+            orig_rew_mse_results = np.load(os.path.join(models_dir, f'mse_{pool}.npy'))
+            orig_rew_mse_results[np.isposinf(orig_rew_mse_results)] = np.nan
+        else:
+            orig_rew_mse_results = None
     else:
         model_pool_files = sorted(list(glob(os.path.join(models_dir, 'model_pool_*.npy'))))
         orig_results = np.vstack([
@@ -227,14 +234,27 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
         else:
             orig_mse_results = None
 
+        if os.path.isfile(os.path.join(models_dir, f'mse_{os.path.basename(model_pool_files[0]).split("_")[-1]}')):
+            model_rew_mse_files = [
+                os.path.join(models_dir, f'mse_{os.path.basename(i).split("_")[-1]}') for i in model_pool_files
+            ]
+            orig_rew_mse_results = np.vstack([
+                np.load(i) for i in model_rew_mse_files
+            ])
+            orig_rew_mse_results[np.isposinf(orig_rew_mse_results)] = np.nan
+        else:
+            orig_rew_mse_results = None
+
     # Subsample the results
     if subsample_size is not None:
         subsample_idxs = np.random.choice(np.arange(orig_results.shape[0]), subsample_size, replace=False)
         results =  orig_results[subsample_idxs,:]
         mse_results = orig_mse_results[subsample_idxs,:] if orig_mse_results is not None else None
+        rew_mse_results = orig_rew_mse_results[subsample_idxs,:] if orig_rew_mse_results is not None else None
     else:
         results = orig_results
         mse_results = orig_mse_results
+        rew_mse_results = orig_rew_mse_results
     
     #######################
     # Load pre-existing PCA
@@ -248,4 +268,4 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
 
     pca_1d_sa, pca_2d_sa, explained_var_2d = project_arr(results[:,:STATE_DIMS+ACTION_DIMS], pca_2d=pca_model)
 
-    return results, pca_1d_sa, pca_2d_sa, mse_results, explained_var_2d
+    return results, pca_1d_sa, pca_2d_sa, mse_results, rew_mse_results, explained_var_2d
