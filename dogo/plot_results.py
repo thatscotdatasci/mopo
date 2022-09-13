@@ -5,11 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid.inset_locator import mark_inset
 from scipy.ndimage import uniform_filter1d
+from sklearn.linear_model import LinearRegression
 
 from dogo.constants import FIG_DIR
+from dogo.results import get_scores_df, get_results, get_experiment_details
 
 lss = ['-', '--']
-cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', 'b', 'g', 'r']
 
 FEATURE_LABEL_DICT = {
     'evaluation/return-average': 'Evaluation Return Average',
@@ -18,6 +20,11 @@ FEATURE_LABEL_DICT = {
     'model/mean_unpenalized_rewards': 'Average Unpenalised Rewards',
     'model/mean_penalized_rewards': 'Average Penalised Reward',
     'model/mean_penalty': 'Average Penalty'
+}
+
+SCORING_LABEL_DICT = {
+    'log_prob': 'Log Likelihood',
+    'overall_mse': 'MSE'
 }
 
 def plot_experiment_metrics(
@@ -129,8 +136,8 @@ def plot_min_max_penalty(exp_set_label_collection: list):
     ax.set_ylabel('Penalty')
     ax.legend()
 
-def plot_evaluation_returns(exps: list, title: str = None, ymin=None, ymax=None, feature: str = 'evaluation/return-average', fig_size=(20,10), labels=None, legend=True, save_path=None, erm_dashed=True, loc='upper left', ncol=1):
-    plt.rc('font', size=22)
+def plot_evaluation_returns(exps: list, title: str = None, xmin=None, xmax=None, ymin=None, ymax=None, feature: str = 'evaluation/return-average', fig_size=(20,10), labels=None, legend=True, save_path=None, erm_dashed=True, loc='upper left', ncol=1):
+    plt.rc('font', size=12)
     fig, ax = plt.subplots(1, 1, figsize=fig_size)
 
     for i, exp in enumerate(exps):
@@ -155,6 +162,7 @@ def plot_evaluation_returns(exps: list, title: str = None, ymin=None, ymax=None,
 
     ax.set_xlabel('Steps')
     ax.set_ylabel(FEATURE_LABEL_DICT[feature])
+    ax.set_xlim(left=xmin, right=xmax)
     ax.set_ylim(bottom=ymin, top=ymax)
     
     if title is not None:
@@ -166,7 +174,7 @@ def plot_evaluation_returns(exps: list, title: str = None, ymin=None, ymax=None,
     if save_path is not None:
         fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
 
-def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, xmax=501000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average', save_path=None, loc='upper left'):
+def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average', save_path=None, loc='upper left', max_timestep=500000):
     fig, ax = plt.subplots(1, 1, figsize=(18,10))
     plt.rcParams.update({'font.size': 18})
 
@@ -177,6 +185,8 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
 
         for exp in exp_set:
             exp_timesteps = exp.sac.result['timesteps_total'].values
+            exp_timesteps = exp_timesteps[exp_timesteps<=max_timestep]
+
             start_points = np.hstack([np.where(exp_timesteps==1000)[0], len(exp_timesteps)])
             exp_end_points.append(exp_timesteps[start_points[1:]-1])
 
@@ -215,13 +225,14 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
         summary_metrics[label] = {
             'mean': np.round(mean_arr[-1],0).astype(int),
             'std': np.round(std_arr[-1],0).astype(int),
-            'count': count_arr[-2]
+            'count': count_arr[-2],
+            'text': f'{np.round(mean_arr[-1],0).astype(int)} ± {np.round(std_arr[-1],0).astype(int)}'
         }
         
 
     ax.set_xlabel('Training Steps')
     ax.set_ylabel(FEATURE_LABEL_DICT[feature])
-    ax.set_xlim(left=xmin, right=xmax)
+    ax.set_xlim(left=xmin, right=max_timestep+1000)
     ax.set_ylim(bottom=ymin, top=ymax)
     if title is not None:
         ax.set_title(title)
@@ -231,3 +242,71 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
         fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
 
     return summary_metrics
+
+def plot_dynamics_score_vs_agent_return(exp_groups, eval_ds, train_eval_ds, agent_score_timesteps=500000, xmin=None, xmax=None, ymin1=None, ymax1=None, primary_metric='log_prob', secondary_metric='overall_mse', show_secondary_metric=True, mode='ood'):
+    fig, ax1 = plt.subplots(1, 1, figsize=(10,10))
+
+    if show_secondary_metric:
+        ax2 = ax1.twinx()
+
+    scores_all = []
+    primary_metric_vals_all = []
+    for i, (exps, label) in enumerate(exp_groups):
+        primary_metric_vals = []
+        secondary_metric_vals = []
+        scores = []
+        for exp_name in exps:
+            exp_results = get_results(exp_name)
+            terminus_mask = exp_results.sac.result['timesteps_total']==agent_score_timesteps
+            if any(terminus_mask):
+                exp = get_experiment_details(exp_name)
+                dynamics_exp = get_experiment_details(exp.dynamics_model_exp)
+                dynamics_scores = get_scores_df([dynamics_exp.name], eval_ds)
+
+                if mode == 'ood':
+                    primary_metric_vals.append(dynamics_scores.loc[~dynamics_scores['evaluation_dataset'].isin(train_eval_ds), primary_metric].mean())
+                    secondary_metric_vals.append(dynamics_scores.loc[~dynamics_scores['evaluation_dataset'].isin(train_eval_ds), secondary_metric].mean())
+                elif mode == 'id':
+                    primary_metric_vals.append(dynamics_scores.loc[dynamics_scores['evaluation_dataset'].isin(train_eval_ds), primary_metric].mean())
+                    secondary_metric_vals.append(dynamics_scores.loc[dynamics_scores['evaluation_dataset'].isin(train_eval_ds), secondary_metric].mean())
+                elif mode == 'all':
+                    primary_metric_vals.append(dynamics_scores[primary_metric].mean())
+                    secondary_metric_vals.append(dynamics_scores[secondary_metric].mean())
+                scores.append(exp_results.sac.result.loc[terminus_mask, 'evaluation/return-average'].values[0])
+
+        scores_all.extend(scores)
+        primary_metric_vals_all.extend(primary_metric_vals)
+        
+        arg_sort = np.argsort(scores)
+        scores = np.array(scores)[arg_sort]
+        primary_metric_vals = np.array(primary_metric_vals)[arg_sort]
+        secondary_metric_vals = np.array(secondary_metric_vals)[arg_sort]
+
+        if show_secondary_metric:
+            ax1.plot(scores, primary_metric_vals, marker='o', ls='--', color=cols[i], label=f'{label} - Log-Likelihood')
+            ax2.plot(scores, secondary_metric_vals, marker='x', ls='--', color=cols[i], label=f'{label} - MSE')
+        else:
+            ax1.plot(primary_metric_vals, scores, marker='o', ls='--', color=cols[i], label=f'{label}')
+    
+    if show_secondary_metric:
+        ax1.set_xlabel('Agent Return')
+        ax1.set_ylabel(SCORING_LABEL_DICT[primary_metric])
+        ax2.set_ylabel(SCORING_LABEL_DICT[secondary_metric])
+    else:
+        arg_sort_all = np.argsort(scores_all)
+        scores_all = np.array(scores_all)[arg_sort_all]
+        primary_metric_vals_all = np.array(primary_metric_vals_all)[arg_sort_all]
+
+        lr = LinearRegression().fit(primary_metric_vals_all.reshape(-1, 1), scores_all.reshape(-1, 1))
+        x_range = np.linspace(primary_metric_vals_all.min(), primary_metric_vals_all.max(), 2)
+        y_vals = lr.predict(x_range.reshape(-1, 1)).flatten()
+
+        ax1.plot(x_range, y_vals, marker='', ls=':', color=cols[i+1], label=f'LBF - $R^2={lr.score(primary_metric_vals_all.reshape(-1, 1), scores_all.reshape(-1, 1)):.2f}$')
+
+        ax1.set_ylabel('Agent Return')
+        ax1.set_xlabel(SCORING_LABEL_DICT[primary_metric])
+
+    ax1.set_xlim(xmin, xmax)
+    ax1.set_ylim(ymin1, ymax1)
+
+    fig.legend(ncol=2, loc='upper center')
