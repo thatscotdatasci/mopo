@@ -21,7 +21,12 @@
 # MP725
 
 # 1 Epoch of Retraining
-
+# MP874 \
+# MP875 \
+# MP876 \
+# MP877 \
+# MP878 \
+# MP879
 
 for model in \
 MP874 \
@@ -31,5 +36,5 @@ MP877 \
 MP878 \
 MP879
 do
-    .env/bin/python dogo/score_model_new.py $model
+    .env/bin/python dogo/score_model_rt.py $model
 done
