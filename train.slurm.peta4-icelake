@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 ##SBATCH --array=1-3
-#SBATCH --time=12:00:00
+#SBATCH --time=36:00:00
 #SBATCH --mail-type=FAIL
 #! Uncomment this to prevent the job from being requeued (e.g. if
 #! interrupted by node failure or system downtime):
@@ -37,10 +37,14 @@ options="run_local examples.development \
         --config=examples.config.d4rl.halfcheetah_custom \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name halfcheetah_mixed_2
-        --seed 4321 \
-        --dynamics-model-exp MP288 \
-        --dataset MIXED-1"
+        --exp-name halfcheetah_mixed_rt_1 \
+        --seed 1443 \
+        --dynamics-model-exp MP748 \
+        --bnn-retrain-epochs 0 \
+        --penalty-coeff 0.0 \
+        --rollout-length 5 \
+        --rollout-batch-size 50000 \
+        --dataset MIXED-RT-1"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
