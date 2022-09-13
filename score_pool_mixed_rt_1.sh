@@ -55,15 +55,12 @@
 # MP918
 
 for model in \
-MP910 \
-MP911 \
-MP912 \
-MP913 \
-MP914 \
-MP915 \
-MP916 \
-MP917 \
-MP918
+MP982 \
+MP983 \
+MP984 \
+MP988 \
+MP989 \
+MP990
 do
     .env/bin/python dogo/model_pool/score_pool.py --policy-experiment $model
 done
