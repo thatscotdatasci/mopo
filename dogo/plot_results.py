@@ -174,7 +174,7 @@ def plot_evaluation_returns(exps: list, title: str = None, xmin=None, xmax=None,
     if save_path is not None:
         fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
 
-def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average', save_path=None, loc='upper left', max_timestep=500000):
+def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmin=-1000, ymin=None, ymax=None, show_ends=True, feature: str = 'evaluation/return-average', save_path=None, loc='upper left', max_timestep=500000, end_point_val=-2000):
     fig, ax = plt.subplots(1, 1, figsize=(18,10))
     plt.rcParams.update({'font.size': 18})
 
@@ -220,7 +220,7 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
 
         if show_ends:
             exp_end_points = exp_end_points[exp_end_points<x_vals[-1]]
-            ax.scatter(exp_end_points, -2000*np.ones_like(exp_end_points), marker='x', color=cols[i], s=100)
+            ax.scatter(exp_end_points, end_point_val*np.ones_like(exp_end_points), marker='x', color=cols[i], s=100)
         
         summary_metrics[label] = {
             'mean': np.round(mean_arr[-1],0).astype(int),
