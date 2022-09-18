@@ -350,9 +350,9 @@ def plot_dynamics_group_values(dynamics_exp_label_groups, policy_exps, expected_
     if save_path is not None:
         fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
 
-def plot_policy_group_values(policy_exp_label_groups, expected_records, deterministic_model=True, deterministic_policy=True, show_penalised=True, loc='upper left', y_min=None, y_max=None, save_path=None, x_label=None, x_tick_rot=45):
+def plot_policy_group_values(policy_exp_label_groups, expected_records, deterministic_model=True, deterministic_policy=True, show_penalised=True, loc='upper left', y_min=None, y_max=None, save_path=None, x_label=None, x_tick_rot=45, fig_size=(10,10)):
     plt.rc('font', size=22)
-    fig, ax = plt.subplots(1, 1, figsize=(10,10))
+    fig, ax = plt.subplots(1, 1, figsize=fig_size)
 
     xtick_labels = []
     grouped_fake_pen_returns = np.zeros((len(policy_exp_label_groups),2))
