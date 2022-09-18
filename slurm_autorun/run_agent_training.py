@@ -2,8 +2,8 @@ import os
 import json
 import sys
 import time
+from copy import deepcopy
 from datetime import datetime
-import itertools
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -17,111 +17,127 @@ ROLLOUT_BATCH_SIZES = {
     5: 50000,
     10: 25000,
     20: 12500,
+    50: 5000,
 }
 
 
-class MopoExpSet:
+class MopoAgentExp:
     def __init__(
         self,
         config,
-        dynamics_model_exps,
-        mopo_penalty_coeffs,
-        rollout_lengths,
-        datasets,
+        dynamics_model_exp,
+        mopo_penalty_coeff,
+        rollout_length,
+        dataset,
+        output_dir,
+        exp_id,
         exp_name=None,
         seed=None,
         bnn_retrain_epochs=0,
         rollout_batch_size=None
     ) -> None:
+        dynamics_exp = get_experiment_details(dynamics_model_exp)
+
         # Params always specified by user
         self.config = config
-        self.dynamics_model_exps = dynamics_model_exps
-        self.mopo_penalty_coeffs = mopo_penalty_coeffs
-        self.rollout_lengths = rollout_lengths
-        self.datasets = datasets
+        self.dynamics_model_exp = dynamics_model_exp
+        self.mopo_penalty_coeff = mopo_penalty_coeff
+        self.rollout_length = rollout_length
+        self.dataset = dataset
+        self.exp_id = exp_id
 
-        # Params with defaults
-        self.exp_name = exp_name
-        self.seed = seed
+        # Params with defaults/values taken from the dynamics experiment
+        self.exp_name = exp_name or '_'.join(dynamics_exp.base_dir.split('_')[:-1])
+        self.seed = seed or dynamics_exp.seed
         self.bnn_retrain_epochs = bnn_retrain_epochs
-        self.rollout_batch_size = rollout_batch_size
+        self.rollout_batch_size = rollout_batch_size or ROLLOUT_BATCH_SIZES[self.rollout_length]
+
+        # Other arguments
+        self.output_dir = output_dir
 
     _jinja_template = None
     @property
     def jinja_template(self):
         if self._jinja_template is None:
-            template_loader = FileSystemLoader(searchpath="./")
+            template_loader = FileSystemLoader(searchpath=SLRUM_AUTORUN_DIR)
             env = Environment(loader=template_loader)
             self._jinja_template = env.get_template(SLURM_TRAIN_TEMPLATE_PATH)
         return self._jinja_template
 
-    def exp_record(self, dme, mpc, rl, d):
-        dynamics_exp = get_experiment_details(dme)
+    @property
+    def exp_record(self):
         return {
             "config": self.config,
-            "exp_name": '_'.join(dynamics_exp.base_dir.split('_')[:-1]),
-            "seed": dynamics_exp.seed,
-            "dynamics_model_exp": dme,
+            "exp_name": self.exp_name,
+            "seed": self.seed,
+            "dynamics_model_exp": self.dynamics_model_exp,
             "bnn_retrain_epochs": self.bnn_retrain_epochs,
-            "mopo_penalty_coeff": mpc,
-            "rollout_length": rl,
-            "rollout_batch_size": ROLLOUT_BATCH_SIZES[rl],
-            "dataset": d,
+            "mopo_penalty_coeff": self.mopo_penalty_coeff,
+            "rollout_length": self.rollout_length,
+            "rollout_batch_size": self.rollout_batch_size,
+            "dataset": self.dataset,
         }
-
-    @property
-    def exp_collection(self):
-        return (self.exp_record(*params_set) for params_set in  itertools.product(
-            self.dynamics_model_exps,
-            self.mopo_penalty_coeffs,
-            self.rollout_lengths,
-            self.datasets,
-        ))
 
     @property
     def slurm_tmp_filename(self):
         t_stamp = datetime.utcfromtimestamp(int(time.time())).strftime(TIME_FORMAT)
-        return os.path.join(SLRUM_AUTORUN_DIR, f'train.slurm.peta4-icelake.{t_stamp}')
+        return os.path.join(SLRUM_AUTORUN_DIR, 'output', self.output_dir, f'train.slurm.peta4-icelake.{t_stamp}')
         
-    def run_experiments(self):
-        failure = False
-        exps_triggered = []
-        for i in self.exp_collection:
-            slrum_tmp_file = self.slurm_tmp_filename
-            with open(slrum_tmp_file, 'w') as f:
-                f.write(self.jinja_template.render(i))
-            stream = os.popen(f'sbatch {slrum_tmp_file}')
-            output = stream.read()
+    def run_experiment(self):
+        slrum_tmp_file = self.slurm_tmp_filename
+        with open(slrum_tmp_file, 'w') as f:
+            f.write(self.jinja_template.render(self.exp_record))
+        stream = os.popen(f'sbatch {slrum_tmp_file}')
+        output = stream.read()
             
-            if not output.startswith('Submitted batch job '):
-                failure = True
-                print(output)
-                break
+        if not output.startswith('Submitted batch job '):
+            raise RuntimeError(f'Did not trigger job successfully!\n{self.exp_record}')
 
-            job_id = output.split()[-1]
+        job_id = output.split()[-1]
+        with open(slrum_tmp_file+'.' + str(job_id), 'w') as f:
+            f.write('')
+
+        print(job_id)
+    
+        return job_id
+
+def run_experiment_set(params_filepath):
+    output_dir = params_filepath.split('/')[-1].replace('.json', '')
+
+    os.makedirs(os.path.join(SLRUM_AUTORUN_DIR, 'output', output_dir), exist_ok=True)
+
+    with open(params_filepath, 'r') as f:
+        exp_coll = json.load(f)
+    
+    failure = False
+    exps_triggered = []
+    exp_coll_triggered = []
+    for exp_params in exp_coll:
+        try:
+            job_id = MopoAgentExp(**exp_params, output_dir=output_dir).run_experiment()
+        except RuntimeError:
+            failure = True
+            break
+        else:
             exps_triggered.append(job_id)
-            with open(slrum_tmp_file+'.' + str(job_id), 'w') as f:
-                f.write('')
-            
+
+            exp_triggered = deepcopy(exp_params)
+            exp_triggered.update({'slurm_job_id': job_id})
+            exp_coll_triggered.append(exp_triggered)
+
             time.sleep(1)
 
-        if failure: 
-            raise RuntimeError('Did not trigger job successfully!')
-                
-        return exps_triggered
+    with open(os.path.join(SLRUM_AUTORUN_DIR, 'output', output_dir, params_filepath.split('/')[-1]), 'w') as f:
+        json.dump(exp_coll_triggered, f, indent=4)
 
-def run_experiment_set(exp_set_dict):
-    MopoExpSet(**exp_set_dict).run_experiments()
+    print(' '.join(exps_triggered))
 
-def main(params_filepath):
-    with open(params_filepath, 'r') as f:
-        params_collection = json.load(f)
-    exps_triggered = [run_experiment_set(i) for i in params_collection]
-    print(exps_triggered)
+    if failure:
+        raise RuntimeError('Did not trigger all jobs successfully!')
 
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = "/home/ajc348/rds/hpc-work/mopo/exp_params.170922.1.json"
+    params_filepath = "/home/ajc348/rds/hpc-work/mopo/slurm_autorun/exp_params/exp_params.180922_2.json"
 
-    main(params_filepath)
+    run_experiment_set(params_filepath)
