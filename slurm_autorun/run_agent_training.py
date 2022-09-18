@@ -104,7 +104,7 @@ class MopoAgentExp:
 def run_experiment_set(params_filepath):
     output_dir = params_filepath.split('/')[-1].replace('.json', '')
 
-    os.makedirs(os.path.join(SLRUM_AUTORUN_DIR, 'output', output_dir), exist_ok=True)
+    os.makedirs(os.path.join(SLRUM_AUTORUN_DIR, 'output', output_dir))
 
     with open(params_filepath, 'r') as f:
         exp_coll = json.load(f)

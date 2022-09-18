@@ -6,7 +6,8 @@ def filter_function(item, params):
     return all([
         item['dynamics_model_exp'] == params['algorithm_params']['kwargs']['dynamics_model_exp'],
         item['mopo_penalty_coeff'] == params['algorithm_params']['kwargs']['penalty_coeff'],
-        item['rollout_length'] == params['algorithm_params']['kwargs']['rollout_length']
+        item['rollout_length'] == params['algorithm_params']['kwargs']['rollout_length'],
+        item.get('bnn_retrain_epochs',0) == params['algorithm_params']['kwargs']['bnn_retrain_epochs']
     ])
 
 #############
@@ -26,8 +27,11 @@ for params_filepath in params_filepaths:
     with open (params_filepath, 'r') as f:
         params = json.load(f)
     config_record = list(filter(lambda x: filter_function(x, params), config))
-    if len(config_record) != 1:
+    if len(config_record) > 1:
+        print(config_record)
         raise RuntimeError(params)
+    elif len(config_record) == 0:
+        continue
     
     with open(os.path.join(os.path.dirname(params_filepath), f'{config_record[0]["exp_id"]}.txt'), 'w') as f:
         f.write('')
