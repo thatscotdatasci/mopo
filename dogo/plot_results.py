@@ -15,6 +15,7 @@ cols = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377
 
 FEATURE_LABEL_DICT = {
     'evaluation/return-average': 'Evaluation Return Average',
+    'model/eval_return_mean': 'Dynamics Return Average',
     'Q_loss': 'Q Loss',
     'Q-avg': 'Average Q-Value',
     'model/mean_unpenalized_rewards': 'Average Unpenalised Rewards',
@@ -232,6 +233,84 @@ def plot_grouped_evaluation_returns(exp_set_labels: list, title: str = None, xmi
 
     ax.set_xlabel('Training Steps')
     ax.set_ylabel(FEATURE_LABEL_DICT[feature])
+    ax.set_xlim(left=xmin, right=max_timestep+1000)
+    ax.set_ylim(bottom=ymin, top=ymax)
+    if title is not None:
+        ax.set_title(title)
+    ax.legend(loc=loc)
+
+    if save_path is not None:
+        fig.savefig(os.path.join(FIG_DIR, save_path), pad_inches=0.2, bbox_inches='tight')
+
+    return summary_metrics
+
+def plot_grouped_evaluation_and_dynamics_returns(exp_set_labels: list, title: str = None, xmin=-1000, ymin=None, ymax=None, show_ends=True, save_path=None, loc='upper left', max_timestep=500000, end_point_val=-2000):
+    fig, ax = plt.subplots(1, 1, figsize=(18,10))
+    plt.rcParams.update({'font.size': 18})
+
+    summary_metrics = {}
+    for i, (exp_set, label) in enumerate(exp_set_labels):
+        exp_eval_results = []
+        exp_dyn_results = []
+        exp_end_points = []
+
+        for exp in exp_set:
+            exp_timesteps = exp.sac.result['timesteps_total'].values
+            exp_timesteps = exp_timesteps[exp_timesteps<=max_timestep]
+
+            start_points = np.hstack([np.where(exp_timesteps==1000)[0], len(exp_timesteps)])
+            exp_end_points.append(exp_timesteps[start_points[1:]-1])
+
+            if len(start_points) > 1:
+                training_lengths = np.ediff1d(start_points)
+                training_start_ind = np.argmax(training_lengths)
+                training_start = start_points[training_start_ind]
+                training_end = len(exp_timesteps) if training_start_ind == len(start_points) else start_points[training_start_ind+1]
+
+                exp_eval_results.append(exp.sac.result['evaluation/return-average'][training_start:training_end])
+                exp_dyn_results.append(exp.sac.result['model/eval_return_mean'][training_start:training_end])
+        
+        comb_eval_arr = np.vstack(list(zip_longest(*[
+            exp_res for exp_res in exp_eval_results
+            ], fillvalue=np.NaN
+        )))
+        comb_dyn_arr = np.vstack(list(zip_longest(*[
+            exp_res for exp_res in exp_dyn_results
+            ], fillvalue=np.NaN
+        )))
+        exp_end_points = np.hstack(exp_end_points)
+
+        mean_eval_arr = np.nanmean(comb_eval_arr, axis=-1)
+        mean_dyn_arr = np.nanmean(comb_dyn_arr, axis=-1)
+        x_vals = np.arange(len(mean_eval_arr))*1000
+
+        ax.plot(x_vals, mean_eval_arr, c=cols[i], label=label)
+        ax.plot(x_vals, mean_dyn_arr, c=cols[i], ls='--', label=label)
+        # ax.fill_between(x_vals, min_arr, max_arr, color=cols[i], alpha=0.5)
+        # ax.fill_between(x_vals, mean_arr-std_arr, mean_arr+std_arr, color=cols[i], alpha=0.5)
+
+        terminal_points = np.where(np.sort((comb_eval_arr==np.NaN).argmin(axis=0))>0)[0]
+        ax.scatter(x_vals[terminal_points], mean_eval_arr[terminal_points], color=cols[i], s=100)
+
+        if show_ends:
+            exp_end_points = exp_end_points[exp_end_points<x_vals[-1]]
+            ax.scatter(exp_end_points, end_point_val*np.ones_like(exp_end_points), marker='x', color=cols[i], s=100)
+        
+        exploit_diff = mean_dyn_arr-mean_eval_arr
+        exploit_diff_mean = np.round(np.nanmean(exploit_diff),0).astype(int)
+        exploit_diff_std = np.round(np.nanstd(exploit_diff),0).astype(int)
+        summary_metrics[label] = {
+            'mean_eval_std': np.round(np.nanstd(mean_eval_arr),0).astype(int),
+            'mean_dyn_std': np.round(np.nanstd(mean_dyn_arr),0).astype(int),
+            'outliers': np.round(np.sum(np.abs(mean_dyn_arr)>20000)/len(mean_dyn_arr),3),
+            'frac_inf': np.round(np.sum(np.isinf(mean_dyn_arr))/len(mean_dyn_arr),3),
+            'diff_mean': exploit_diff_mean,
+            'diff_std': exploit_diff_std,
+            'text': f'{exploit_diff_mean} ± {exploit_diff_std}'
+        }
+        
+    ax.set_xlabel('Training Steps')
+    ax.set_ylabel('Episode Return')
     ax.set_xlim(left=xmin, right=max_timestep+1000)
     ax.set_ylim(bottom=ymin, top=ymax)
     if title is not None:
