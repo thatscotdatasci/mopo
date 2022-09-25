@@ -138,6 +138,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = "/home/ajc348/rds/hpc-work/mopo/slurm_autorun/exp_params/exp_params.180922_2.json"
+    params_filepath = "/home/ajc348/rds/hpc-work/mopo/slurm_autorun/exp_params/exp_params.250922_1.json"
 
     run_experiment_set(params_filepath)
