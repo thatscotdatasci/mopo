@@ -18,6 +18,7 @@ ROLLOUT_BATCH_SIZES = {
     10: 25000,
     20: 12500,
     50: 5000,
+    100: 2500,
 }
 
 
@@ -138,6 +139,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = "/home/ajc348/rds/hpc-work/mopo/slurm_autorun/exp_params/exp_params.250922_1.json"
+    params_filepath = "/home/ajc348/rds/hpc-work/mopo/slurm_autorun/exp_params/exp_params.260922_2.json"
 
     run_experiment_set(params_filepath)
