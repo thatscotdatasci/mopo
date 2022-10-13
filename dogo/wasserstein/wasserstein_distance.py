@@ -1,4 +1,3 @@
-import sys
 import os
 from itertools import combinations, product
 
@@ -72,53 +71,58 @@ def experiment_collection_distances(experiment_dict):
     std_arr = std_arr + np.triu(std_arr.swapaxes(1,2), k=1)
     return mean_arr, std_arr
 
-# def datset_distances(exp, datasets):
-#     scores_dir, elites = experiment_details(exp)
+############################################################################
+# Original functions, which hold the model constant and measure the distance
+# between predictive distributions for different datasets.
+############################################################################
 
-#     n_datasets = len(datasets)
-#     wd_vals_arr = np.zeros((n_datasets, n_datasets))
-#     for i in range(n_datasets):
-#         dataset_1 = datasets[i]
-#         d1_m = np.load(os.path.join(scores_dir, f'{dataset_1}_{SEED}_means.npy'))[elites,:,:]
-#         d1_c = np.load(os.path.join(scores_dir, f'{dataset_1}_{SEED}_vars.npy'))[elites,:,:]
-#         for j in range(i+1):
-#             dataset_2 = datasets[j]
-#             d2_m = np.load(os.path.join(scores_dir, f'{dataset_2}_{SEED}_means.npy'))[elites,:,:]
-#             d2_c = np.load(os.path.join(scores_dir, f'{dataset_2}_{SEED}_vars.npy'))[elites,:,:]
-#             wd_vals_arr[i,j] = wasserstein_dist(d1_m, d2_m, d1_c, d2_c)
-#         print(f'Completed {i+1}/{n_datasets} datasets')
-#     return wd_vals_arr + wd_vals_arr.T - np.diag(wd_vals_arr.diagonal())
+def datset_distances(exp, datasets):
+    scores_dir, elites = experiment_details(exp)
 
-# def distances_plot(wd_vals_arr, datasets):
-#     fig, ax = plt.subplots(1, 1, figsize=(len(datasets),len(datasets)))
+    n_datasets = len(datasets)
+    wd_vals_arr = np.zeros((n_datasets, n_datasets))
+    for i in range(n_datasets):
+        dataset_1 = datasets[i]
+        d1_m = np.load(os.path.join(scores_dir, f'{dataset_1}_{SEED}_means.npy'))[elites,:,:]
+        d1_c = np.load(os.path.join(scores_dir, f'{dataset_1}_{SEED}_vars.npy'))[elites,:,:]
+        for j in range(i+1):
+            dataset_2 = datasets[j]
+            d2_m = np.load(os.path.join(scores_dir, f'{dataset_2}_{SEED}_means.npy'))[elites,:,:]
+            d2_c = np.load(os.path.join(scores_dir, f'{dataset_2}_{SEED}_vars.npy'))[elites,:,:]
+            wd_vals_arr[i,j] = wasserstein_dist(d1_m, d2_m, d1_c, d2_c)
+        print(f'Completed {i+1}/{n_datasets} datasets')
+    return wd_vals_arr + wd_vals_arr.T - np.diag(wd_vals_arr.diagonal())
 
-#     mat = ax.matshow(wd_vals_arr)
-#     ax.set_xticks(range(len(datasets)))
-#     ax.set_yticks(range(len(datasets)))
-#     ax.set_xticklabels(datasets, rotation=45)
-#     ax.set_yticklabels(datasets, rotation=45)
+def distances_plot(wd_vals_arr, datasets):
+    fig, ax = plt.subplots(1, 1, figsize=(len(datasets),len(datasets)))
 
-#     for (i,j), z in np.ndenumerate(wd_vals_arr):
-#         if z != 0:
-#             ax.text(j, i, '{0:.2f}'.format(z), ha="center", va="center", color='w' if i == j else 'k')
+    mat = ax.matshow(wd_vals_arr)
+    ax.set_xticks(range(len(datasets)))
+    ax.set_yticks(range(len(datasets)))
+    ax.set_xticklabels(datasets, rotation=45)
+    ax.set_yticklabels(datasets, rotation=45)
 
-#     fig.colorbar(mat)
+    for (i,j), z in np.ndenumerate(wd_vals_arr):
+        if z != 0:
+            ax.text(j, i, '{0:.2f}'.format(z), ha="center", va="center", color='w' if i == j else 'k')
 
-#     return fig
+    fig.colorbar(mat)
 
-# def wasserstein_distances(exp, datasets, save_output=True, return_plot=False):
-#     scores_dir, _ = experiment_details(exp)
+    return fig
+
+def wasserstein_distances(exp, datasets, save_output=True, return_plot=False):
+    scores_dir, _ = experiment_details(exp)
     
-#     wd_vals_arr = datset_distances(exp, datasets)
-#     wd_vals_df = pd.DataFrame(wd_vals_arr, index=datasets, columns=datasets)
-#     if save_output:
-#         wd_vals_df.to_json(os.path.join(scores_dir, 'wasserstein_distances.json'))
+    wd_vals_arr = datset_distances(exp, datasets)
+    wd_vals_df = pd.DataFrame(wd_vals_arr, index=datasets, columns=datasets)
+    if save_output:
+        wd_vals_df.to_json(os.path.join(scores_dir, 'wasserstein_distances.json'))
 
-#     wd_plot = distances_plot(wd_vals_arr, datasets)
-#     if save_output: 
-#         wd_plot.savefig(os.path.join(scores_dir, 'wasserstein_distances.jpeg'))
+    wd_plot = distances_plot(wd_vals_arr, datasets)
+    if save_output: 
+        wd_plot.savefig(os.path.join(scores_dir, 'wasserstein_distances.jpeg'))
     
-#     if return_plot:
-#         return wd_vals_arr, wd_plot
-#     else:
-#         return wd_vals_arr, None
+    if return_plot:
+        return wd_vals_arr, wd_plot
+    else:
+        return wd_vals_arr, None
