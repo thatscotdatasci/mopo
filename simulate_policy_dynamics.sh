@@ -1,8 +1,9 @@
 #! /bin/bash
 
-########################################
-# D3RLPY - 0.1M
-########################################
+###############################################################
+# This will run the `simulate_policy_dynamics_model.py` script, 
+# running each policy against each dynamics model.
+###############################################################
 
 policy_experiments=(\
 "MP461" \
@@ -44,6 +45,7 @@ for i in ${policy_experiments[@]}
 do
     for j in ${dynamics_experiments[@]}
     do
+        # Use the --stochastic-model and --stochastic-policy flags to run the dynamics model/policy stochastically - deterministic mode is the default
         .env/bin/python examples/development/simulate_policy_dynamics_model.py --policy-experiment=$i --dynamics-experiment=$j --num-rollouts=5
     done
 done
