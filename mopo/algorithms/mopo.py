@@ -333,6 +333,9 @@ class MOPO(RLAlgorithm):
             else:
                 evaluation_metrics = {}
 
+            # Evaluate the policy against the learned environment model
+            model_metrics.update(self._eval_model())
+
             gt.stamp('epoch_after_hook')
 
             sampler_diagnostics = self.sampler.get_diagnostics()
@@ -413,21 +416,24 @@ class MOPO(RLAlgorithm):
             self._model.save(save_path, self._total_timestep)
 
     def _log_model_pool(self):
-        # Save 100k random records from the model pool
-        save_path = os.path.join(self._log_dir, 'models')
-        filesystem.mkdir(save_path)
-        full_path = os.path.join(save_path, 'model_pool_{}.npy'.format(self._total_timestep))
-        pool_samples = self._model_pool.random_batch(100000)
-        pool_arr = np.hstack([
-            pool_samples['observations'],
-            pool_samples['actions'],
-            pool_samples['next_observations'],
-            pool_samples['rewards'],
-            pool_samples['terminals'],
-            pool_samples['policies'],
-            pool_samples['penalties'],
-        ])
-        np.save(full_path, pool_arr)
+        # This is quite data intensive, and so is disabled by default.
+        # Turning it on/off should really be implemented as a command line argument.
+        return
+        # # Save 100k random records from the model pool
+        # save_path = os.path.join(self._log_dir, 'models')
+        # filesystem.mkdir(save_path)
+        # full_path = os.path.join(save_path, 'model_pool_{}.npy'.format(self._total_timestep))
+        # pool_samples = self._model_pool.random_batch(100000)
+        # pool_arr = np.hstack([
+        #     pool_samples['observations'],
+        #     pool_samples['actions'],
+        #     pool_samples['next_observations'],
+        #     pool_samples['rewards'],
+        #     pool_samples['terminals'],
+        #     pool_samples['policies'],
+        #     pool_samples['penalties'],
+        # ])
+        # np.save(full_path, pool_arr)
 
     def _set_rollout_length(self):
         min_epoch, max_epoch, min_length, max_length = self._rollout_schedule
@@ -526,6 +532,12 @@ class MOPO(RLAlgorithm):
 
             obs = next_obs[nonterm_mask]
 
+        # Horizontally stack all of the reward vectors - necessary when dealing with environments that have variable episode lengths.
+        # The `np.mean` etc. methods attempt to perform a stacking, which fails - do the job for them.
+        unpenalised_rewards = np.hstack(unpenalised_rewards)
+        penalised_rewards = np.hstack(penalised_rewards)
+        penalties = np.hstack(penalties)
+
         mean_rollout_length = sum(steps_added) / rollout_batch_size
         rollout_stats = {
             'mean_rollout_length': mean_rollout_length,
@@ -545,6 +557,65 @@ class MOPO(RLAlgorithm):
         print('[ Model Rollout ] Added: {:.1e} | Model pool: {:.1e} (max {:.1e}) | Length: {} | Train rep: {}'.format(
             sum(steps_added), self._model_pool.size, self._model_pool._max_size, mean_rollout_length, self._n_train_repeat
         ))
+        return rollout_stats
+
+    def _eval_model(self):
+        batch = self.sampler.random_batch(self._eval_n_episodes)
+
+        # Episodes can finish at different times - keep track of those that are still running
+        nonterm_mask = np.ones(self._eval_n_episodes).astype(bool)
+        obs = batch['observations']
+        unpenalised_rewards = []
+
+        # 1000 is the max episode length
+        for i in range(1000):
+            if not self._rollout_random:
+                act = self._policy.actions_np(obs)
+            else:
+                act_ = self._policy.actions_np(obs)
+                act = np.random.uniform(low=-1, high=1, size=act_.shape)
+
+            if self._model_type == 'identity':
+                next_obs = obs
+                rew = np.zeros((len(obs), 1))
+                term = (np.ones((len(obs), 1)) * self._identity_terminal).astype(np.bool)
+                info = {}
+            else:
+                next_obs, rew, term, info = self.fake_env.step(obs, act)
+            
+            # Determine those episodes that did not terminate in the current step
+            step_nonterm_mask = ~term.squeeze(-1)
+
+            # Update nonterm_mask to reflect the episodes that are still running
+            # The purpose of nonterm_mask[nonterm_mask] is to update only those episodes that were running
+            # at the start of the current step. Remember that nonterm_mask is a boolean array, and so can 
+            # be used for slicing in this way.
+            nonterm_mask[nonterm_mask] = step_nonterm_mask
+
+            # Early exit if there are no episodes still running.
+            if nonterm_mask.sum() == 0:
+                print('[ Model Rollout ] Breaking early: {} | {} / {}'.format(i, nonterm_mask.sum(), nonterm_mask.shape))
+                break
+
+            # Any episodes that have finished get a np.nan reward value in the current step
+            step_unpen_rewards = np.ones(self._eval_n_episodes) * np.nan
+            step_unpen_rewards[nonterm_mask] = info['unpenalized_rewards'].flatten()[step_nonterm_mask]
+            unpenalised_rewards.append(step_unpen_rewards)
+
+            # We only keep running with those episodes that have not already terminated - increased efficieny
+            obs = next_obs[step_nonterm_mask]
+
+        unpenalised_rewards = np.vstack(unpenalised_rewards)
+        unpenalised_returns = np.nansum(unpenalised_rewards, axis=0)
+
+        # eval_return_count will include only those episodes that did not fail immediately
+        rollout_stats = {
+            'eval_return_mean': np.nanmean(unpenalised_returns),
+            'eval_return_std': np.nanstd(unpenalised_returns),
+            'eval_return_count': np.sum(~np.isnan(unpenalised_returns)),
+            'eval_mean_length': np.mean(np.sum(np.isnan(unpenalised_rewards), axis=0))
+        }
+
         return rollout_stats
 
     def _visualize_model(self, env, timestep):
@@ -850,6 +921,12 @@ class MOPO(RLAlgorithm):
         diagnostics = OrderedDict({
             'Q-avg': np.mean(Q_values),
             'Q-std': np.std(Q_values),
+            'Q-min': np.min(Q_values),
+            'Q-25': np.percentile(Q_values, 25),
+            'Q-50': np.percentile(Q_values, 50),
+            'Q-75': np.percentile(Q_values, 75),
+            'Q-95': np.percentile(Q_values, 95),
+            'Q-max': np.max(Q_values),
             'Q_loss': np.mean(Q_losses),
             'alpha': alpha,
         })
