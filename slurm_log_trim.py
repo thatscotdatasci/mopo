@@ -1,3 +1,8 @@
+############################################################################
+# NOTE: This script will modify log files - keeping commented out to prevent
+# accidental execution.
+############################################################################
+
 # import os
 # from glob import glob
 
