@@ -1,8 +1,8 @@
 #! /bin/bash
 
-############
-# MIXED-RT-3
-############
+#####################
+# Score Hopper models
+#####################
 
 for model in \
 HO001 \

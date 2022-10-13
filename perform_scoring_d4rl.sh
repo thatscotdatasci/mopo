@@ -1,8 +1,8 @@
 #! /bin/bash
 
-######
-# D4RL
-######
+###################
+# Score D4RL models
+###################
 
 for model in \
 MP521 \
