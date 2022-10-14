@@ -3,6 +3,7 @@ import json
 import os
 import pickle
 from glob import glob
+# from multiprocessing import Pool
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -49,7 +50,11 @@ PARAMETERS_PATH_W = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params_walk
 
 OUTPUT_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/analysis/policy")
 
-# The HalfCheetah environment used has an upper episode length limit of 1000 steps
+# MuJoCo environments have a maximum episode length of 1000 (https://github.com/openai/gym/blob/master/gym/envs/__init__.py#L214)
+# HalfCheetah episodes always complete this many steps - the environment does not have a termination condition
+# Hopper and Walker2d can terminate before 1000 steps - see the modules in mopo.static for the termination functions
+# I have verified that the termination functions in mopo.static match those of the real environments
+# However, the termination functions do not account for episode length, and so the resriction must be manually enforced
 MAX_EPISODE_LENGTH = 1000
 assert MAX_EPISODE_LENGTH <= 1000
 
@@ -298,8 +303,8 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, determ
         next_obs_real = np.ones_like(obs)*np.nan
         rew_real = np.nan
         if not done_fake or not real_env_broken:
-            eval_env._env.set_state(*get_qpos_qvel(obs.flatten(), env_name))
             try:
+                eval_env._env.set_state(*get_qpos_qvel(obs.flatten(), env_name))
                 next_obs_real, rew_real, _, _ = eval_env.step(act)
             except MujocoException:
                 print('MuJoCo env became unstable')
@@ -307,7 +312,7 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, determ
         eval_collector.add_transition(obs, act, next_obs_real, rew_real)
 
         # Gym environment - follow the real environment dynamics, taking actions from the policy
-        next_obs_gym = {'observations': np.ones_like(obs)*np.nan}
+        next_obs_gym = {'observations': np.ones(len(obs.flatten()))*np.nan}
         rew_gym = np.nan
         if not done_gym:
             act_gym = policy.actions_np(obs_gym)
@@ -330,7 +335,7 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, determ
         'gym':  gym_collector.return_transitions()
     }, (init_obs, init_act)
 
-def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model, q_value_estimate=True):
+def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model, q_value_estimate=False):
     # Create the desired number of rollouts
     if q_value_estimate:
         init_rollout, init_obs_act = rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model)
@@ -338,6 +343,11 @@ def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler, 
         for _ in range(n_rollouts-1):
             rollouts.append(rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model, init_obs_act=init_obs_act)[0])
     else:
+        # Multithreaded approach - would need to create individual environments within the function, however
+        # rollout_model_multi = lambda _: rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model)[0]
+        # with Pool() as pool:
+        #     rollouts = list(pool.map(rollout_model_multi, range(n_rollouts)))
+
         rollouts = [rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model)[0] for _ in range(n_rollouts)]
     return rollouts
 
@@ -451,23 +461,32 @@ def simulate_policy(args):
     ###############
     # Print rewards
     ###############
-    fake_pen_rewards = [ro['fake']['rewards'].sum() for ro in rollouts]
-    fake_unpen_rewards = [ro['fake']['unpen_rewards'].sum() for ro in rollouts]
-    eval_rewards = [ro['eval']['rewards'].sum() for ro in rollouts]
-    gym_rewards = [ro['gym']['rewards'].sum() for ro in rollouts]
+    fake_pen_rewards = [np.nansum(ro['fake']['rewards']) for ro in rollouts]
+    fake_unpen_rewards = [np.nansum(ro['fake']['unpen_rewards']) for ro in rollouts]
+    eval_rewards = [np.nansum(ro['eval']['rewards']) for ro in rollouts]
+    gym_rewards = [np.nansum(ro['gym']['rewards']) for ro in rollouts]
+
+    fake_lens = [np.sum(~np.isnan(ro['fake']['rewards']), axis=0).item() for ro in rollouts]
+    eval_lens = [np.sum(~np.isnan(ro['eval']['rewards']), axis=0).item() for ro in rollouts]
+    gym_lens = [np.sum(~np.isnan(ro['gym']['rewards']), axis=0).item() for ro in rollouts]
+
     print('---')
     print(f'Dynamics Model: {dynamics_exp} - Deterministic: {args.deterministic_model}')
     print(f'Policy: {args.policy_experiment} - Deterministic: {args.deterministic_policy}')
     print('---')
-    print('Fake Pen Rewards: {}'.format(fake_pen_rewards))
-    print('Fake Unpen Rewards: {}'.format(fake_unpen_rewards))
-    print('Eval Rewards: {}'.format(eval_rewards))
-    print('Gym Rewards: {}'.format(gym_rewards))
+    print('Fake Pen Rewards: {}'.format(np.round(fake_pen_rewards, 3)))
+    print('Fake Unpen Rewards: {}'.format(np.round(fake_unpen_rewards, 3)))
+    print('Eval Rewards: {}'.format(np.round(eval_rewards, 3)))
+    print('Gym Rewards: {}'.format(np.round(gym_rewards, 3)))
     print('---')
-    print('Fake Pen Mean: {}'.format(np.nanmean(fake_pen_rewards)))
-    print('Fake Unpen Mean: {}'.format(np.nanmean(fake_unpen_rewards)))
-    print('Eval Mean: {}'.format(np.nanmean(eval_rewards)))
-    print('Gym Mean: {}'.format(np.nanmean(gym_rewards)))
+    print('Fake Pen Mean: {:.3f}'.format(np.nanmean(fake_pen_rewards)))
+    print('Fake Unpen Mean: {:.3f}'.format(np.nanmean(fake_unpen_rewards)))
+    print('Eval Mean: {:.3f}'.format(np.nanmean(eval_rewards)))
+    print('Gym Mean: {:.3f}'.format(np.nanmean(gym_rewards)))
+    print('---')
+    print('Fake Episode Lengths: {}'.format(fake_lens))
+    print('Eval Episode Lengths: {}'.format(eval_lens))
+    print('Gym Episode Lengths: {}'.format(gym_lens))
 
     file_prefix = get_file_prefix(args, dynamics_exp)
     
