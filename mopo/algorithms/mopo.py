@@ -560,11 +560,15 @@ class MOPO(RLAlgorithm):
         return rollout_stats
 
     def _eval_model(self):
-        batch = self.sampler.random_batch(self._eval_n_episodes)
+        # Sample starting locations from the training data
+        # batch = self.sampler.random_batch(self._eval_n_episodes)
+        # obs = batch['observations']
+        
+        # Sample starting locations from the real environment
+        obs = np.vstack(self._evaluation_environment.reset()['observations'] for _ in range(self._eval_n_episodes))
 
         # Episodes can finish at different times - keep track of those that are still running
         nonterm_mask = np.ones(self._eval_n_episodes).astype(bool)
-        obs = batch['observations']
         unpenalised_rewards = []
 
         # 1000 is the max episode length
