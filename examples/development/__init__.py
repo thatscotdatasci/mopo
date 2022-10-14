@@ -4,9 +4,10 @@ In particular, the examples are exposed to the command line interface
 (defined in `softlearning.scripts.console_scripts`) through the
 `get_trainable_class`, `get_variant_spec`, and `get_parser` functions.
 """
+import os
 import json
 
-RESULTS_MAP_PATH = '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json'
+RESULTS_MAP_PATH = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json')
 
 def get_trainable_class(*args, **kwargs):
     from .main import ExperimentRunner
@@ -40,7 +41,7 @@ def get_params_from_file(
 		params['seed'] = seed
 
 	if dataset is not None:
-		params['kwargs']['pool_load_path'] = f'~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data/{dataset}.npy'
+		params['kwargs']['pool_load_path'] = os.path.expanduser(f'~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data/{dataset}.npy')
 
 	if penalty_coeff is not None:
 		params['kwargs']['penalty_coeff'] = penalty_coeff
@@ -63,7 +64,7 @@ def get_params_from_file(
 		with open(RESULTS_MAP_PATH, 'r') as f:
 			results_map = json.load(f)
 		load_exp_details = results_map[dynamics_model_exp]
-		params['kwargs']['model_load_dir'] = f'~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/{load_exp_details["environment"]}/{load_exp_details["base_dir"]}/{load_exp_details["experiment_dir"]}/models'
+		params['kwargs']['model_load_dir'] = os.path.expanduser(f'~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/{load_exp_details["environment"]}/{load_exp_details["base_dir"]}/{load_exp_details["experiment_dir"]}/models')
 
 	params = DotMap(params)
 	return params

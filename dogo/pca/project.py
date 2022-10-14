@@ -10,7 +10,7 @@ from dogo.constants import PCA_1D, PCA_2D
 STATE_DIMS = 17
 ACTION_DIMS = 6
 STATE_ACTION_DIMS = STATE_DIMS + ACTION_DIMS
-DATA_DIR = '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data'
+DATA_DIR = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data')
 
 PCA_BASE_DATASETS = [
     'D3RLPY-RT-0.1M-1-P0_1000000.npy',

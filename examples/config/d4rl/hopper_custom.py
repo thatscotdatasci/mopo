@@ -1,3 +1,4 @@
+import os
 from .base_mopo import mopo_params, deepcopy
 
 params = deepcopy(mopo_params)
@@ -8,8 +9,8 @@ params.update({
     'seed': 1234,
 })
 params['kwargs'].update({
-    'pool_load_path': '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data/MIXED-RT-2.npy',
-    # 'model_load_dir': '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_3_101e3/seed:1443_2022-07-12_18-45-29jgyuaam3/models',
+    'pool_load_path': os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data/MIXED-RT-2.npy'),
+    # 'model_load_dir': os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_3_101e3/seed:1443_2022-07-12_18-45-29jgyuaam3/models'),
     'bnn_retrain_epochs': 0,
     'pool_load_max_size': 101000,
     'rollout_length': 5,

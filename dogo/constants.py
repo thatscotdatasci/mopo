@@ -1,14 +1,16 @@
+import os
+
 DEFAULT_SEED = 1443
 
 #######
 # Paths
 #######
-MOPO_RESULTS_MAP_PATH = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json"
-MOPO_BASEDIR = "/home/ajc348/rds/hpc-work/mopo"
-RESULTS_BASEDIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo"
-SCORING_BASEDIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring"
-DATA_DIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data"
-FIG_DIR = "/home/ajc348/rds/hpc-work/mopo/figs"
+MOPO_RESULTS_MAP_PATH = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json")
+MOPO_BASEDIR = os.path.expanduser("~/rds/hpc-work/mopo")
+RESULTS_BASEDIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo")
+SCORING_BASEDIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring")
+DATA_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data")
+FIG_DIR = os.path.expanduser("~/rds/hpc-work/mopo/figs")
 
 #######
 # Docs
@@ -36,8 +38,8 @@ SAC_TRAINING_FILES = {
 #####
 # PCA
 #####
-PCA_1D = '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_1d.pkl'
-PCA_2D = '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_2d.pkl'
+PCA_1D = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_1d.pkl')
+PCA_2D = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_2d.pkl')
 
 ############
 # Dimensions
