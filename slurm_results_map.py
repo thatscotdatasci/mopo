@@ -7,8 +7,8 @@ from glob import glob
 
 REGEX_PATTERN = r".*[A-Z][A-Z][0-9][0-9][0-9].txt"
 LOCAL_RESULTS_DIR = "/home/ajc348/rds/hpc-work/mopo/ray_mopo"
-REMOTE_RESULTS_DIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo"
-RESULTS_MAP_PATH = "/home/ajc348/rds/hpc-work/dogo_results/mopo/results_map.json"
+REMOTE_RESULTS_DIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo"
+RESULTS_MAP_PATH = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json"
 
 def glob_re(paths):
     return filter(re.compile(REGEX_PATTERN).match, paths)

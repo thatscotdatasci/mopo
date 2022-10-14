@@ -3,11 +3,11 @@ DEFAULT_SEED = 1443
 #######
 # Paths
 #######
-MOPO_RESULTS_MAP_PATH = "/home/ajc348/rds/hpc-work/dogo_results/mopo/results_map.json"
+MOPO_RESULTS_MAP_PATH = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json"
 MOPO_BASEDIR = "/home/ajc348/rds/hpc-work/mopo"
-RESULTS_BASEDIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo"
-SCORING_BASEDIR = "/home/ajc348/rds/hpc-work/dogo_results/mopo/model_scoring"
-DATA_DIR = "/home/ajc348/rds/hpc-work/dogo_results/data"
+RESULTS_BASEDIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo"
+SCORING_BASEDIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring"
+DATA_DIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data"
 FIG_DIR = "/home/ajc348/rds/hpc-work/mopo/figs"
 
 #######
@@ -36,8 +36,8 @@ SAC_TRAINING_FILES = {
 #####
 # PCA
 #####
-PCA_1D = '/home/ajc348/rds/hpc-work/dogo_results/pca/pca_1d.pkl'
-PCA_2D = '/home/ajc348/rds/hpc-work/dogo_results/pca/pca_2d.pkl'
+PCA_1D = '/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_1d.pkl'
+PCA_2D = '/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_2d.pkl'
 
 ############
 # Dimensions

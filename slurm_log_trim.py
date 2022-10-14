@@ -6,10 +6,10 @@
 # import os
 # from glob import glob
 
-# FULL_LOG_PATH = '/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/full_logs'
+# FULL_LOG_PATH = '/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/full_logs'
 
 # def main():
-#     for path in glob('/home/ajc348/rds/hpc-work/dogo_results/mopo/ray_mopo/halfcheetah/*/seed*/train-log.*'):
+#     for path in glob('/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/halfcheetah/*/seed*/train-log.*'):
 #         trim_filepath = os.path.join(FULL_LOG_PATH, *path.split('/')[-4:])
 #         trim_dir = os.path.dirname(trim_filepath)
 #         if not os.path.isfile(trim_filepath):
