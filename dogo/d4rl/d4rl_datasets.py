@@ -2,6 +2,12 @@ import gym
 import d4rl
 import numpy as np
 
+
+##########################################################
+# Capture D4RL datasets and save them in my desired format
+##########################################################
+
+
 name = 'halfcheetah-random-v0'
 env = gym.make(name)
 data = d4rl.qlearning_dataset(env)
