@@ -61,6 +61,12 @@ assert MAX_EPISODE_LENGTH <= 1000
 # Whether to draw episode starting locations from the dataset used to train the dynamics models
 START_LOCS_FROM_POLICY_TRAINING = False
 
+# If True, the same initial state and action will be used for all episodes
+# Thus, an MC estimate of the state-action pair will be evaluated
+# Only makes sense to use when one or both of the dynamics model and policy are in stochastic mode
+# The initial state and action used are not presently recorded
+Q_VALUE_ESTIMATE = False
+
 PCA_1D = 'pca/pca_1d.pkl'
 PCA_2D = 'pca/pca_2d.pkl'
 
@@ -335,9 +341,9 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, determ
         'gym':  gym_collector.return_transitions()
     }, (init_obs, init_act)
 
-def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model, q_value_estimate=False):
+def generate_rollouts(n_rollouts, policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model):
     # Create the desired number of rollouts
-    if q_value_estimate:
+    if Q_VALUE_ESTIMATE:
         init_rollout, init_obs_act = rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, deterministic_model)
         rollouts = [init_rollout]
         for _ in range(n_rollouts-1):
