@@ -418,10 +418,10 @@ def plot_dynamics_score_vs_agent_return(
     if show_secondary_metric:
         ax2 = ax1.twinx()
 
-    scores_all = []
+    agent_returns_all = []
     primary_metric_vals_all = []
     for i, (exps, label) in enumerate(exp_groups):
-        scores = []
+        agent_returns = []
         primary_metric_vals = []
         secondary_metric_vals = []
         for exp_name in exps:
@@ -445,36 +445,36 @@ def plot_dynamics_score_vs_agent_return(
                     primary_metric_vals.append(dynamics_scores[primary_metric].mean())
                     secondary_metric_vals.append(dynamics_scores[secondary_metric].mean())
 
-                scores.append(exp_results.sac.result.loc[terminus_mask, 'evaluation/return-average'].values[0])
+                agent_returns.append(exp_results.sac.result.loc[terminus_mask, 'evaluation/return-average'].values[0])
 
-        scores_all.extend(scores)
+        agent_returns_all.extend(agent_returns)
         primary_metric_vals_all.extend(primary_metric_vals)
         
-        arg_sort = np.argsort(scores)
-        scores = np.array(scores)[arg_sort]
+        arg_sort = np.argsort(agent_returns)
+        agent_returns = np.array(agent_returns)[arg_sort]
         primary_metric_vals = np.array(primary_metric_vals)[arg_sort]
         secondary_metric_vals = np.array(secondary_metric_vals)[arg_sort]
 
         if show_secondary_metric:
-            ax1.plot(scores, primary_metric_vals, marker='o', ls='--', color=cols[i], label=f'{label} - Log-Likelihood')
-            ax2.plot(scores, secondary_metric_vals, marker='x', ls='--', color=cols[i], label=f'{label} - MSE')
+            ax1.plot(agent_returns, primary_metric_vals, marker='o', ls='--', color=cols[i], label=f'{label} - Log-Likelihood')
+            ax2.plot(agent_returns, secondary_metric_vals, marker='x', ls='--', color=cols[i], label=f'{label} - MSE')
         else:
-            ax1.plot(primary_metric_vals, scores, marker='o', ls='--', color=cols[i], label=f'{label}')
+            ax1.plot(primary_metric_vals, agent_returns, marker='o', ls='--', color=cols[i], label=f'{label}')
     
     if show_secondary_metric:
         ax1.set_xlabel('Agent Return')
         ax1.set_ylabel(SCORING_LABEL_DICT[primary_metric])
         ax2.set_ylabel(SCORING_LABEL_DICT[secondary_metric])
     else:
-        arg_sort_all = np.argsort(scores_all)
-        scores_all = np.array(scores_all)[arg_sort_all]
+        arg_sort_all = np.argsort(agent_returns_all)
+        agent_returns_all = np.array(agent_returns_all)[arg_sort_all]
         primary_metric_vals_all = np.array(primary_metric_vals_all)[arg_sort_all]
 
-        lr = LinearRegression().fit(primary_metric_vals_all.reshape(-1, 1), scores_all.reshape(-1, 1))
+        lr = LinearRegression().fit(primary_metric_vals_all.reshape(-1, 1), agent_returns_all.reshape(-1, 1))
         x_range = np.linspace(primary_metric_vals_all.min(), primary_metric_vals_all.max(), 2)
         y_vals = lr.predict(x_range.reshape(-1, 1)).flatten()
 
-        ax1.plot(x_range, y_vals, marker='', ls=':', color=cols[i+1], label=f'LBF - $R^2={lr.score(primary_metric_vals_all.reshape(-1, 1), scores_all.reshape(-1, 1)):.2f}$')
+        ax1.plot(x_range, y_vals, marker='', ls=':', color=cols[i+1], label=f'LBF - $R^2={lr.score(primary_metric_vals_all.reshape(-1, 1), agent_returns_all.reshape(-1, 1)):.2f}$')
 
         ax1.set_ylabel('Agent Return')
         ax1.set_xlabel(SCORING_LABEL_DICT[primary_metric])
