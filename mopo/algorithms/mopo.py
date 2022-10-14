@@ -617,7 +617,7 @@ class MOPO(RLAlgorithm):
             'eval_return_mean': np.nanmean(unpenalised_returns),
             'eval_return_std': np.nanstd(unpenalised_returns),
             'eval_return_count': np.sum(~np.isnan(unpenalised_returns)),
-            'eval_mean_length': np.mean(np.sum(np.isnan(unpenalised_rewards), axis=0))
+            'eval_mean_length': np.mean(np.sum(~np.isnan(unpenalised_rewards), axis=0))
         }
 
         return rollout_stats
