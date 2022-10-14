@@ -12,13 +12,13 @@ from softlearning.environments.utils import get_environment_from_params
 from softlearning.replay_pools.utils import get_replay_pool_from_variant
 from dogo.results import get_experiment_details
 
-DATA_BASEDIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data"
+DATA_BASEDIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data"
 DATA_PATHS = []
 
 PARAMETERS_PATH_HC = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params_halfcheetah.json"
 PARAMETERS_PATH_H = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params_hopper.json"
 PARAMETERS_PATH_W = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params_walker2d.json"
-OUTPUT_BASE_DIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring"
+OUTPUT_BASE_DIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring"
 
 
 def score_model(experiment: str, data_paths: List[str], deterministic=True):

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from dogo.results import get_experiment_details
 
 SEED = 1443
-SCORES_BASE_DIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring"
+SCORES_BASE_DIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring"
 
 
 def experiment_details(exp):

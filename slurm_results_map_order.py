@@ -5,8 +5,8 @@ import itertools
 import collections
 from glob import glob
 
-RESULTS_MAP_PATH = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json"
-RESULTS_MAP_ORDER_PATH = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map_order.json"
+RESULTS_MAP_PATH = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json"
+RESULTS_MAP_ORDER_PATH = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map_order.json"
 
 def main():
     with open(RESULTS_MAP_PATH, 'r') as f:

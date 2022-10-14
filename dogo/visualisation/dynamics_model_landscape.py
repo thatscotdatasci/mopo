@@ -29,8 +29,8 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 STATE_DIMS = 17
 ACTION_DIMS = 6
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
-DATA_DIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data"
-OUTPUT_DIR = "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/analysis/dynamics"
+DATA_DIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data"
+OUTPUT_DIR = "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/analysis/dynamics"
 DETERMINISTIC_MODEL = True
 N_RECORDS = 10000
 
