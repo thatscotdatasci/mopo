@@ -286,6 +286,11 @@ def rollout_model(policy, fake_env, eval_env, gym_env, sampler, env_name, determ
     done_gym = False
 
     # It might be that the episode finishes earlier in one environment than the others - keep running until they're all done
+    # If an episode finishes early for an environment, `np.NaN` will be used as a reward filler until the episode has completed
+    # in the other environment. This is necessary to obtain arrays of the same length, which can then be stacked.
+    # NOTE: When analsing the resuts, the length of each episode in each environment can therefore be identified by looking at
+    # the number of non `np.NaN` values. It is important to look at this to identify whether one environment has higher returns
+    # solely by taking actions with higher reward (real or predicted), or whether the episode was longer.
     while not all([done_fake, done_gym]) and n_steps < MAX_EPISODE_LENGTH:
         # Query the policy for the action to take, unless in the first step and an initial action is provided
         if n_steps == 0:
