@@ -114,6 +114,8 @@ def restore_pool_contiguous(replay_pool, load_path):
 
     state_dim = replay_pool.fields['observations'].shape[1]
     action_dim = replay_pool.fields['actions'].shape[1]
+
+    # +1 for rewards, +1 for terminals, +1 for policy indicator
     expected_dim = state_dim + action_dim + state_dim + 1 + 1 + 1
     actual_dim = data.shape[1]
 
