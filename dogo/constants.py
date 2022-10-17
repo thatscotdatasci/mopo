@@ -44,8 +44,12 @@ PCA_2D = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_resu
 ############
 # Dimensions
 ############
-STATE_DIMS = 17
-ACTION_DIMS = 6
+HC_STATE_DIMS = 17
+HC_ACTION_DIMS = 6
+HC_REWARD_DIMS = 1
+HC_TERMINAL_DIMS = 1
+HC_POLICY_DIMS = 1
+HC_PENALTY_DIMS = 1
 
 #######
 # Names

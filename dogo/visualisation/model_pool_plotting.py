@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from dogo.rollouts.split import split_halfcheetah_v2_trans_arr
 from dogo.pca.project import learn_project_arr_2d
 from dogo.results import PoolArrs, get_sac_pools
-from dogo.constants import STATE_DIMS, ACTION_DIMS
+from dogo.constants import HC_STATE_DIMS, HC_ACTION_DIMS
 
 
 def model_pool_learn_pca(exp_list_label_set):
@@ -13,7 +13,7 @@ def model_pool_learn_pca(exp_list_label_set):
     exp_lists = (i[0] for i in exp_list_label_set)
     exps = (item for sublist in exp_lists for item in sublist)
     results_arr = (PoolArrs(*get_sac_pools(exp, subsample_size=None)) for exp in exps)
-    sa_arr = np.vstack([i.pool[:,:STATE_DIMS+ACTION_DIMS] for i in results_arr])
+    sa_arr = np.vstack([i.pool[:,:HC_STATE_DIMS+HC_ACTION_DIMS] for i in results_arr])
     return learn_project_arr_2d(sa_arr)
 
 def _model_pool_2dhist(exp_list_label_set, mode, vmin=None, vmax=None, pen_coeff=None, pool=None, pca_model=None, results_arr=None, mean=True, fig_size=None):

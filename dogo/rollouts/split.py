@@ -2,19 +2,14 @@ from collections import namedtuple
 
 import numpy as np
 
+from dogo.constants import HC_STATE_DIMS, HC_ACTION_DIMS, HC_REWARD_DIMS, HC_TERMINAL_DIMS, HC_POLICY_DIMS
+
 #################################################
 # Dimensions for HalfCheetah v2 dataset
 # DO NOT TRY TO APPLY TO OTHERS WITHOUT CHECKING!
 #################################################
-STATE_DIMS = 17
-ACTION_DIMS = 6
-REWARD_DIMS = 1
-TERMINAL_DIMS = 1
-POLICY_DIMS = 1
-PENALTY_DIMS = 1
-
-DIMS = [STATE_DIMS, ACTION_DIMS, STATE_DIMS, REWARD_DIMS, TERMINAL_DIMS, POLICY_DIMS]
-ENDS = np.cumsum(DIMS)
+HC_DIMS = [HC_STATE_DIMS, HC_ACTION_DIMS, HC_STATE_DIMS, HC_REWARD_DIMS, HC_TERMINAL_DIMS, HC_POLICY_DIMS]
+HC_ENDS = np.cumsum(HC_DIMS)
 
 HOPPER_STATE_DIMS = 11
 HOPPER_ACTION_DIMS = 3
@@ -31,12 +26,12 @@ HOPPER_ENDS = np.cumsum(HOPPER_DIMS)
 ##############
 TransRecords = namedtuple('TransRecords', 'states actions next_states rewards dones policies penalties')
 def split_halfcheetah_v2_trans_arr(arr: str):
-    return TransRecords(*np.split(arr, ENDS, axis=1))
+    return TransRecords(*np.split(arr, HC_ENDS, axis=1))
 
 def split_hopper_v2_trans_arr(arr: str):
     return TransRecords(*np.split(arr, HOPPER_ENDS, axis=1))
 
-REG_DIMS = [STATE_DIMS, ACTION_DIMS, STATE_DIMS, REWARD_DIMS]
+REG_DIMS = [HC_STATE_DIMS, HC_ACTION_DIMS, HC_STATE_DIMS, HC_REWARD_DIMS]
 REG_ENDS = np.cumsum(REG_DIMS)
 RegRecords = namedtuple('RegRecords', 'states actions next_states rewards dones')
 def split_halfcheetah_v2_reg_arr(arr: str):

@@ -11,7 +11,7 @@ from scipy.io import loadmat
 from dogo.pca.project import project_arr
 from dogo.constants import (
     MOPO_BASEDIR, RESULTS_BASEDIR, SCORING_BASEDIR, MOPO_RESULTS_MAP_PATH, DYNAMICS_TRAINING_FILES, SAC_TRAINING_FILES, DEFAULT_SEED,
-    STATE_DIMS, ACTION_DIMS
+    HC_STATE_DIMS, HC_ACTION_DIMS
 )
 
 ########
@@ -266,6 +266,6 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
     #     np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*_pca_2d.npy'))))
     # ])[subsample_idxs,:]
 
-    pca_1d_sa, pca_2d_sa, explained_var_2d = project_arr(results[:,:STATE_DIMS+ACTION_DIMS], pca_2d=pca_model)
+    pca_1d_sa, pca_2d_sa, explained_var_2d = project_arr(results[:,:HC_STATE_DIMS+HC_ACTION_DIMS], pca_2d=pca_model)
 
     return results, pca_1d_sa, pca_2d_sa, mse_results, rew_mse_results, explained_var_2d

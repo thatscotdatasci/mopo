@@ -6,7 +6,7 @@ import matplotlib.gridspec as gridspec
 
 from dogo.results import get_experiment_details, PoolArrs
 from dogo.pca.project import project_arr, learn_project_arr_2d
-from dogo.constants import ACTION_DIMS, DATA_DIR, STATE_DIMS, RESULTS_BASEDIR, FIG_DIR
+from dogo.constants import HC_STATE_DIMS, HC_ACTION_DIMS, DATA_DIR, RESULTS_BASEDIR, FIG_DIR
 from dogo.visualisation.model_pool_plotting import (
     model_pool_pen_rewards_2dhist,
     model_pool_penalties_2dhist,
@@ -210,7 +210,7 @@ def policy_dynamics_pool_visitation_2dhist(policy_exp_list_label_set, mode, eval
             # Creating a fake pool that only contains rewards and reward penalties
             # This enables the use of the `model_pool_visitation_2dhist` function
             pool = np.hstack((
-                np.zeros((n_records, STATE_DIMS+ACTION_DIMS+STATE_DIMS)), reward_arrs, np.zeros((n_records, 2)), reward_pens_arrs
+                np.zeros((n_records, HC_STATE_DIMS+HC_ACTION_DIMS+HC_STATE_DIMS)), reward_arrs, np.zeros((n_records, 2)), reward_pens_arrs
             ))
             results_arr[policy_exp] = PoolArrs(pool=pool, pca_sa_1d=None, pca_sa_2d=pca_2d_arrs, mse_results=mse_arrs, explained_var_2d=explained_var)
         except MetricNotFound:
@@ -825,7 +825,7 @@ def plot_reward_error_landscape_comp(dynamics_policy_exps_list, training_dataset
     
     if training_dataset:
         dynamics_exp_details = get_experiment_details(dynamics_exp)
-        _, data_pca_2d_arr = project_arr(np.load(os.path.join(DATA_DIR, f'{dynamics_exp_details.dataset}.npy'))[:,:STATE_DIMS+ACTION_DIMS])
+        _, data_pca_2d_arr = project_arr(np.load(os.path.join(DATA_DIR, f'{dynamics_exp_details.dataset}.npy'))[:,:HC_STATE_DIMS+HC_ACTION_DIMS])
         for i in range(2):
             ax[i].scatter(data_pca_2d_arr[:,0], data_pca_2d_arr[:,1], -0.1*np.ones_like(data_pca_2d_arr[:,1]), marker='+', s=10, color='lightgray', label=f'Training Data')
 

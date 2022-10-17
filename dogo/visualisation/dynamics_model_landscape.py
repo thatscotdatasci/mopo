@@ -16,6 +16,7 @@ from softlearning.environments.utils import get_environment_from_params
 from softlearning.replay_pools.utils import get_replay_pool_from_variant
 from softlearning.replay_pools import SimpleReplayPool
 from softlearning.samplers.utils import get_sampler_from_variant
+from dogo.constants import HC_STATE_DIMS, HC_ACTION_DIMS
 from dogo.results import get_experiment_details
 from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 
@@ -26,8 +27,6 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 # - choosing to be deterministic or not has a large impact
 # - parameter deterministic is set to False in trining, which impacts the dynamics
 
-STATE_DIMS = 17
-ACTION_DIMS = 6
 PARAMETERS_PATH = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params.json")
 DATA_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data")
 OUTPUT_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/analysis/dynamics")
@@ -118,7 +117,7 @@ def sample_transitions(args):
     eval_env = get_environment_from_params(environment_params)
 
     if args.dataset is not None:
-        sa_arr = np.load(os.path.join(DATA_DIR, f'{args.dataset}.npy'))[:N_RECORDS,:STATE_DIMS+ACTION_DIMS]
+        sa_arr = np.load(os.path.join(DATA_DIR, f'{args.dataset}.npy'))[:N_RECORDS,:HC_STATE_DIMS+HC_ACTION_DIMS]
     else:
         sa_arr = None
 
@@ -130,8 +129,8 @@ def sample_transitions(args):
 
     for i in range(N_RECORDS):
         if sa_arr is not None:
-            obs = sa_arr[i,:STATE_DIMS]
-            act = sa_arr[i,STATE_DIMS:STATE_DIMS+ACTION_DIMS]
+            obs = sa_arr[i,:HC_STATE_DIMS]
+            act = sa_arr[i,HC_STATE_DIMS:HC_STATE_DIMS+HC_ACTION_DIMS]
             eval_env._env.set_state(*get_qpos_qvel(obs.flatten()))
         else:
             obs = eval_env.reset()['observations']

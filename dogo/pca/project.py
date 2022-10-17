@@ -5,11 +5,10 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.metrics import r2_score
 
-from dogo.constants import PCA_1D, PCA_2D
+from dogo.constants import PCA_1D, PCA_2D, HC_STATE_DIMS, HC_ACTION_DIMS
 
-STATE_DIMS = 17
-ACTION_DIMS = 6
-STATE_ACTION_DIMS = STATE_DIMS + ACTION_DIMS
+
+HC_STATE_ACTION_DIMS = HC_STATE_DIMS + HC_ACTION_DIMS
 DATA_DIR = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data')
 
 PCA_BASE_DATASETS = [
@@ -62,7 +61,7 @@ def learn_project_arr_2d(arr, inc_training_data=False):
     arr[:,1:8] = np.arctan2(np.sin(arr[:,1:8]), np.cos(arr[:,1:8]))
 
     if inc_training_data:
-        training_data = np.vstack([np.load(os.path.join(DATA_DIR, tds))[:,:STATE_ACTION_DIMS] for tds in PCA_BASE_DATASETS])
+        training_data = np.vstack([np.load(os.path.join(DATA_DIR, tds))[:,:HC_STATE_ACTION_DIMS] for tds in PCA_BASE_DATASETS])
         arr = np.vstack([training_data, arr])
 
     pca_2d = PCA(2)
