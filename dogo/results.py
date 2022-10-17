@@ -28,6 +28,10 @@ PoolArrs = namedtuple('PoolArrs', 'pool pca_sa_1d pca_sa_2d mse_results rew_mse_
 # Helpers
 #########
 def get_results_path(experiment: str):
+    """ Determine the absolute path to the experiment results.
+    Look first in the local results directory, and then in the dogo_results repo.
+    All experiment results are (manually) transferred to dogo_results shortly after completion
+    """
     with open(MOPO_RESULTS_MAP_PATH, 'r') as f:
         mopo_results_map = json.load(f)
 
@@ -38,6 +42,8 @@ def get_results_path(experiment: str):
     relative_path = os.path.join("ray_mopo", environment, base_dir, experiment_dir)
     local_path = os.path.join(MOPO_BASEDIR, relative_path)
     results_repo_path = os.path.join(RESULTS_BASEDIR, relative_path)
+
+    # Check in the local results directory, and then dogo_results
     if os.path.isdir(results_repo_path):
         return results_repo_path, environment, base_dir, experiment_dir
     elif os.path.isdir(local_path):
@@ -45,12 +51,16 @@ def get_results_path(experiment: str):
     else:
         raise FileNotFoundError(f'Could not find results directory at {results_repo_path} or {local_path}')
 
-def get_experiment_details(experiment: str, get_elites: bool = False):    
+def get_experiment_details(experiment: str, get_elites: bool = False):
+    """ Load details about the passed experiment.
+    """
     results_dir, environment, base_dir, experiment_dir = get_results_path(experiment)
 
     with open(os.path.join(results_dir, "params.json"), 'r') as f:
         params = json.load(f)
 
+    # Newer experiments have a `dynamics_model_exp` parameter to make the environment model
+    # used in policy training easier to identify.
     dynamics_model_exp = params["algorithm_params"]["kwargs"].get("dynamics_model_exp", None)
     if dynamics_model_exp is not None:
         dynamics_model_exp_details = get_experiment_details(dynamics_model_exp, get_elites=get_elites)
@@ -115,8 +125,11 @@ def get_experiment_details(experiment: str, get_elites: bool = False):
     )
 
 def get_results(experiment: str):
+    """ Load the environment model and policy training results.
+    """
     experiment_details = get_experiment_details(experiment)
     
+    # Load the environment model training results
     dynamics_training_results = {}
     for k, v in DYNAMICS_TRAINING_FILES.items():
         file_path = os.path.join(experiment_details.results_dir, v)
@@ -126,6 +139,7 @@ def get_results(experiment: str):
             dynamics_training_results[k] = None
     dynamics_training_results = DynamicsTrainingResults(**dynamics_training_results)
 
+    # Load the policy training results
     sac_training_results = {}
     for k, v in SAC_TRAINING_FILES.items():
         file_path = os.path.join(experiment_details.results_dir, v)
@@ -135,13 +149,16 @@ def get_results(experiment: str):
             sac_training_results[k] = None
     sac_training_results = SacTrainingResults(**sac_training_results)
 
+    # Create an object which holds both the experiment details and results
     return ExperimentResults(
         **experiment_details._asdict(),
         dynamics = dynamics_training_results,
         sac = sac_training_results
     )
 
-def get_experiment_dataset_score(experiment, dataset, seed=DEFAULT_SEED):
+def get_experiment_dataset_scoring_results(experiment, dataset, seed=DEFAULT_SEED):
+    """ Load the results of scoring the environment model trained in `experiment` when it is run against `dataset`.
+    """
     with open(MOPO_RESULTS_MAP_PATH, 'r') as f:
         mopo_results_map = json.load(f)
 
@@ -149,6 +166,8 @@ def get_experiment_dataset_score(experiment, dataset, seed=DEFAULT_SEED):
         return json.load(f)
 
 def get_pred_means_and_vars(experiment, dataset, seed=DEFAULT_SEED):
+    """ Load the means and variances output by the environment model trained in `experiment` when it is run against `dataset`.
+    """
     with open(MOPO_RESULTS_MAP_PATH, 'r') as f:
         mopo_results_map = json.load(f)
 
@@ -169,11 +188,13 @@ def get_pred_means_and_vars(experiment, dataset, seed=DEFAULT_SEED):
     return means, vars
 
 def get_scores_df(experiments: list, datasets: list):
+    """ Load the results of scoring the environment models trained in `experiments` when they are run against the `datasets`.
+    """
     scores = {}
     for exp in experiments:
         exp_details = get_experiment_details(exp)
         for dataset in datasets:
-            score = get_experiment_dataset_score(exp, dataset)
+            score = get_experiment_dataset_scoring_results(exp, dataset)
             score['rex'] = exp_details.rex
             score['rex_beta'] = exp_details.rex_beta or 0.
             score['seed'] = exp_details.seed
@@ -185,21 +206,37 @@ def get_scores_df(experiments: list, datasets: list):
     )
 
 def average_scores_over_seeds(exps: list):
-    metrics = ['model_pol_total_loss_history', 'model_pol_var_loss_history', 'model_train_decay_loss_history', 'model_train_var_lim_loss_history']
-    results = {m: 0. for m in metrics}
-    results['model_pol_std_loss_history'] = 0.
-    for exp in exps:
-        for metric in metrics:
-            if metric == 'model_pol_total_loss_history':
-                results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric).mean(axis=1)[-50:].mean()/getattr(exp.dynamics, 'model_mean_pol_loss_history').shape[1])
-            elif metric == 'model_pol_var_loss_history':
-                results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric).mean(axis=1)[-50:].mean())
-                results['model_pol_std_loss_history'] += (1/len(exps)) * (np.sqrt(getattr(exp.dynamics, metric)).mean(axis=1)[-50:].mean())
-            else:
-                results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric)[-50:].values.mean())
-    return results
+    """ DEPRECATED - this function is not widely used. It's purpose is somewhat unclear, so it should be reviewed before being used in the future.
+    """
+    raise RuntimeError('The logic for this function needs to be re-reviewed.')
 
-def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
+    # metrics = ['model_pol_total_loss_history', 'model_pol_var_loss_history', 'model_train_decay_loss_history', 'model_train_var_lim_loss_history', 'model_pol_std_loss_history']
+    # results = {m: 0. for m in metrics}
+    # for exp in exps:
+    #     for metric in metrics:
+    #         if metric == 'model_pol_total_loss_history':
+    #             results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric).mean(axis=1)[-50:].mean()/getattr(exp.dynamics, 'model_mean_pol_loss_history').shape[1])
+    #         elif metric == 'model_pol_var_loss_history':
+    #             results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric).mean(axis=1)[-50:].mean())
+    #             results['model_pol_std_loss_history'] += (1/len(exps)) * (np.sqrt(getattr(exp.dynamics, metric)).mean(axis=1)[-50:].mean())
+    #         else:
+    #             results[metric] += (1/len(exps)) * (getattr(exp.dynamics, metric)[-50:].values.mean())
+    # return results
+
+def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None, mask_inf=False):
+    """ During policy training we have the ability to sample the model pool periodically.
+    This function will load these samples, if they are present.
+    
+    The optional argument `pool` should be the epoch for which samples are to be loaded.
+    Needless to say, samples have to have been captured during this epoch of training.
+    If this is not passed then all sample files present will be loaded.
+
+    The optional argument `subsample_size` can be used to further subsample the samples.
+
+    THe optional argument `mask_inf` can be used to remove extreme reward values.
+    This is valid if looking at the core population, but one should check for the presence
+    of extreme reward values.
+    """
     exp_details = get_experiment_details(exp_name)
     models_dir = os.path.join(exp_details.results_dir, 'models')
     
@@ -208,13 +245,15 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
 
         if os.path.isfile(os.path.join(models_dir, f'overall_mse_{pool}.npy')):
             orig_mse_results = np.load(os.path.join(models_dir, f'overall_mse_{pool}.npy'))
-            orig_mse_results[np.isposinf(orig_mse_results)] = np.nan
+            if mask_inf:
+                orig_mse_results[np.isposinf(np.abs(orig_mse_results))] = np.nan
         else:
             orig_mse_results = None
 
         if os.path.isfile(os.path.join(models_dir, f'mse_{pool}.npy')):
             orig_rew_mse_results = np.load(os.path.join(models_dir, f'mse_{pool}.npy'))
-            orig_rew_mse_results[np.isposinf(orig_rew_mse_results)] = np.nan
+            if mask_inf:
+                orig_rew_mse_results[np.isposinf(np.abs(orig_rew_mse_results))] = np.nan
         else:
             orig_rew_mse_results = None
     else:
@@ -230,7 +269,8 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
             orig_mse_results = np.vstack([
                 np.load(i) for i in model_mse_files
             ])
-            orig_mse_results[np.isposinf(orig_mse_results)] = np.nan
+            if mask_inf:
+                orig_mse_results[np.isposinf(np.abs(orig_mse_results))] = np.nan
         else:
             orig_mse_results = None
 
@@ -241,11 +281,12 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
             orig_rew_mse_results = np.vstack([
                 np.load(i) for i in model_rew_mse_files
             ])
-            orig_rew_mse_results[np.isposinf(orig_rew_mse_results)] = np.nan
+            if mask_inf:
+                orig_rew_mse_results[np.isposinf(np.abs(orig_rew_mse_results))] = np.nan
         else:
             orig_rew_mse_results = None
 
-    # Subsample the results
+    # Subsample the results - if `subsample_size` argument was passed
     if subsample_size is not None:
         subsample_idxs = np.random.choice(np.arange(orig_results.shape[0]), subsample_size, replace=False)
         results =  orig_results[subsample_idxs,:]
@@ -266,6 +307,8 @@ def get_sac_pools(exp_name, pool=None, subsample_size=10000, pca_model=None):
     #     np.load(i) for i in sorted(list(glob(os.path.join(models_dir, 'model_pool_*_pca_2d.npy'))))
     # ])[subsample_idxs,:]
 
+    # Create 1D and 2D projections of the state-action data
+    # If `pca_model` is `None` then a default projection matrix will be used.
     pca_1d_sa, pca_2d_sa, explained_var_2d = project_arr(results[:,:HC_STATE_DIMS+HC_ACTION_DIMS], pca_2d=pca_model)
 
     return results, pca_1d_sa, pca_2d_sa, mse_results, rew_mse_results, explained_var_2d
