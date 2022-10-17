@@ -1,6 +1,9 @@
 import numpy as np
 
 class RolloutCollector:
+    """ Creates a very simple object for collecting and returning transition data.
+    """
+
     def __init__(self) -> None:
         self.obs = []
         self.acts = []
@@ -29,6 +32,12 @@ class RolloutCollector:
         }
 
 class MopoRolloutCollector(RolloutCollector):
+    """ Extends `RolloutCollector` to also collect unpeanlised reward values and penalties.
+
+    Additional metrics, relating to the model ensemble, can also be collected.
+    This class is very extendable.
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.unpen_rews = []
