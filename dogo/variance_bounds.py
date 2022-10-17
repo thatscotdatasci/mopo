@@ -8,6 +8,17 @@ from dogo.results import get_experiment_details
 EXPERIMENT = 'MP339'
 PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
 
+
+#############################################################################################
+# The MOPO environment model training loss function includes a term for learning
+# limits to the variance predictions that are made.
+# This is imporant as MOPO penalises reward predictions using the the standard deviation
+# of the predictive distribution.
+# This simple script returns the learned variance bounds and the max/min L2 norm of the
+# standard deviation bounds. The max norm corresponds to the maximum possible reward penalty.
+#############################################################################################
+
+
 def variance_bounds():
     #######################################
     # Load the dynamics model
