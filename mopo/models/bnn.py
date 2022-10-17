@@ -101,6 +101,8 @@ class BNN:
             self.num_elites = params['num_elites'] #params.get('num_elites', 1)
             self.model_loaded = False
 
+            # Corrected the indentation on the below code block
+            # Previous version would wipe the `self.var_layers` property of the loaded model
             if self.separate_mean_var:
                 self.var_layers = []
             else:
@@ -270,11 +272,16 @@ class BNN:
                 self.train_decay_loss = tf.add_n(self.decays)
                 self.train_var_lim_loss = None  # Note: will error when attempt is made to save to disk - but this logic branch should not be invoked
                 self.train_loss = self.train_core_loss + self.train_decay_loss
+
             self.mse_loss, self.mse_pol_tot_loss, self.mse_pol_var_loss, self.mse_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=False)
+            
+            # If we are in the REx training loop, multiply the training loss by the learning rate decay
+            # We do not make any modifications to the original MOPO training procedure in the initial training loop
             self.train_loss = tf.cond(self.sy_rex_training_loop,
                 lambda: self.lr_decay * self.train_loss,
                 lambda: self.train_loss
             )
+            
             self.train_op = self.optimizer.minimize(self.train_loss, var_list=self.optvars)
 
         # Initialize all variables
@@ -379,9 +386,8 @@ class BNN:
             [layer.reset(self.sess) for layer in self.var_layers]
 
     def validate(self, inputs, targets, policies):
-        # Alan: This function does not appear to be called
-        # Assumed that it is most reasonable to run as if it were
-        # in the REx training loop.
+        # This function does not appear to be called.
+        # Assumed that it is most reasonable to run as if it were in the REx training loop.
         inputs = np.tile(inputs[None], [self.num_nets, 1, 1])
         targets = np.tile(targets[None], [self.num_nets, 1, 1])
         losses = self.sess.run(
@@ -466,8 +472,10 @@ class BNN:
             hide_progress (bool): If True, hides the progress bar shown at the beginning of training.
             holdout_policy (float or None): The policy to hold-out during training and use in evaluation.
                 If not specified, uses holdout_ratio to randomly select records from across all policies.
-            repeat_dynamics_epochs ('int'): Number of epochs to repeat again after convergence condition
-                is met.
+            repeat_dynamics_epochs ('int'): Number of epoch sets to be completed after the original MOPO
+                termination condition is met. For example, if this is set to 2 and it takes 10 epochs for
+                the original termination condition to be met, then training will continue for another 20
+                epochs.
 
         Returns: None
         """
@@ -529,17 +537,18 @@ class BNN:
         grad_updates = 0
 
         # Complete two loops of training. First loop performs normal training
-        # The second loop includes REx adjustments, if REx is enabled
+        # The second loop applies REx, if REx is enabled (else the first loop is effectively completed again)
         for o_loop in range(2):
             if o_loop == 0:
                 print('[ BNN ] Begginning training')
                 epoch = -1
                 rex_training_loop = False
             elif o_loop == 1:
-                # Complete as much training as was performed in the first training loop again
-                # Unless a pre-trained model has been loaded, in which case do not perform any further training
+                # Multiply the number of epochs performed in the first training loop by `repeat_dynamics_epochs`
+                # and perform this number of epochs of additional training.
+                # Unless a pre-trained model has been loaded, in which case do not perform any further training.
                 epoch_iter = range(0) if self.model_loaded else range(repeat_dynamics_epochs*(epoch+1))
-                print('[ BNN ] Begginning further {} epochs of training'.format(0 if self.model_loaded else epoch+1))
+                print('[ BNN ] Begginning further {} epochs of training'.format(0 if self.model_loaded else repeat_dynamics_epochs*(epoch+1)))
                 rex_training_loop = True
             else:
                 raise RuntimeError('Attempting to complete unexpected training loop')
@@ -606,8 +615,7 @@ class BNN:
                 t = time.time() - t0
 
                 # Break conditions apply only in the first, standard training loop
-                # In the second loop we force an equal number of training epochs as in the first loop
-                # Second loop only takes place is self.rex is True
+                # In the second loop we force `repeat_dynamics_epochs` times the number of training epochs as in the first loop to be completed
                 if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
                     break
                 if max_t and t > max_t:
@@ -823,6 +831,9 @@ class BNN:
         distribution is Gaussian, with both mean and (diagonal) covariance matrix being determined
         by network outputs.
 
+        See the `tf_rex_loss_calculations.ipynb` notebook for more details on how REx was implemented,
+        and a worked example.
+
         Arguments:
             inputs: (tf.Tensor) A tensor representing the input batch
             targets: (tf.Tensor) The desired targets for each input vector in inputs.
@@ -838,28 +849,28 @@ class BNN:
         inv_var = tf.exp(-log_var)
 
         # In the below the loss for each observation in each batch is determined
-        # obs_losses will have dimensions: [B N 1]; the final dimension is retained
-        # as this is needed for future matric multiplication
+        # losses will have dimensions: [B N 1]; the final dimension is retained
+        # as this is needed for future matrix multiplication
         if inc_var_loss:
-            # Alan: Log-likelihood.
-            obs_mse_losses = tf.reduce_mean(tf.square(mean - targets) * inv_var, axis=-1, keepdims=True)
-            obs_var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
-            obs_losses = obs_mse_losses + obs_var_losses
+            # Log-likelihood
+            mse_losses = tf.reduce_mean(tf.square(mean - targets) * inv_var, axis=-1, keepdims=True)
+            var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
+            losses = mse_losses + var_losses
         else:
-            # Alan: MSE.
-            obs_losses = tf.reduce_mean(tf.square(mean - targets), axis=-1, keepdims=True)
+            # MSE
+            losses = tf.reduce_mean(tf.square(mean - targets), axis=-1, keepdims=True)
 
         # Identify the unique policies present across all batches of data
         policies = tf.cast(policies, tf.int32)
         unique_pols = tf.unique(tf.reshape(policies, [-1])).y
 
-        # Create a policy one-hot encoding - this will have dimensions: [B N P], where:
+        # Create a policy one-hot encoding - this will have dimensions: [B N P], where
         # P = the number of unique policies
         pol_one_hot = tf.squeeze(tf.one_hot(policies, tf.reduce_max(unique_pols+1), axis=-1), axis=-2)
         
         # Take the sum of the observation losses for the records belonging to each policy in each batch
         # Following transposition, performing multiplication: [B P N] x [B N 1] = [B P 1]
-        pol_mean_sum = tf.squeeze(tf.matmul(tf.transpose(pol_one_hot, [0,2,1]), obs_losses), axis=-1)
+        pol_mean_sum = tf.squeeze(tf.matmul(tf.transpose(pol_one_hot, [0,2,1]), losses), axis=-1)
 
         # Count the number of observations belonging to each policy in each batch
         # This also has demensions [B P 1]
@@ -872,18 +883,18 @@ class BNN:
         # Determine the mean loss for each policy across the batches
         mean_policy_losses = tf.reduce_mean(policy_losses, axis=0)
 
-        # Add the losses across all the policies. Results in vector of length B.
+        # Add the losses across all the policies. Results in vector of length B
         policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
 
         # Determine the variance of the losses - use boolean mask to ensure only taking variance for
-        # policies which appear in the batch (i.e., some batches may not have record for all policies).
-        # Scale the sum of the losses by (1/\beta) and add the variance term
+        # policies which appear in the batch (i.e., some batches may not have records for all policies).
         def determine_var(x):
             batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
             return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
         policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
+            # This function is only run in the REx training loop.
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses
