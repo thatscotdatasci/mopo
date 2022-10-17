@@ -39,25 +39,41 @@ PCA_BASE_DATASETS = [
 ]
 
 def project_arr(arr, pca_1d=None, pca_2d=None):
+    """ Project the passed array using either the passed PCA models, or defaults.
+    """
+
     # Transform joint angles to lie in [-pi, pi range]
+    # They can lie outside of this range, but this adds a spurious source of variance
     arr[:,1:8] = np.arctan2(np.sin(arr[:,1:8]), np.cos(arr[:,1:8]))
 
+    # If no PCA model was passed, load the default model
+    # This was trained on the files stated in:
+    # ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_1d_training_datasets.txt
     if pca_1d is None:
         with open(PCA_1D, 'rb') as f:
             pca_1d = pickle.load(f)
     state_action_pca_1d = pca_1d.transform(arr)
 
+    # If no PCA model was passed, load the default model
+    # This was trained on the files stated in:
+    # ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_2d_training_datasets.txt
     if pca_2d is None:
         with open(PCA_2D, 'rb') as f:
             pca_2d = pickle.load(f)
     state_action_pca_2d = pca_2d.transform(arr)
 
+    # Determine the fraction of the original variance that is captured by the projection
     explained_var_2d = r2_score(arr, pca_2d.inverse_transform(state_action_pca_2d), multioutput='variance_weighted')
     
     return state_action_pca_1d, state_action_pca_2d, explained_var_2d
 
 def learn_project_arr_2d(arr, inc_training_data=False):
+    """ Use the passed arr to learn a projection matrix, and then use it to project the arrau.
+    If `inc_training_data` is True then the `PCA_BASE_DATASETS` will also be used to train the projection matrix.
+    """
+
     # Transform joint angles to lie in [-pi, pi range]
+    # They can lie outside of this range, but this adds a spurious source of variance
     arr[:,1:8] = np.arctan2(np.sin(arr[:,1:8]), np.cos(arr[:,1:8]))
 
     if inc_training_data:
