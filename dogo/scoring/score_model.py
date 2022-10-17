@@ -22,6 +22,10 @@ OUTPUT_BASE_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/
 
 
 def score_model(experiment: str, data_paths: List[str], deterministic=True):
+    """ Use the environment model trained in `experiment` to make predictions for the next state and reward for those
+    transitions in the `data_paths` files. Determine the log-likelihood of the real next state and reward, and the MSE
+    of the predictions.
+    """
     exp_details = get_experiment_details(experiment, get_elites=True)
     model_dir = os.path.join(exp_details.results_dir, 'models')
     elites = exp_details.elites
@@ -40,7 +44,7 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
         params = json.load(f)
     params["model_dir"] = model_dir
 
-    # Set the seed
+    # Set the seed - use the same seed as applied in the environment model training
     seed = params['seed']
     if seed is not None:
         np.random.seed(seed)
@@ -77,22 +81,27 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
         restore_pool_contiguous(replay_pool, params['replay_pool_params']['pool_load_path'])
         env_samples = replay_pool.return_all_samples()
         
-        ###################################
-        # Run obs and actions through model
-        ###################################
+        #######################################################################################
+        # Run obs and actions through model to obtained predicted rewards and next observations
+        #######################################################################################
         # Taken from the `step` method in FakeEnv: mopo/models/fake_env.py
 
         obs, acts, rewards, next_obs = env_samples['observations'], env_samples['actions'], env_samples['rewards'], env_samples['next_observations']
         inputs = np.concatenate((obs, acts), axis=-1)
         outputs = np.concatenate((rewards, next_obs), axis=-1)
 
+        # Note that the dynamics model actually predicts the difference between the current and next observation, hence we add the original obs
+        # to predicted means
         ensemble_model_means, ensemble_model_vars = bnn.predict(inputs, factored=True)
         ensemble_model_means[:,:,1:] += obs
         ensemble_model_stds = np.sqrt(ensemble_model_vars)
     
+        # The first dimension of the returned matrices corresponds to the predicted reward, the rest corresponds to the predicted next observation
         ensemble_reward_model_means, ensemble_next_obs_model_means = ensemble_model_means[:,:,:1], ensemble_model_means[:,:,1:]
         ensemble_reward_model_vars, ensemble_next_obs_model_vars = ensemble_model_vars[:,:,:1], ensemble_model_vars[:,:,1:]
 
+        # We only sample from the predictive Gaussian distribution if the `deterministic` argument is True (default)
+        # Otherwise the mean prediction is used
         if deterministic:
             ensemble_samples = ensemble_model_means
         else:
@@ -105,6 +114,7 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
         # Determine Log-Likelihood
         ##########################
         # Taken from the `step` method in FakeEnv: mopo/models/fake_env.py
+        # Determine the combined log-probability, as well as the individual reward and dynamics log-probabilities
 
         k = outputs.shape[-1]
         log_probs = -1/2 * (k * np.log(2*np.pi) + np.log(ensemble_model_vars).sum(-1) + (np.power(outputs-ensemble_model_means, 2)/ensemble_model_vars).sum(-1))
@@ -120,7 +130,8 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
         # Determine MSE
         ###############
         # Taking the mean over both features and records
-        # Replicates the way the MSE is calculated in the `_compile_losses` method of mopo/models/bnn.py
+        # Replicates the way the MSE is calculated in the `_compile_losses` method of mopo/models/bnn.py (i.e. taking the mean over features, rather than the vector norm)
+        # Again, determine the combined log-probability, as well as the individual reward and dynamics log-probabilities
 
         actual_rewards, actual_next_obs = env_samples['rewards'], env_samples['next_observations']
         overall_mse = ((outputs-pred_outputs)**2).mean(axis=-1).mean(axis=-1)
@@ -169,6 +180,7 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
 
         # Save the means and variances - these are used to calculate Wasserstein distances, and analysis of the
         # standard deviations tells us about the reward penalties MOPO is likely to apply during training.
+        # However, this is quite data hungry, and so could potentially be disabled.
         with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_means.npy'), 'wb') as f:
             np.save(f, ensemble_model_means)
         with open(os.path.join(json_output_dir, f'{data_path.split("/")[-1][:-4]}_{seed}_vars.npy'), 'wb') as f:
