@@ -1,0 +1,82 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "MOPO",
+            "type": "python",
+            "request": "launch",
+            "program": "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/softlearning/scripts/console_scripts.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "run_example_debug",
+                "examples.development",
+                "--config=examples.config.d4rl.hopper_custom",
+                "--exp-name=hopper_alan_test",
+                "--seed=1443",
+                "--dynamics-model-exp=HO001",
+                "--bnn-retrain-epochs=0",
+                "--penalty-coeff=1.0",
+                "--rollout-length=5",
+                "--rollout-batch-size=50000",
+                "--dataset=H-MIXED-RT-1"
+            ]
+        },
+        {
+            "name": "MOPO - Simulate",
+            "type": "python",
+            "request": "launch",
+            "program": "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/examples/development/simulate_policy.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "/home/ajc348/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_rt_2m_3_1000e3/seed:1234_2022-07-03_21-32-15newc_0je/ray_mopo/HalfCheetah/halfcheetah_d3rlpy_rt_2m_3_1000e3/seed:1234_2022-07-03_21-32-15newc_0je/checkpoint_501",
+                "--max-path-length=1000",
+                "--num-rollouts=1",
+                "--render-mode=None",
+            ]
+        },
+        {
+            "name": "MOPO - Simulate Policy",
+            "type": "python",
+            "request": "launch",
+            "program": "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/examples/development/simulate_policy.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--experiment=MP677",
+                "--num-rollouts=10"
+            ]
+        },
+        {
+            "name": "MOPO - Simulate Dynamics",
+            "type": "python",
+            "request": "launch",
+            "program": "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/examples/development/simulate_policy_dynamics_model.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--policy-experiment=HC061",
+                // "--dynamics-experiment=MP551",
+                "--num-rollouts=10",
+                // "--stochastic-model",
+                // "--seed=1443"
+            ]
+        },
+        {
+            "name": "MOPO - Dynamics Landscape",
+            "type": "python",
+            "request": "launch",
+            "program": "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/visualisation/dynamics_model_landscape.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--dynamics-experiment=MP338",
+                "--dataset=MIXED-3",
+            ]
+        }
+    ]
+}
