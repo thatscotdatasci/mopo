@@ -27,7 +27,7 @@ module load rhel8/default-icl              # REQUIRED - loads the basic environm
 
 #! Insert additional module load commands after this line if needed:
 module load miniconda/3
-source /home/ajc348/rds/hpc-work/mopo/README.mopo.activate
+source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable: 
 application="/bin/bash"

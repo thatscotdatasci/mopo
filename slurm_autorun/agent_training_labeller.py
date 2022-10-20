@@ -24,7 +24,7 @@ def filter_function(item, params):
 #############
 # Config File
 #############
-config_filepath = '/home/ajc348/rds/hpc-work/mopo/slurm_autorun/exp_params/exp_params.170922_2.json'
+config_filepath = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/exp_params.170922_2.json')
 with open(config_filepath, 'r') as f:
     config = json.load(f)
 
@@ -34,7 +34,7 @@ with open(config_filepath, 'r') as f:
 ##############
 # This will return all params.json files in the given results directory, not just those relating to
 # experiments defined in the exp_params file.
-glob_pattern = '/home/ajc348/rds/hpc-work/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_rt_5_101e3/*/params.json'
+glob_pattern = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_rt_5_101e3/*/params.json')
 params_filepaths = glob(glob_pattern)
 
 

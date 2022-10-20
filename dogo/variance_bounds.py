@@ -6,7 +6,7 @@ from scipy.io import loadmat
 from dogo.results import get_experiment_details
 
 EXPERIMENT = 'MP339'
-PARAMETERS_PATH = "/home/ajc348/rds/hpc-work/mopo/dogo/bnn_params.json"
+PARAMETERS_PATH = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params.json")
 
 
 #############################################################################################

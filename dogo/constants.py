@@ -6,11 +6,11 @@ DEFAULT_SEED = 1443
 # Paths
 #######
 MOPO_RESULTS_MAP_PATH = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json")
-MOPO_BASEDIR = os.path.expanduser("~/rds/hpc-work/mopo")
+MOPO_BASEDIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo")
 RESULTS_BASEDIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo")
 SCORING_BASEDIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring")
 DATA_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data")
-FIG_DIR = os.path.expanduser("~/rds/hpc-work/mopo/figs")
+FIG_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/figs")
 
 #######
 # Docs

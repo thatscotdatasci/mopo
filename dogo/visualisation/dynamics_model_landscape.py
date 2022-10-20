@@ -30,7 +30,7 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 #   the MOPO penalty - the standard deviations of the predictive dists are still used
 ######################################################################################
 
-PARAMETERS_PATH = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params.json")
+PARAMETERS_PATH = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params.json")
 DATA_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data")
 OUTPUT_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/analysis/dynamics")
 DETERMINISTIC_MODEL = True

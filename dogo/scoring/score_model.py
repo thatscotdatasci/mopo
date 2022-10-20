@@ -15,9 +15,9 @@ from dogo.results import get_experiment_details
 DATA_BASEDIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data")
 DATA_PATHS = []
 
-PARAMETERS_PATH_HC = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params_halfcheetah.json")
-PARAMETERS_PATH_H = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params_hopper.json")
-PARAMETERS_PATH_W = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params_walker2d.json")
+PARAMETERS_PATH_HC = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params_halfcheetah.json")
+PARAMETERS_PATH_H = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params_hopper.json")
+PARAMETERS_PATH_W = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params_walker2d.json")
 OUTPUT_BASE_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/model_scoring")
 
 
@@ -60,7 +60,7 @@ def score_model(experiment: str, data_paths: List[str], deterministic=True):
     # Instantiate model
     ###################
     # This will load the model whose location is specified in the parameters
-    # Taken from: /rds/user/ajc348/hpc-work/mopo/mopo/models/constructor.py
+    # Taken from: ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/mopo/models/constructor.py
 
     bnn = BNN(params)
     bnn.model_loaded = True

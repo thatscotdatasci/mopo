@@ -13,7 +13,7 @@ from glob import glob
 
 
 REGEX_PATTERN = r".*[A-Z][A-Z][0-9][0-9][0-9].txt"
-LOCAL_RESULTS_DIR = os.path.expanduser("~/rds/hpc-work/mopo/ray_mopo")
+LOCAL_RESULTS_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo")
 REMOTE_RESULTS_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo")
 RESULTS_MAP_PATH = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/results_map.json")
 

@@ -10,7 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 from dogo.results import get_experiment_details
 
 TIME_FORMAT = '%Y%m%d%H%M%S'
-SLRUM_AUTORUN_DIR = os.path.expanduser('~/rds/hpc-work/mopo/slurm_autorun')
+SLRUM_AUTORUN_DIR = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun')
 SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
 
 # Map rollout lengths to rollout batch sizes
@@ -166,6 +166,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = "/home/ajc348/rds/hpc-work/mopo/slurm_autorun/exp_params/exp_params.260922_2.json"
+    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/exp_params.260922_2.json")
 
     run_experiment_set(params_filepath)

@@ -44,9 +44,9 @@ from dogo.rollouts.collectors import RolloutCollector, MopoRolloutCollector
 
 # BNN parameters paths
 # As stated above, these are needed to instantiate a `BNN` object - they should not impact scoring
-PARAMETERS_PATH_HC = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params_halfcheetah.json")
-PARAMETERS_PATH_H = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params_hopper.json")
-PARAMETERS_PATH_W = os.path.expanduser("~/rds/hpc-work/mopo/dogo/bnn_params_walker2d.json")
+PARAMETERS_PATH_HC = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params_halfcheetah.json")
+PARAMETERS_PATH_H = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params_hopper.json")
+PARAMETERS_PATH_W = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/dogo/bnn_params_walker2d.json")
 
 OUTPUT_DIR = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/analysis/policy")
 
