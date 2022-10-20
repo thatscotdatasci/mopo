@@ -42,7 +42,7 @@ def project_arr(arr, pca_1d=None, pca_2d=None):
     """ Project the passed array using either the passed PCA models, or defaults.
     """
 
-    # Transform joint angles to lie in [-pi, pi range]
+    # Transform joint angles to lie in [-pi, pi] range
     # They can lie outside of this range, but this adds a spurious source of variance
     arr[:,1:8] = np.arctan2(np.sin(arr[:,1:8]), np.cos(arr[:,1:8]))
 
