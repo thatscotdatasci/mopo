@@ -4,7 +4,7 @@
     "num_elites": 5,
     "separate_mean_var": true,
     "deterministic": false,
-    "log_dir": "/rds/user/ajc348/hpc-work/mopo",
+    "log_dir": "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo",
     "model_dir": null,
     "load_model": true,
     "environment_params": {
