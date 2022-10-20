@@ -5,6 +5,13 @@
 
 # from sklearn.decomposition import PCA
 
+
+############################################################################
+# This script was replaced by the following equivalent:
+# ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/pca/pca_training.py
+############################################################################
+
+
 # STATE_DIMS = 17
 # ACTION_DIMS = 6
 # STATE_ACTION_DIMS = STATE_DIMS + ACTION_DIMS
