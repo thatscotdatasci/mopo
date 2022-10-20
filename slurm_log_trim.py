@@ -3,6 +3,15 @@
 # accidental execution.
 ############################################################################
 
+######################################################################################
+# The purpose of this script is to trim the training-logs down to only the first 123
+# lines. The files can take a considerable amount of space, but are mostly not used.
+#
+# The first 123 lines are kept as all the information that might be used is contained
+# within these (specifically, the choice of elite models has been made and declared by
+# this point).
+######################################################################################
+
 # import os
 # from glob import glob
 
