@@ -1,0 +1,14 @@
+[
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC025", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC900"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC026", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC901"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC027", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC902"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC031", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC903"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC032", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC904"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC033", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC905"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC037", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC906"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC038", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC907"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC039", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC908"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC043", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC909"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC044", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC910"},
+    {"config":"halfcheetah_custom", "dynamics_model_exp":"HC045", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"MIXED-RT-4", "exp_id":"HC911"}
+]

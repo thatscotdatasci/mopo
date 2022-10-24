@@ -1,0 +1,32 @@
+{
+    "name": "BNN",
+    "num_networks": 7,
+    "num_elites": 5,
+    "separate_mean_var": true,
+    "deterministic": false,
+    "log_dir": "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo",
+    "model_dir": null,
+    "load_model": true,
+    "environment_params": {
+        "training": {
+            "domain": "Walker2d",
+            "task": "v2",
+            "universe": "gym",
+            "kwargs": {}
+        },
+        "evaluation": {
+            "domain": "Walker2d",
+            "task": "v2",
+            "universe": "gym",
+            "kwargs": {}
+        }
+    },
+    "replay_pool_params": {
+        "type": "SimpleReplayPool",
+        "kwargs": {
+            "max_size": 1000000
+        },
+        "pool_load_path": null
+    },
+    "seed": 1443
+}

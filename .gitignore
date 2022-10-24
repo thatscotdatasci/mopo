@@ -1,7 +1,7 @@
 *.pkl
 *.stl
 *.png
-*.json
+# *.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -119,5 +119,12 @@ vendor/*
 
 
 .mujoco/
-.vscode/
 .DS_Store
+
+.env/
+.env_jupyter/
+ray_mopo/
+slurm_logs/
+machine.file.*
+slurm-*out
+slurm_autorun/output/*

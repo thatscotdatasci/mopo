@@ -82,6 +82,18 @@ class MOPO(RLAlgorithm):
             model_load_dir=None,
             penalty_coeff=0.,
             penalty_learned_var=False,
+
+            # Project parameters
+            rex=False,
+            rex_beta=10.0,
+            rex_multiply=False,
+            holdout_policy=None,
+            train_bnn_only=False,
+            repeat_dynamics_epochs=1,
+            lr_decay=1.0,
+            bnn_batch_size=256,
+            bnn_retrain_epochs=1,
+
             **kwargs,
     ):
         """
@@ -104,9 +116,27 @@ class MOPO(RLAlgorithm):
             reparameterize ('bool'): If True, we use a gradient estimator for
                 the policy derived using the reparameterization trick. We use
                 a likelihood ratio based estimator otherwise.
+            rex (`bool`): If True, we add the V-REx penalty to the loss during
+                dynamics training.
+            rex_beta (`float`): The penalty value to use in V-REx.
+            rex_multiply (`bool`): If True, multiply variance by beta, else
+                divide sum of losses by beta.
+            holdout_policy (`float` or `None`): The policy to holdout during
+                training and use for evaluation. If not specified, will select
+                a subset of data from across policies randomly.
+            train_bnn_only ('bool'): If True, only the BNN will be trained.
+            repeat_dynamics_epochs ('int'): Number of epochs of dynamics model
+                training to repeat again after convergence condition is met.
+            lr_decay ('float'): (optional) Multiply the core loss by this number
+                before returning. Applies in REx training loop.
+            bnn_retrain_epochs ('int'): (optional) Number of epochs to retrain
+                loaded BNN model for.
         """
 
         super(MOPO, self).__init__(**kwargs)
+
+        self._log_dir = os.getcwd()
+        self._writer = Writer(self._log_dir)
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)
@@ -115,7 +145,9 @@ class MOPO(RLAlgorithm):
         self._model = construct_model(obs_dim=obs_dim, act_dim=act_dim, hidden_dim=hidden_dim,
                                       num_networks=num_networks, num_elites=num_elites,
                                       model_type=model_type, separate_mean_var=separate_mean_var,
-                                      name=model_name, load_dir=model_load_dir, deterministic=deterministic)
+                                      name=model_name, load_dir=model_load_dir, deterministic=deterministic,
+                                      rex=rex, rex_beta=rex_beta, rex_multiply=rex_multiply, 
+                                      lr_decay=lr_decay, log_dir=self._log_dir)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
@@ -131,8 +163,12 @@ class MOPO(RLAlgorithm):
         self._rollout_random = rollout_random
         self._real_ratio = real_ratio
 
-        self._log_dir = os.getcwd()
-        self._writer = Writer(self._log_dir)
+        self._holdout_policy = holdout_policy
+        self._repeat_dynamics_epochs = repeat_dynamics_epochs
+
+        self._train_bnn_only = train_bnn_only
+        self._bnn_batch_size = bnn_batch_size
+        self._bnn_retrain_epochs = bnn_retrain_epochs
 
         self._training_environment = training_environment
         self._evaluation_environment = evaluation_environment
@@ -224,11 +260,25 @@ class MOPO(RLAlgorithm):
             self._epoch, self._model_train_freq, self._timestep, self._total_timestep)
         )
 
-        max_epochs = 1 if self._model.model_loaded else None
-        model_train_metrics = self._train_model(batch_size=256, max_epochs=max_epochs, holdout_ratio=0.2, max_t=self._max_model_t)
+        # The original MOPO code would run 1 epoch of training against a loaded model
+        # Changes made to the code mean that we can now specify `self._bnn_retrain_epochs=0`
+        max_epochs = self._bnn_retrain_epochs if self._model.model_loaded else None
+        model_train_metrics = self._train_model(
+            batch_size=self._bnn_batch_size,
+            max_epochs=max_epochs,
+            holdout_ratio=0.2,
+            max_t=self._max_model_t,
+            holdout_policy=self._holdout_policy,
+            repeat_dynamics_epochs=self._repeat_dynamics_epochs
+        )
         model_metrics.update(model_train_metrics)
         self._log_model()
         gt.stamp('epoch_train_model')
+
+        # If we are only learning a dynamics model, tell Ray to stop training at this point
+        # No policy training will take place
+        if self._train_bnn_only:
+            yield {'done': True, **{}}
         #### 
 
         for self._epoch in gt.timed_for(range(self._epoch, self._n_epochs)):
@@ -236,6 +286,7 @@ class MOPO(RLAlgorithm):
             self._epoch_before_hook()
             gt.stamp('epoch_before_hook')
 
+            # _n_train_repeat is 1 by default
             self._training_progress = Progress(self._epoch_length * self._n_train_repeat)
             start_samples = self.sampler._total_samples
             for timestep in count():
@@ -249,6 +300,7 @@ class MOPO(RLAlgorithm):
                 gt.stamp('timestep_before_hook')
 
                 ## model rollouts
+                # _real_ratio is 0.05 by default
                 if timestep % self._model_train_freq == 0 and self._real_ratio < 1.0:
                     self._training_progress.pause()
                     self._set_rollout_length()
@@ -258,6 +310,10 @@ class MOPO(RLAlgorithm):
                     
                     gt.stamp('epoch_rollout_model')
                     self._training_progress.resume()
+
+                    # Save the model pool every 100 epochs, including the very first
+                    if self._epoch % 100 == 0:
+                        self._log_model_pool()
 
                 ## train actor and critic
                 if self.ready_to_train:
@@ -280,6 +336,9 @@ class MOPO(RLAlgorithm):
                 gt.stamp('evaluation_metrics')
             else:
                 evaluation_metrics = {}
+
+            # Evaluate the policy against the learned environment model
+            model_metrics.update(self._eval_model())
 
             gt.stamp('epoch_after_hook')
 
@@ -325,6 +384,9 @@ class MOPO(RLAlgorithm):
 
             yield diagnostics
 
+        # Save the final model pool
+        self._log_model_pool()
+
         self.sampler.terminate()
 
         self._training_after_hook()
@@ -349,13 +411,36 @@ class MOPO(RLAlgorithm):
         print('MODEL: {}'.format(self._model_type))
         if self._model_type == 'identity':
             print('[ MOPO ] Identity model, skipping save')
-        elif self._model.model_loaded:
-            print('[ MOPO ] Loaded model, skipping save')
+        # Disabled the original code below - still want to save the loaded model
+        # as it may have recieved at least one additional epoch of training (depending
+        # on the value of `bnn_retrain_epochs`)
+        # elif self._model.model_loaded:
+        #     print('[ MOPO ] Loaded model, skipping save')
         else:
             save_path = os.path.join(self._log_dir, 'models')
             filesystem.mkdir(save_path)
             print('[ MOPO ] Saving model to: {}'.format(save_path))
             self._model.save(save_path, self._total_timestep)
+
+    def _log_model_pool(self):
+        # This is quite data intensive, and so is disabled by default.
+        # Turning it on/off should really be implemented as a command line argument for convenience.
+        return
+        # # Save 100k random records from the model pool
+        # save_path = os.path.join(self._log_dir, 'models')
+        # filesystem.mkdir(save_path)
+        # full_path = os.path.join(save_path, 'model_pool_{}.npy'.format(self._total_timestep))
+        # pool_samples = self._model_pool.random_batch(100000)
+        # pool_arr = np.hstack([
+        #     pool_samples['observations'],
+        #     pool_samples['actions'],
+        #     pool_samples['next_observations'],
+        #     pool_samples['rewards'],
+        #     pool_samples['terminals'],
+        #     pool_samples['policies'],
+        #     pool_samples['penalties'],
+        # ])
+        # np.save(full_path, pool_arr)
 
     def _set_rollout_length(self):
         min_epoch, max_epoch, min_length, max_length = self._rollout_schedule
@@ -375,6 +460,11 @@ class MOPO(RLAlgorithm):
         obs_space = self._pool._observation_space
         act_space = self._pool._action_space
 
+        # For standard HalfCheetah _epoch_length is 1000 and model_train_freq is 1000
+        # Thus, we create one batch of rollouts per epoch
+        #
+        # By default, _rollout_length is 5, _rollout_batch_size is 50,0000 and _model_retain_epochs is 5
+        # Thus, we get a pool size of 1.25e+06
         rollouts_per_epoch = self._rollout_batch_size * self._epoch_length / self._model_train_freq
         model_steps_per_epoch = int(self._rollout_length * rollouts_per_epoch)
         new_pool_size = self._model_retain_epochs * model_steps_per_epoch
@@ -401,8 +491,8 @@ class MOPO(RLAlgorithm):
             model_metrics = {}
         else:
             env_samples = self._pool.return_all_samples()
-            train_inputs, train_outputs = format_samples_for_training(env_samples)
-            model_metrics = self._model.train(train_inputs, train_outputs, **kwargs)
+            train_inputs, train_outputs, train_policies = format_samples_for_training(env_samples)
+            model_metrics = self._model.train(train_inputs, train_outputs, train_policies, **kwargs)
         return model_metrics
 
     def _rollout_model(self, rollout_batch_size, **kwargs):
@@ -412,6 +502,9 @@ class MOPO(RLAlgorithm):
         batch = self.sampler.random_batch(rollout_batch_size)
         obs = batch['observations']
         steps_added = []
+        unpenalised_rewards = []
+        penalised_rewards = []
+        penalties = []
         for i in range(self._rollout_length):
             if not self._rollout_random:
                 act = self._policy.actions_np(obs)
@@ -427,8 +520,16 @@ class MOPO(RLAlgorithm):
             else:
                 next_obs, rew, term, info = self.fake_env.step(obs, act, **kwargs)
             steps_added.append(len(obs))
+            unpenalised_rewards.append(info['unpenalized_rewards'].flatten())
+            penalised_rewards.append(info['penalized_rewards'].flatten())
 
-            samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term}
+            pen = info['penalty'] if info['penalty'] is not None else np.zeros_like(rew)
+            penalties.append(pen.flatten())
+
+            # Adding a policy identifier to the rollouts - this will not be used during SAC training
+            pol = np.zeros((len(obs), 1))
+
+            samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol, 'penalties': pen}
             self._model_pool.add_samples(samples)
 
             nonterm_mask = ~term.squeeze(-1)
@@ -438,11 +539,97 @@ class MOPO(RLAlgorithm):
 
             obs = next_obs[nonterm_mask]
 
+        # Horizontally stack all of the reward vectors - necessary when dealing with environments that have variable episode lengths.
+        # The `np.mean` etc. methods attempt to perform a stacking, which fails - do the job for them.
+        unpenalised_rewards = np.hstack(unpenalised_rewards)
+        penalised_rewards = np.hstack(penalised_rewards)
+        penalties = np.hstack(penalties)
+
         mean_rollout_length = sum(steps_added) / rollout_batch_size
-        rollout_stats = {'mean_rollout_length': mean_rollout_length}
+        rollout_stats = {
+            'mean_rollout_length': mean_rollout_length,
+            'mean_unpenalized_rewards': np.mean(unpenalised_rewards),
+            'std_unpenalized_rewards': np.std(unpenalised_rewards),
+            'min_unpenalized_rewards': np.min(unpenalised_rewards),
+            'max_unpenalized_rewards': np.max(unpenalised_rewards),
+            'mean_penalized_rewards': np.mean(penalised_rewards),
+            'std_penalized_rewards': np.std(penalised_rewards),
+            'min_penalized_rewards': np.min(penalised_rewards),
+            'max_penalized_rewards': np.max(penalised_rewards),
+            'mean_penalty': np.mean(penalties),
+            'std_penalty': np.std(penalties),
+            'min_penalty': np.min(penalties),
+            'max_penalty': np.max(penalties),
+        }
         print('[ Model Rollout ] Added: {:.1e} | Model pool: {:.1e} (max {:.1e}) | Length: {} | Train rep: {}'.format(
             sum(steps_added), self._model_pool.size, self._model_pool._max_size, mean_rollout_length, self._n_train_repeat
         ))
+        return rollout_stats
+
+    def _eval_model(self):
+        # Sample starting locations from the training data
+        # batch = self.sampler.random_batch(self._eval_n_episodes)
+        # obs = batch['observations']
+        
+        # Sample starting locations from the real environment
+        obs = np.vstack(self._evaluation_environment.reset()['observations'] for _ in range(self._eval_n_episodes))
+
+        # Episodes can finish at different times - keep track of those that are still running
+        nonterm_mask = np.ones(self._eval_n_episodes).astype(bool)
+        unpenalised_rewards = []
+
+        # 1000 is the max episode length for MuJoCo environments
+        for i in range(1000):
+            # Below is copied from `_rollout_model`, which generates data for SAC training
+            if not self._rollout_random:
+                act = self._policy.actions_np(obs)
+            else:
+                act_ = self._policy.actions_np(obs)
+                act = np.random.uniform(low=-1, high=1, size=act_.shape)
+
+            if self._model_type == 'identity':
+                next_obs = obs
+                rew = np.zeros((len(obs), 1))
+                term = (np.ones((len(obs), 1)) * self._identity_terminal).astype(np.bool)
+                info = {}
+            else:
+                next_obs, rew, term, info = self.fake_env.step(obs, act)
+            
+            # Determine those episodes that did not terminate in the current step
+            step_nonterm_mask = ~term.squeeze(-1)
+
+            # Update nonterm_mask to reflect the episodes that are still running
+            # The purpose of nonterm_mask[nonterm_mask] is to update only those episodes that were running
+            # at the start of the current step. Remember that nonterm_mask is a boolean array, and so can 
+            # be used for slicing in this way.
+            nonterm_mask[nonterm_mask] = step_nonterm_mask
+
+            # Early exit if there are no episodes still running.
+            if nonterm_mask.sum() == 0:
+                print('[ Model Rollout ] Breaking early: {} | {} / {}'.format(i, nonterm_mask.sum(), nonterm_mask.shape))
+                break
+
+            # Any episodes that have finished get a `np.nan` reward value in the current step
+            # The remainder get the appropriate reward value
+            step_unpen_rewards = np.ones(self._eval_n_episodes) * np.nan
+            step_unpen_rewards[nonterm_mask] = info['unpenalized_rewards'].flatten()[step_nonterm_mask]
+            unpenalised_rewards.append(step_unpen_rewards)
+
+            # For increased efficieny, we only keep running with those episodes that have not already terminated
+            obs = next_obs[step_nonterm_mask]
+
+        unpenalised_rewards = np.vstack(unpenalised_rewards)
+        unpenalised_returns = np.nansum(unpenalised_rewards, axis=0)
+
+        # `eval_return_count` will include only those episodes that did not fail immediately
+        # It is not anticipated that any episodes should fail immediately in the vast majority of cases
+        rollout_stats = {
+            'eval_return_mean': np.nanmean(unpenalised_returns),
+            'eval_return_std': np.nanstd(unpenalised_returns),
+            'eval_return_count': np.sum(~np.isnan(unpenalised_returns)),
+            'eval_mean_length': np.mean(np.sum(~np.isnan(unpenalised_rewards), axis=0))
+        }
+
         return rollout_stats
 
     def _visualize_model(self, env, timestep):
@@ -748,6 +935,12 @@ class MOPO(RLAlgorithm):
         diagnostics = OrderedDict({
             'Q-avg': np.mean(Q_values),
             'Q-std': np.std(Q_values),
+            'Q-min': np.min(Q_values),
+            'Q-25': np.percentile(Q_values, 25),
+            'Q-50': np.percentile(Q_values, 50),
+            'Q-75': np.percentile(Q_values, 75),
+            'Q-95': np.percentile(Q_values, 95),
+            'Q-max': np.max(Q_values),
             'Q_loss': np.mean(Q_losses),
             'alpha': alpha,
         })

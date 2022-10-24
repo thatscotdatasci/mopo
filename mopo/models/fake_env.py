@@ -109,8 +109,20 @@ class FakeEnv:
             penalized_rewards = penalized_rewards[0]
             terminals = terminals[0]
 
-        info = {'mean': return_means, 'std': return_stds, 'log_prob': log_prob, 'dev': dev,
-                'unpenalized_rewards': unpenalized_rewards, 'penalty': penalty, 'penalized_rewards': penalized_rewards}
+        info = {
+            'mean': return_means,
+            'std': return_stds,
+            'ensemble_means_mean': ensemble_model_means.mean(axis=0),
+            'ensemble_means_std': ensemble_model_means.std(axis=0),
+            'ensemble_vars_mean': ensemble_model_vars.mean(axis=0),
+            'ensemble_vars_std': ensemble_model_vars.std(axis=0),
+            'ensemble_stds_norm': np.linalg.norm(ensemble_model_stds, axis=2).flatten(),
+            'log_prob': log_prob,
+            'dev': dev,
+            'unpenalized_rewards': unpenalized_rewards,
+            'penalty': penalty,
+            'penalized_rewards': penalized_rewards
+        }
         return next_obs, penalized_rewards, terminals, info
 
     ## for debugging computation graph
