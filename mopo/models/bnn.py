@@ -50,6 +50,7 @@ class BNN:
                     Applies in REx training loop.
                 .log_dir (str): Where to save logs to during training.
         """
+        print('params', params)
         self.name = get_required_argument(params, 'name', 'Must provide name.')
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
