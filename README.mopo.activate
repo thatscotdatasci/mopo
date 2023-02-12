@@ -8,7 +8,9 @@ eval "$(conda shell.bash hook)"
 # export LD_LIBRARY_PATH=~/.mujoco/mujoco210/bin:$LD_LIBRARY_PATH
 # export LD_LIBRARY_PATH=~/.mujoco/mujoco200_linux/bin:$LD_LIBRARY_PATH
 
+conda deactivate
 conda activate /rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo/.env
+cd /rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo
 export LD_LIBRARY_PATH=~/.mujoco/mujoco200/bin:$LD_LIBRARY_PATH
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 export RAY_DISABLE_MEMORY_MONITOR=1

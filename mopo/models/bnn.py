@@ -51,6 +51,7 @@ class BNN:
                 .log_dir (str): Where to save logs to during training.
         """
         self.name = get_required_argument(params, 'name', 'Must provide name.')
+        print('self.name ', self.name)
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
 

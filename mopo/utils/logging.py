@@ -178,7 +178,7 @@ class Wandb():
     def __init__(self, flags, subname=''):
         import wandb
         self.wandb = wandb
-        exp_name = flags.name + subname
+        exp_name = flags.get('name') + subname
         self.wandb.init(
             project='REx',
             config=flags,
