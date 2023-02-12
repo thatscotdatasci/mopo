@@ -464,15 +464,15 @@ class BNN:
 
         prefix = 'holdout/' if holdout else ''
 
-        print('total_losses', total_losses)
-        print('pol_total_losses', pol_total_losses)
-        print('pol_var_losses', pol_var_losses)
-        print('mean_pol_losses', mean_pol_losses)
-        self.wlogger.wandb.log({prefix + 'total_losses': total_losses,
-                                prefix + 'pol_total_losses': pol_total_losses,
-                                prefix + 'pol_var_losses': pol_var_losses,
-                                prefix + 'mean_pol_losses': mean_pol_losses,
-                                })
+        # print('total_losses', total_losses)
+        # print('pol_total_losses', pol_total_losses)
+        # print('pol_var_losses', pol_var_losses)
+        # print('mean_pol_losses', mean_pol_losses)
+        n_models = len(total_losses)
+        self.wlogger.wandb.log(**{prefix + f'M{i}_total_losses': total_losses[i] for i in range(n_models)},
+                               **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(n_models)},
+                               **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(n_models)},
+                               **{prefix + f'M{i}_mean_pol_losses': mean_pol_losses[i] for i in range(n_models)})
 
 
 
