@@ -468,10 +468,12 @@ class BNN:
         # print('pol_total_losses', pol_total_losses)
         # print('pol_var_losses', pol_var_losses)
         # print('mean_pol_losses', mean_pol_losses)
-        self.wlogger.wandb.log(**{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
+        d = {**{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
                                **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
                                **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
-                               **{prefix + f'M{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))})
+                               **{prefix + f'M{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))}}
+        print('d', d)
+        self.wlogger.wandb.log(d)
 
 
 
