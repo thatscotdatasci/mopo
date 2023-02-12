@@ -54,7 +54,7 @@ class BNN:
         self.name = get_required_argument(params, 'name', 'Must provide name.')
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
-        self.exp_name = self._log_dir.split('/')[-2] + '/' + self._log_dir.split('/')[-1]
+        self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
 
         print('[ BNN ] Initializing model: {} | {} networks | {} elites'.format(params['name'], params['num_networks'], params['num_elites']))
         if params.get('sess', None) is None:
