@@ -176,17 +176,18 @@ if __name__ == '__main__':
 	progress.close()
 
 class Wandb():
-    def __init__(self, flags, name=''):
-        import wandb
-        self.wandb = wandb
-        self.wandb.init(
-            project='REx',
-            config=flags,
-            entity=os.getenv('WANDB_USER', 'REx'),
-            reinit=True,
-            # Restore parameters
-            resume="allow",
-            id=name,
-            name=name,
-        )
+	def __init__(self, flags, name=''):
+		import wandb
+		print('wandb name', name)
+		self.wandb = wandb
+		self.wandb.init(
+			project='REx',
+			config=flags,
+			entity=os.getenv('WANDB_USER', 'REx'),
+			reinit=True,
+			# Restore parameters
+			resume="allow",
+			id=name,
+			name=name,
+		)
         self.wandb.config.update(flags, allow_val_change=True)
