@@ -51,7 +51,6 @@ class BNN:
                 .log_dir (str): Where to save logs to during training.
         """
         self.name = get_required_argument(params, 'name', 'Must provide name.')
-        print('self.name ', self.name)
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
 
@@ -434,11 +433,17 @@ class BNN:
 
         print('train_loss', train_loss)
         print('train_var_lim_loss_history_path', train_var_lim_loss_history_path)
-        self.wlogger.wandb.log({'train_loss': train_loss})
+        self.wlogger.wandb.log({'train/loss': train_loss, 'train/core_loss': train_core_loss,
+                                'train/pol_tot_loss': train_pol_tot_loss,
+                                'train/pol_var_loss': train_pol_var_loss,
+                                'train/mean_pol_loss': train_mean_pol_loss,
+                                'train/decay_loss': train_decay_loss,
+                                'train/var_lim_loss': train_var_lim_loss})
 
     def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, holdout=False):
         """Save the current training/holdout evaluation losses.
         """
+        print('holdout', holdout)
         if holdout:
             total_loss_history_path =     os.path.join(self._log_dir, 'model_holdout_loss_history.txt')
             pol_total_loss_history_path = os.path.join(self._log_dir, 'model_holdout_pol_total_loss_history.txt')
@@ -458,6 +463,20 @@ class BNN:
             f.write(",".join(list(pol_var_losses.astype(str)))+"\n")
         with open(mean_pol_loss_history_path, 'a') as f:
             f.write(",".join(list(mean_pol_losses.astype(str)))+"\n")
+
+        prefix = 'holdout/' if holdout else ''
+
+        print('total_losses', total_losses)
+        print('pol_total_losses', pol_total_losses)
+        print('pol_var_losses', pol_var_losses)
+        print('mean_pol_losses', mean_pol_losses)
+        self.wlogger.wandb.log({prefix + 'total_losses': total_losses,
+                                prefix + 'pol_total_losses': pol_total_losses,
+                                prefix + 'pol_var_losses': pol_var_losses,
+                                prefix + 'mean_pol_losses': mean_pol_losses,
+                                })
+
+
 
     #################
     # Model Methods #
