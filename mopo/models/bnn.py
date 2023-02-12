@@ -90,6 +90,7 @@ class BNN:
         self.deterministic = params.get('deterministic', False)
         self.separate_mean_var = params.get('separate_mean_var', False)
 
+        print('self.exp_name', self.exp_name)
         self.wlogger = Wandb(params, name=(self.exp_name + '_bnn'))
 
         if params.get('load_model', False):
