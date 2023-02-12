@@ -435,11 +435,11 @@ class BNN:
         with open(train_var_lim_loss_history_path, 'a') as f:
             f.write(train_var_lim_loss.astype(str)+"\n")
 
-        self.wlogger.wandb.log(**{'train/loss': train_loss, 'train/core_loss': train_core_loss, 'train/decay_loss': train_decay_loss, f'train/var_lim_loss': train_var_lim_loss},
+        self.wlogger.wandb.log({**{'train/loss': train_loss, 'train/core_loss': train_core_loss, 'train/decay_loss': train_decay_loss, f'train/var_lim_loss': train_var_lim_loss},
                                **{f'train/M{i}_pol_tot_loss': train_pol_tot_loss[i] for i in range(len(train_pol_tot_loss))},
                                **{f'train/M{i}_pol_var_loss': train_pol_var_loss[i] for i in range(len(train_pol_var_loss))},
                                **{f'train/M{i}_mean_pol_loss': train_mean_pol_loss[i] for i in range(len(train_mean_pol_loss))},
-                               )
+                                })
 
     def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, holdout=False):
         """Save the current training/holdout evaluation losses.
