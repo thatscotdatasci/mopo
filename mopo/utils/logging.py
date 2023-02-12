@@ -190,4 +190,4 @@ class Wandb():
 			id=name,
 			name=name,
 		)
-        self.wandb.config.update(flags, allow_val_change=True)
+		self.wandb.config.update(flags, allow_val_change=True)
