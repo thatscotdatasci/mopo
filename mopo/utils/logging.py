@@ -176,10 +176,9 @@ if __name__ == '__main__':
 	progress.close()
 
 class Wandb():
-    def __init__(self, flags, subname=''):
+    def __init__(self, flags, name=''):
         import wandb
         self.wandb = wandb
-        exp_name = flags.get('exp_name') + subname
         self.wandb.init(
             project='REx',
             config=flags,
@@ -187,7 +186,7 @@ class Wandb():
             reinit=True,
             # Restore parameters
             resume="allow",
-            id=exp_name,
-            name=exp_name,
+            id=name,
+            name=name,
         )
         self.wandb.config.update(flags, allow_val_change=True)
