@@ -1,6 +1,6 @@
 # Model-based Offline Policy Optimization (MOPO)
 
-Code to reproduce the experiments in [MOPO: Model-based Offline Policy Optimization](https://arxiv.org/pdf/2005.13239.pdf).
+Code to reproduce the experiments in [MOPO: Model-based Offline Policy ls](https://arxiv.org/pdf/2005.13239.pdf).
 
 
 

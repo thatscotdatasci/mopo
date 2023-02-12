@@ -16,7 +16,8 @@ from scipy.io import savemat, loadmat
 from mopo.models.utils import get_required_argument, TensorStandardScaler
 from mopo.models.fc import FC
 
-from mopo.utils.logging import Progress, Silent
+from mopo.utils.logging import Progress, Silent, Wandb
+
 
 np.set_printoptions(precision=5)
 
@@ -86,6 +87,8 @@ class BNN:
 
         self.deterministic = params.get('deterministic', False)
         self.separate_mean_var = params.get('separate_mean_var', False)
+
+        self.wlogger = Wandb(params, subname='_bnn')
 
         if params.get('load_model', False):
             if self.model_dir is None:
@@ -427,6 +430,10 @@ class BNN:
             f.write(train_decay_loss.astype(str)+"\n")
         with open(train_var_lim_loss_history_path, 'a') as f:
             f.write(train_var_lim_loss.astype(str)+"\n")
+
+        print('train_loss', train_loss)
+        print('train_var_lim_loss_history_path', train_var_lim_loss_history_path)
+        self.wlogger.wandb.log({'train_loss': train_loss})
 
     def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, holdout=False):
         """Save the current training/holdout evaluation losses.

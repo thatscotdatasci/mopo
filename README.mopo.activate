@@ -2,7 +2,16 @@
 
 # run these steps to create environment
 eval "$(conda shell.bash hook)"
-conda activate ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/.env
-export LD_LIBRARY_PATH=~/.mujoco/mujoco210/bin:$LD_LIBRARY_PATH
+# conda activate ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/.env
+# conda activate /rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo/.env
+# conda activate ~/envs/mopo/.env
+# export LD_LIBRARY_PATH=~/.mujoco/mujoco210/bin:$LD_LIBRARY_PATH
+# export LD_LIBRARY_PATH=~/.mujoco/mujoco200_linux/bin:$LD_LIBRARY_PATH
+
+conda activate /rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo/.env
+export LD_LIBRARY_PATH=~/.mujoco/mujoco200/bin:$LD_LIBRARY_PATH
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 export RAY_DISABLE_MEMORY_MONITOR=1
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 432100 --rex-beta=20 --exp-name halfcheetah_mixed_rt_100 --dataset MIXED-RT-5
+
+git@github.com:thatscotdatasci/mopo.git
