@@ -181,7 +181,7 @@ class Wandb():
 		print('wandb name', name)
 		self.wandb = wandb
 		self.wandb.init(
-			project='REx2',
+			project='REx',
 			config=flags,
 			entity=os.getenv('WANDB_USER', 'REx'),
 			reinit=True,
