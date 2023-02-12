@@ -431,8 +431,6 @@ class BNN:
         with open(train_var_lim_loss_history_path, 'a') as f:
             f.write(train_var_lim_loss.astype(str)+"\n")
 
-        print('train_loss', train_loss)
-        print('train_var_lim_loss_history_path', train_var_lim_loss_history_path)
         self.wlogger.wandb.log({'train/loss': train_loss, 'train/core_loss': train_core_loss,
                                 'train/pol_tot_loss': train_pol_tot_loss,
                                 'train/pol_var_loss': train_pol_var_loss,
@@ -596,6 +594,7 @@ class BNN:
                     grad_updates += 1
 
                 idxs = shuffle_rows(idxs)
+                print('hide_progress', hide_progress)
                 if not hide_progress:
                     if holdout_ratio < 1e-12:
                         losses, pol_total_losses, pol_var_losses, mean_pol_losses = self.sess.run(
