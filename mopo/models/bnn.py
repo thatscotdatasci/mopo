@@ -54,6 +54,9 @@ class BNN:
         self.name = get_required_argument(params, 'name', 'Must provide name.')
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
+        self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
+        self.exp_name = self.exp_name.replace(':', '')
+        self.wlogger = Wandb(params, name=(self.exp_name + '_bnn'))
 
         print('[ BNN ] Initializing model: {} | {} networks | {} elites'.format(params['name'], params['num_networks'], params['num_elites']))
         if params.get('sess', None) is None:
@@ -88,11 +91,6 @@ class BNN:
 
         self.deterministic = params.get('deterministic', False)
         self.separate_mean_var = params.get('separate_mean_var', False)
-
-        self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
-        self.exp_name = self.exp_name.replace(':', '')
-        print('self.exp_name', self.exp_name)
-        self.wlogger = Wandb(params, name=(self.exp_name + '_bnn'))
 
         if params.get('load_model', False):
             if self.model_dir is None:
@@ -409,7 +407,7 @@ class BNN:
         mean_elite_loss = np.sort(losses)[:self.num_elites].mean()
         return mean_elite_loss
 
-    def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss):
+    def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches):
         """Save the current training losses.
         """
         train_loss_history_path           = os.path.join(self._log_dir, 'model_train_loss_history.txt')
@@ -435,13 +433,13 @@ class BNN:
         with open(train_var_lim_loss_history_path, 'a') as f:
             f.write(train_var_lim_loss.astype(str)+"\n")
 
-        self.wlogger.wandb.log({**{'train/loss': train_loss, 'train/core_loss': train_core_loss, 'train/decay_loss': train_decay_loss, f'train/var_lim_loss': train_var_lim_loss},
+        self.wlogger.wandb.log({**{'train/loss': train_loss, 'train/core_loss': train_core_loss, 'train/decay_loss': train_decay_loss, f'train/var_lim_loss': train_var_lim_loss, 'train/n_datapoints': n_datapoints, 'train/n_baches': n_baches},
                                **{f'train/M{i}_pol_tot_loss': train_pol_tot_loss[i] for i in range(len(train_pol_tot_loss))},
                                **{f'train/M{i}_pol_var_loss': train_pol_var_loss[i] for i in range(len(train_pol_var_loss))},
                                **{f'train/M{i}_mean_pol_loss': train_mean_pol_loss[i] for i in range(len(train_mean_pol_loss))},
-                                })
+                                }, step=n_baches)
 
-    def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, holdout=False):
+    def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, holdout=False):
         """Save the current training/holdout evaluation losses.
         """
         print('holdout', holdout)
@@ -467,10 +465,11 @@ class BNN:
 
         prefix = 'holdout/' if holdout else ''
 
-        d = {**{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
-                               **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
-                               **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
-                               **{prefix + f'M{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))}}
+        d = {**{prefix + 'n_datapoints': n_datapoints, prefix + 'n_baches': n_baches},
+             **{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
+             **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
+             **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
+             **{prefix + f'M{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))}}
         # print('d', d)
         self.wlogger.wandb.log(d)
 
@@ -579,8 +578,12 @@ class BNN:
                 raise RuntimeError('Attempting to complete unexpected training loop')
 
             save_every = 10
+            n_datapoints = 0
+            n_baches = 0
             for epoch in epoch_iter:
                 for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
+                    n_datapoints += batch_num * batch_size
+                    n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
                     _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
                         (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
@@ -592,11 +595,10 @@ class BNN:
                         }
                     )
                     if batch_num % save_every ==0:
-                        self._save_training_losses(train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss)
+                        self._save_training_losses(train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches)
                     grad_updates += 1
 
                 idxs = shuffle_rows(idxs)
-                print('hide_progress', hide_progress)
                 if not hide_progress:
                     if holdout_ratio < 1e-12:
                         losses, pol_total_losses, pol_var_losses, mean_pol_losses = self.sess.run(
@@ -609,7 +611,7 @@ class BNN:
                                 }
                             )
                         if batch_num % save_every == 0:
-                            self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses)
+                            self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches)
                         named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
                         progress.set_description(named_losses)
                     else:
@@ -632,8 +634,8 @@ class BNN:
                                 }
                             )
                         if batch_num % save_every == 0:
-                            self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses)
-                            self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout_mean_pol_losses, holdout=True)
+                            self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches)
+                            self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout_mean_pol_losses, n_datapoints, n_baches, holdout=True)
                         named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
                         named_holdout_losses = [['V{}'.format(i), holdout_losses[i]] for i in range(len(holdout_losses))]
                         named_losses = named_losses + named_holdout_losses + [['T', time.time() - t0]]

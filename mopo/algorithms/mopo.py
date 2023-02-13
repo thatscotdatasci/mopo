@@ -20,7 +20,7 @@ from mopo.models.constructor import construct_model, format_samples_for_training
 from mopo.models.fake_env import FakeEnv
 from mopo.utils.writer import Writer
 from mopo.utils.visualization import visualize_policy
-from mopo.utils.logging import Progress
+from mopo.utils.logging import Progress, Wandb
 import mopo.utils.filesystem as filesystem
 import mopo.off_policy.loader as loader
 
@@ -137,11 +137,16 @@ class MOPO(RLAlgorithm):
 
         self._log_dir = os.getcwd()
         self._writer = Writer(self._log_dir)
+        print('self._log_dir policy', self._log_dir)
+        self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
+        self.exp_name = self.exp_name.replace(':', '')
+        self.wlogger = Wandb(params, name=(self.exp_name + '_policy'))
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)
         self._model_type = model_type
         self._identity_terminal = identity_terminal
+        print('model_load_dir', model_load_dir)
         self._model = construct_model(obs_dim=obs_dim, act_dim=act_dim, hidden_dim=hidden_dim,
                                       num_networks=num_networks, num_elites=num_elites,
                                       model_type=model_type, separate_mean_var=separate_mean_var,
@@ -307,6 +312,12 @@ class MOPO(RLAlgorithm):
                     self._reallocate_model_pool()
                     model_rollout_metrics = self._rollout_model(rollout_batch_size=self._rollout_batch_size, deterministic=self._deterministic)
                     model_metrics.update(model_rollout_metrics)
+                    time_step_global = self._epoch_length * self._epoch + timestep
+                    print('_total_timestep', self._total_timestep)
+                    print('time_step_global', time_step_global)
+                    print('train-steps', self._num_train_steps)
+                    print('epoch', self._epoch)
+                    self.wlogger.wandb.log({**{'rollout_model/' + key: value for key, value in model_rollout_metrics}, **{'rollout_model/time_step_global': time_step_global}}, step=time_step_global)
                     
                     gt.stamp('epoch_rollout_model')
                     self._training_progress.resume()
@@ -373,7 +384,10 @@ class MOPO(RLAlgorithm):
                 ('timestep', self._timestep),
                 ('timesteps_total', self._total_timestep),
                 ('train-steps', self._num_train_steps),
+                ('time_step_global', time_step_global)
             )))
+
+            self.wlogger.wandb.log(diagnostics, step=_total_timestep)
 
             if self._eval_render_mode is not None and hasattr(
                     evaluation_environment, 'render_rollouts'):
