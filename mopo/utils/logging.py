@@ -176,12 +176,12 @@ if __name__ == '__main__':
 	progress.close()
 
 class Wandb():
-	def __init__(self, flags, name=''):
+	def __init__(self, flags, name='', project=''):
 		import wandb
 		print('wandb name', name)
 		self.wandb = wandb
 		self.wandb.init(
-			project='REx',
+			project='REx' + project,
 			config=flags,
 			entity=os.getenv('WANDB_USER', 'REx'),
 			reinit=True,

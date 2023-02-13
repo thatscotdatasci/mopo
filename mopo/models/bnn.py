@@ -56,7 +56,7 @@ class BNN:
         self._log_dir = params.get('log_dir', None)
         self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
         self.exp_name = self.exp_name.replace(':', '')
-        self.wlogger = Wandb(params, name=(self.exp_name + '_bnn'))
+        self.wlogger = Wandb(params, name=self.exp_name, project='_bnn')
 
         print('[ BNN ] Initializing model: {} | {} networks | {} elites'.format(params['name'], params['num_networks'], params['num_elites']))
         if params.get('sess', None) is None:

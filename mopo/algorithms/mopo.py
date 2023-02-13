@@ -140,7 +140,7 @@ class MOPO(RLAlgorithm):
         print('self._log_dir policy', self._log_dir)
         self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
         self.exp_name = self.exp_name.replace(':', '')
-        self.wlogger = Wandb(params, name=(self.exp_name + '_policy'))
+        self.wlogger = Wandb(params, name=self.exp_name, project='_policy')
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)
@@ -267,6 +267,7 @@ class MOPO(RLAlgorithm):
 
         # The original MOPO code would run 1 epoch of training against a loaded model
         # Changes made to the code mean that we can now specify `self._bnn_retrain_epochs=0`
+        print('save_path', os.path.join(self._log_dir, 'models'))
         max_epochs = self._bnn_retrain_epochs if self._model.model_loaded else None
         model_train_metrics = self._train_model(
             batch_size=self._bnn_batch_size,
