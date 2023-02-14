@@ -57,7 +57,7 @@ class BNN:
         self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
         self.exp_name = self.exp_name.replace(':', '')
 
-        self.train_bnn_only = train_bnn_only
+        self.train_bnn_only = params.get(train_bnn_only, None)
         if self.train_bnn_only:
             self.wlogger = Wandb(params, name=self.exp_name, project='_bnn')
 
