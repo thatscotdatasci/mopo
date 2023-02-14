@@ -49,12 +49,14 @@ def datetimestamp(divider='-', datetime_divider='T'):
     now = now.strftime(
         '%Y{d}%m{d}%dT%H{d}%M{d}%S'
         ''.format(d=divider, dtd=datetime_divider))
-    print('now', now)
+    print('nowcjsnkjncrjksdncjdkr', now)
     return now
 
 
 def datestamp(divider='-'):
-    return datetime.date.today().isoformat().replace('-', divider)
+    now = datetime.date.today().isoformat().replace('-', divider)
+    print('nowNVJnFJKNV', now)
+    return now
 
 
 def timestamp(divider='-'):
