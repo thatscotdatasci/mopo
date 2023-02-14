@@ -153,7 +153,8 @@ class MOPO(RLAlgorithm):
                                       model_type=model_type, separate_mean_var=separate_mean_var,
                                       name=model_name, load_dir=model_load_dir, deterministic=deterministic,
                                       rex=rex, rex_beta=rex_beta, rex_multiply=rex_multiply, 
-                                      lr_decay=lr_decay, log_dir=self._log_dir)
+                                      lr_decay=lr_decay, log_dir=self._log_dir,
+                                      train_bnn_only=train_bnn_only)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
