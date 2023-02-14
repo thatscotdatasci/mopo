@@ -319,7 +319,7 @@ class MOPO(RLAlgorithm):
                     print('time_step_global', time_step_global)
                     print('train-steps', self._num_train_steps)
                     print('epoch', self._epoch)
-                    self.wlogger.wandb.log({**{'rollout_model/' + key: value for key, value in model_rollout_metrics}, **{'rollout_model/time_step_global': time_step_global}}, step=time_step_global)
+                    self.wlogger.wandb.log({**{'rollout_model/' + key: value for key, value in model_rollout_metrics.items()}, **{'rollout_model/time_step_global': time_step_global}}, step=time_step_global)
                     
                     gt.stamp('epoch_rollout_model')
                     self._training_progress.resume()
