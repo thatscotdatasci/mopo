@@ -136,6 +136,7 @@ class MOPO(RLAlgorithm):
         super(MOPO, self).__init__(**kwargs)
 
         self._log_dir = os.getcwd()
+        print('self._log_dir', self._log_dir)
         self._writer = Writer(self._log_dir)
         if not train_bnn_only:
             print('self._log_dir policy', self._log_dir)

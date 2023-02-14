@@ -89,6 +89,7 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
         experiment_id = '{}_{}e3'.format(experiment_id, int(max_size/1000))
     ####
 
+
     variant_spec = add_command_line_args_to_variant_spec(
         variant_spec, command_line_args)
 
@@ -122,6 +123,8 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
         'restore': command_line_args.restore,  # Defaults to None
     }
 
+    print('experiment', experiment)
+    print('experiment_id', experiment_id)
     return experiment_id, experiment
 
 
