@@ -60,12 +60,13 @@ def get_params_from_file(
 
 	params['kwargs']['dynamics_model_exp'] = dynamics_model_exp
 	if dynamics_model_exp is not None:
+		print('dynamics_model_exp', dynamics_model_exp)
 		# Identify the experiment folder from the provided name
 		with open(RESULTS_MAP_PATH, 'r') as f:
 			results_map = json.load(f)
 		load_exp_details = results_map[dynamics_model_exp]
 		params['kwargs']['model_load_dir'] = os.path.expanduser(f'~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/{load_exp_details["environment"]}/{load_exp_details["base_dir"]}/{load_exp_details["experiment_dir"]}/models')
-
+		print("params['kwargs']['model_load_dir']", params['kwargs']['model_load_dir'])
 	params = DotMap(params)
 	return params
 

@@ -137,10 +137,11 @@ class MOPO(RLAlgorithm):
 
         self._log_dir = os.getcwd()
         self._writer = Writer(self._log_dir)
-        print('self._log_dir policy', self._log_dir)
-        self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
-        self.exp_name = self.exp_name.replace(':', '')
-        self.wlogger = Wandb(kwargs, name=self.exp_name, project='_policy')
+        if not self._train_bnn_only:
+            print('self._log_dir policy', self._log_dir)
+            self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
+            self.exp_name = self.exp_name.replace(':', '')
+            self.wlogger = Wandb(kwargs, name=self.exp_name, project='_policy')
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)
