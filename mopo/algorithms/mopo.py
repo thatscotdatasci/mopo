@@ -390,7 +390,7 @@ class MOPO(RLAlgorithm):
                 ('time_step_global', time_step_global)
             )))
 
-            self.wlogger.wandb.log(diagnostics, step=_total_timestep)
+            self.wlogger.wandb.log(diagnostics, step=self._total_timestep)
 
             if self._eval_render_mode is not None and hasattr(
                     evaluation_environment, 'render_rollouts'):
