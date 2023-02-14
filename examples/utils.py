@@ -165,7 +165,8 @@ def add_ray_tune_args(parser):
     parser.add_argument(
         '--trial-name-template',
         type=str,
-        default='seed:{trial.config[run_params][seed]}',
+        default='seed:{trial.config[seed]}',
+        # default='seed:{trial.config[run_params][seed]}',
         # default='id={trial.trial_id}-seed={trial.config[run_params][seed]}',
         help=tune_help_string(
             "Optional string template for trial name. For example:"
