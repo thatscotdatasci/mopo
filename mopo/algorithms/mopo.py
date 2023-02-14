@@ -137,7 +137,7 @@ class MOPO(RLAlgorithm):
 
         self._log_dir = os.getcwd()
         self._writer = Writer(self._log_dir)
-        if not self._train_bnn_only:
+        if not train_bnn_only:
             print('self._log_dir policy', self._log_dir)
             self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
             self.exp_name = self.exp_name.replace(':', '')
