@@ -123,7 +123,7 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
         'restore': command_line_args.restore,  # Defaults to None
     }
 
-    print('experiment', experiment)
+    # print('experiment', experiment)
     # print('experiment_id', experiment_id)
     return experiment_id, experiment
 
@@ -136,6 +136,7 @@ def unique_cluster_name(args):
         args.task
     )
     cluster_name = "-".join(cluster_name_parts).lower()
+    print('cluster_name', cluster_name)
     return cluster_name
 
 
