@@ -86,7 +86,7 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
     #### add pool_load_max_size to experiment_id
     if 'pool_load_max_size' in variant_spec['algorithm_params']['kwargs']:
         max_size = variant_spec['algorithm_params']['kwargs']['pool_load_max_size']
-        experiment_id = '{}_{}e3'.format(experiment_id, int(max_size/1000))
+        # experiment_id = '{}_{}e3'.format(experiment_id, int(max_size/1000)) #ToDo: why pool_load_max_size is important?
     ####
 
 
@@ -123,8 +123,8 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
         'restore': command_line_args.restore,  # Defaults to None
     }
 
-    print('experiment', experiment)
-    print('experiment_id', experiment_id)
+    # print('experiment', experiment)
+    # print('experiment_id', experiment_id)
     return experiment_id, experiment
 
 
@@ -339,6 +339,8 @@ def launch_example_cluster(example_module_name,
         *example_argv)
     cluster_command = ' '.join(cluster_command_parts)
 
+    print('config_file', config_file)
+    print('override_cluster_name', override_cluster_name)
     return exec_cluster(
         config_file=config_file,
         cmd=cluster_command,
