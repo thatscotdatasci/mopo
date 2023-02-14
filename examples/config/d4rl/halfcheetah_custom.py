@@ -11,6 +11,7 @@ params.update({
 params['kwargs'].update({
     'pool_load_path': os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data/MIXED-RT-1.npy'),
     # 'model_load_dir': os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_1_101e3/seed:4321_2022-06-18_10-53-164l945x_3/models'),
+    'model_load_dir': os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_rt_49_101e3/seed:1449_2023-02-13_19-12-16vz0nw7nv/models'),
     'bnn_retrain_epochs': 0,
     'pool_load_max_size': 101000,
     'rollout_length': 5,
