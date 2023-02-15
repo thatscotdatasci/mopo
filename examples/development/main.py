@@ -228,7 +228,7 @@ def main(argv=None):
     instructions.
     """
     # __package__ should be `development.main`
-    print('argv', argv)
+    print('argvFENFKJNEKJN', argv)
     run_example_local(__package__, argv)
 
 
