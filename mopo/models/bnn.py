@@ -470,7 +470,7 @@ class BNN:
 
         prefix = 'holdout/' if holdout else ''
 
-        d = {**{prefix + 'n_datapoints': n_datapoints, prefix + 'n_baches': n_baches, prefix + 'epoch': epoch},
+        d = {**{'n_datapoints': n_datapoints, 'n_baches': n_baches, 'epoch': epoch},
              **{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
              **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
              **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
