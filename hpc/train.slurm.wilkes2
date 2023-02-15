@@ -39,7 +39,7 @@ application="mopo"
 options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=5 --exp-name rexb5 --dataset MIXED-RT-5"
 
 #! Work directory (i.e. where the job will run):
-workdir="~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
+workdir="/rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
                              # in which sbatch is run.
 
 #! Are you using OpenMP (NB this is unrelated to OpenMPI)? If so increase this
