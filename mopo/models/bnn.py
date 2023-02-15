@@ -675,11 +675,13 @@ class BNN:
                 # Break conditions apply only in the first, standard training loop
                 # In the second loop we force `repeat_dynamics_epochs` times the number of training epochs as in the first loop to be completed
                 if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
+                    print('breaking the first loop')
                     break
                 if max_t and t > max_t:
                     descr = 'Breaking because of timeout: {}! (max: {})'.format(t, max_t)
                     progress.append_description(descr)
                     # print('Breaking because of timeout: {}! | (max: {})\n'.format(t, max_t))
+                    print('breaking the second loop')
                     # time.sleep(5)
                     break
 
@@ -708,6 +710,7 @@ class BNN:
         val_loss = (np.sort(holdout_losses)[:self.num_elites]).mean()
         model_metrics = {'val_loss': val_loss}
         print('[ BNN ] Holdout', np.sort(holdout_losses), model_metrics)
+        print('finished BNN training!')
         return OrderedDict(model_metrics)
         # return np.sort(holdout_losses)[]
 
