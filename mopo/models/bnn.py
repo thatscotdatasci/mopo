@@ -437,8 +437,19 @@ class BNN:
         with open(train_var_lim_loss_history_path, 'a') as f:
             f.write(train_var_lim_loss.astype(str)+"\n")
 
-        self.wlogger.wandb.log({**{'train/loss': train_loss, 'train/core_loss': train_core_loss, 'train/decay_loss': train_decay_loss,
-                                   f'train/var_lim_loss': train_var_lim_loss, 'train/n_datapoints': n_datapoints, 'train/n_baches': n_baches, 'train/epoch': epoch},
+        prefix = 'train/'
+        self.wlogger.wandb.log({**{'train/loss': train_loss,
+                                   'train/core_loss': train_core_loss,
+                                   'train/decay_loss': train_decay_loss,
+                                   f'train/var_lim_loss': train_var_lim_loss,
+                                   'train/n_datapoints': n_datapoints, 'train/n_baches': n_baches, 'train/epoch': epoch,
+                                   prefix + 'pol_total_losses_mean': np.mean(train_pol_tot_loss),
+                                   prefix + 'pol_var_losses_mean': np.mean(train_pol_var_loss),
+                                   prefix + 'mean_pol_losses_mean': np.mean(train_mean_pol_loss),
+                                   prefix + 'pol_total_losses_var': np.var(train_pol_tot_loss),
+                                   prefix + 'pol_var_losses_var': np.var(train_pol_var_loss),
+                                   prefix + 'mean_pol_losses_var': np.var(train_mean_pol_loss),
+                                   },
                                **{f'train/M{i}_pol_tot_loss': train_pol_tot_loss[i] for i in range(len(train_pol_tot_loss))},
                                **{f'train/M{i}_pol_var_loss': train_pol_var_loss[i] for i in range(len(train_pol_var_loss))},
                                **{f'train/M{i}_mean_pol_loss': train_mean_pol_loss[i] for i in range(len(train_mean_pol_loss))},
@@ -470,7 +481,16 @@ class BNN:
 
         prefix = 'holdout/' if holdout else ''
 
-        d = {**{'n_datapoints': n_datapoints, 'n_baches': n_baches, 'epoch': epoch},
+        d = {**{'n_datapoints': n_datapoints, 'n_baches': n_baches, 'epoch': epoch,
+                prefix + 'total_losses_mean': np.mean(total_losses),
+                prefix + 'pol_total_losses_mean': np.mean(pol_total_losses),
+                prefix + 'pol_var_losses_mean': np.mean(pol_var_losses),
+                prefix + 'mean_pol_losses_mean': np.mean(mean_pol_losses),
+                prefix + 'total_losses_var': np.var(total_losses),
+                prefix + 'pol_total_losses_var': np.var(pol_total_losses),
+                prefix + 'pol_var_losses_var': np.var(pol_var_losses),
+                prefix + 'mean_pol_losses_var': np.var(mean_pol_losses),
+                },
              **{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
              **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
              **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
