@@ -460,7 +460,6 @@ class BNN:
     def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, epoch, holdout=False):
         """Save the current training/holdout evaluation losses.
         """
-        print('holdout', holdout)
         if holdout:
             total_loss_history_path =     os.path.join(self._log_dir, 'model_holdout_loss_history.txt')
             pol_total_loss_history_path = os.path.join(self._log_dir, 'model_holdout_pol_total_loss_history.txt')
@@ -668,15 +667,18 @@ class BNN:
                         progress.set_description(named_losses)
 
                         break_train = self._save_best(epoch, holdout_losses)
+                        print('break_train', break_train)
 
                 progress.update()
                 t = time.time() - t0
 
                 # Break conditions apply only in the first, standard training loop
                 # In the second loop we force `repeat_dynamics_epochs` times the number of training epochs as in the first loop to be completed
+                print('o_loop', o_loop)
                 if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
                     print('breaking the first loop')
                     break
+                print('max_t', max_t)
                 if max_t and t > max_t:
                     descr = 'Breaking because of timeout: {}! (max: {})'.format(t, max_t)
                     progress.append_description(descr)
