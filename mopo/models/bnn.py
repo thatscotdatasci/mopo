@@ -530,6 +530,7 @@ class BNN:
 
         Returns: None
         """
+        print('max_t', max_t)
         self._max_epochs_since_update = max_epochs_since_update
         self._start_train()
         break_train = False
