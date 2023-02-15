@@ -21,6 +21,6 @@ mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_cu
 
 mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name halfcheetah_mixed_rt_49 --seed 1449 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
 
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name pen0 --seed 1 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name pen0 --seed 2 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
 
 git@github.com:thatscotdatasci/mopo.git

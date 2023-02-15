@@ -223,6 +223,7 @@ def run_example_local(example_module_name, example_argv, local_mode=False):
         trainable_class, variant_spec, example_args)
     experiments = {experiment_id: experiment}
 
+    print('example_args.temp_dir', example_args.temp_dir)
     ray.init(
         num_cpus=example_args.cpus,
         num_gpus=example_args.gpus,
@@ -345,8 +346,6 @@ def launch_example_cluster(example_module_name,
         *example_argv)
     cluster_command = ' '.join(cluster_command_parts)
 
-    print('config_file', config_file)
-    print('override_cluster_name', override_cluster_name)
     return exec_cluster(
         config_file=config_file,
         cmd=cluster_command,
