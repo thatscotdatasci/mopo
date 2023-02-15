@@ -224,16 +224,14 @@ def run_example_local(example_module_name, example_argv, local_mode=False):
         trainable_class, variant_spec, example_args)
     experiments = {experiment_id: experiment}
 
-    example_args.temp_dir = 'FjknS'
-    print('example_args.temp_dir', example_args.temp_dir)
     ray.init(
         num_cpus=example_args.cpus,
         num_gpus=example_args.gpus,
         resources=example_args.resources or {},
         local_mode=local_mode,
         include_webui=example_args.include_webui,
-        # temp_dir=example_args.temp_dir,
-        _temp_dir=example_args.temp_dir,
+        temp_dir=example_args.temp_dir,
+        # _temp_dir=example_args.temp_dir,
     )
 
     tune.run_experiments(
