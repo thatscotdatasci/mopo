@@ -15,7 +15,7 @@ export LD_LIBRARY_PATH=~/.mujoco/mujoco200/bin:$LD_LIBRARY_PATH
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 export RAY_DISABLE_MEMORY_MONITOR=1
 # environment model
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 432100 --rex-beta=20 --exp-name halfcheetah_mixed_rt_100 --dataset MIXED-RT-5
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 432100 --rex-beta=5 --exp-name halfcheetah_mixed_rt_5 --dataset MIXED-RT-5
 # agent
 mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name halfcheetah_mixed_rt_49 --seed 1449 --dynamics-model-exp MP748 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
 
