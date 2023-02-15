@@ -46,6 +46,7 @@ class BNN:
                 .rex_beta (float): (optional) The penalty value to use in V-REx.
                 .rex_multiply (`bool`): If True, multiply variance by beta, else divide sum of losses
                     by beta.
+                .rex_std (`bool`): If True, use std instead of var in REx.
                 .lr_decay ('float'): (optional) Multiply the core loss by this number before returning.
                     Applies in REx training loop.
                 .log_dir (str): Where to save logs to during training.
@@ -958,6 +959,7 @@ class BNN:
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
+            policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses
