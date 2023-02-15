@@ -60,6 +60,8 @@ class BNN:
             self.domain = self._log_dir.split('/')[-3]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
             self.exp_name = self._log_dir.split('/')[-2] + '_' + self.exp_seed
+            print('self.exp_name', self.exp_name)
+            print("'_'+self.domain+'_bnn'", '_'+self.domain+'_bnn')
             self.wlogger = Wandb(params, name=self.exp_name, project='_'+self.domain+'_bnn')
 
         print('[ BNN ] Initializing model: {} | {} networks | {} elites'.format(params['name'], params['num_networks'], params['num_elites']))
