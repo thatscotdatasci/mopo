@@ -54,12 +54,12 @@ class BNN:
         self.name = get_required_argument(params, 'name', 'Must provide name.')
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
-        self.domain = self._log_dir.split('/')[-3]
-        self.exp_name = self._log_dir.split('/')[-2] + '_' + self._log_dir.split('/')[-1]
-        self.exp_name = self.exp_name.replace(':', '')
 
         self.train_bnn_only = params.get('train_bnn_only', None)
         if self.train_bnn_only:
+            self.domain = self._log_dir.split('/')[-3]
+            self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
+            self.exp_name = self._log_dir.split('/')[-2] + '_' + self.exp_seed
             self.wlogger = Wandb(params, name=self.exp_name, project='_'+self.domain+'_bnn')
 
         print('[ BNN ] Initializing model: {} | {} networks | {} elites'.format(params['name'], params['num_networks'], params['num_elites']))

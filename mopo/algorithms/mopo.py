@@ -139,11 +139,8 @@ class MOPO(RLAlgorithm):
         print('self._log_dir', self._log_dir)
         self._writer = Writer(self._log_dir)
         if not train_bnn_only:
-            print('self._log_dir policy', self._log_dir)
             self.domain = self._log_dir.split('/')[-3]
-            print(" self._log_dir.split('_')",  self._log_dir.split('_'))
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
-            print('self.exp_seed', self.exp_seed)
             self.exp_name = self._log_dir.split('/')[-2] + '_' + self.exp_seed
             self.wlogger = Wandb(kwargs, name=self.exp_name, project='_'+self.domain+'_policy')
 
