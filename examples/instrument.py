@@ -77,7 +77,7 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
     print('variant_spec', variant_spec)
     params = variant_spec.get('algorithm_params')
     print('params', params)
-    local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' + params.get('dataset'))
+    local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' + command_line_args.get('dataset'))
     print('local_dir', local_dir)
     resources_per_trial = _normalize_trial_resources(
         command_line_args.resources_per_trial,
