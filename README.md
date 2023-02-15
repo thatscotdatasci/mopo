@@ -49,8 +49,8 @@ If you use MOPO for academic research, please kindly cite our paper the using fo
 # environment model
 mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=5 --exp-name rexb5 --dataset MIXED-RT-5
 mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 2 --rex-beta=5 --exp-name rexb5 --dataset MIXED-RT-5
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 2 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 2 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5
 
 
 # agent
