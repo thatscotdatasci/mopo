@@ -2,11 +2,6 @@
 
 # run these steps to create environment
 eval "$(conda shell.bash hook)"
-# conda activate ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/.env
-# conda activate /rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo/.env
-# conda activate ~/envs/mopo/.env
-# export LD_LIBRARY_PATH=~/.mujoco/mujoco210/bin:$LD_LIBRARY_PATH
-# export LD_LIBRARY_PATH=~/.mujoco/mujoco200_linux/bin:$LD_LIBRARY_PATH
 
 conda deactivate
 conda activate /rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo/.env
@@ -14,13 +9,4 @@ cd /rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo
 export LD_LIBRARY_PATH=~/.mujoco/mujoco200/bin:$LD_LIBRARY_PATH
 export TF_FORCE_GPU_ALLOW_GROWTH=true
 export RAY_DISABLE_MEMORY_MONITOR=1
-# environment model
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 432100 --rex-beta=5 --exp-name halfcheetah_mixed_rt_5 --dataset MIXED-RT-5
-# agent
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name halfcheetah_mixed_rt_49 --seed 1449 --dynamics-model-exp MP748 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
 
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name halfcheetah_mixed_rt_49 --seed 1449 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
-
-mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name pen0 --seed 2 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
-
-git@github.com:thatscotdatasci/mopo.git
