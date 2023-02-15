@@ -36,7 +36,7 @@ application="mopo"
 
 #! Run options for the application:
 #options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 4321 --rex-beta=20 --exp-name halfcheetah_mixed_rt_5 --dataset MIXED-RT-5"
-options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=10 --exp-name rexb10 --dataset MIXED-RT-5"
+options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=20 --exp-name rexb20 --dataset MIXED-RT-5"
 
 #! Work directory (i.e. where the job will run):
 #workdir="$SLURM_SUBMIT_DIR"
