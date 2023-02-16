@@ -34,18 +34,16 @@ application="mopo"
 
 #! Run options for the application:
 options="run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom \
-        --model_load_dir ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_rt_49_101e3/1/models \
-        --train_bnn_only False \
+        --config=examples.config.d4rl.{{ config }} \
+        --model_load_dir {{model_load_dir}} \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name rl5_mp0_ms1 \
-        --seed 1 \
-        --bnn-retrain-epochs 0 \
-        --penalty-coeff 0.0 \
-        --rollout-length 5 \
-        --rollout-batch-size 50000 \
-        --dataset MIXED-RT-5"
+        --exp-name {{ exp_name }} \
+        --seed {{ seed }} \
+        --penalty-coeff {{ mopo_penalty_coeff }} \
+        --rollout-length {{ rollout_length }} \
+        --rollout-batch-size {{ rollout_batch_size }} \
+        --dataset {{ dataset }}"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory

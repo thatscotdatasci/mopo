@@ -183,7 +183,7 @@ class Wandb():
 		self.wandb.init(
 			project='REx' + project,
 			config=flags,
-			entity=os.getenv('WANDB_USER', 'REx'),
+			entity=os.getenv('WANDB_USER', 'dgp'),
 			reinit=True,
 			# Restore parameters
 			resume="allow",
