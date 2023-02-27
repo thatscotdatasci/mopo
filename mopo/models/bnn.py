@@ -594,7 +594,7 @@ class BNN:
             if o_loop == 0:
                 print('[ BNN ] Begginning training')
                 epoch = -1
-                rex_training_loop = False
+                rex_training_loop = True #False
             elif o_loop == 1:
                 # Multiply the number of epochs performed in the first training loop by `repeat_dynamics_epochs`
                 # and perform this number of epochs of additional training.
