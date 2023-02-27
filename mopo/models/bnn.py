@@ -418,6 +418,7 @@ class BNN:
         """Save the current training losses.
         """
 
+        print('_save_training_losses epoch', epoch)
         print('_save_training_losses rex_training_loop', rex_training_loop, int(rex_training_loop))
         print('_save_training_losses self.rex', self.rex)
         print('_save_training_losses self.rex_multiply', self.rex_multiply)
