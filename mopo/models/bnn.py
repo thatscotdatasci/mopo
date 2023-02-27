@@ -460,7 +460,6 @@ class BNN:
              **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
              **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
              **{prefix + f'M{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))}}
-        # print('d', d)
         self.wlogger.wandb.log(d)
 
 
@@ -643,7 +642,6 @@ class BNN:
                 if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
                     print('breaking the first loop')
                     break
-                print('max_t', max_t)
                 if max_t and t > max_t:
                     descr = 'Breaking because of timeout: {}! (max: {})'.format(t, max_t)
                     progress.append_description(descr)
@@ -876,8 +874,6 @@ class BNN:
         mean, log_var = self._compile_outputs(inputs, ret_log_var=True)
         inv_var = tf.exp(-log_var)
 
-        print('_compile_losses mean', mean.shape)
-
         # In the below the loss for each observation in each batch is determined
         # losses will have dimensions: [B N 1]; the final dimension is retained
         # as this is needed for future matrix multiplication
@@ -886,7 +882,6 @@ class BNN:
             mse_losses = tf.reduce_mean(tf.square(mean - targets) * inv_var, axis=-1, keepdims=True)
             var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
             losses = mse_losses + var_losses
-            print('_compile_losses losses', losses.shape)
         else:
             # MSE
             losses = tf.reduce_mean(tf.square(mean - targets), axis=-1, keepdims=True)
