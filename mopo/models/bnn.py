@@ -580,6 +580,7 @@ class BNN:
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
+                    print('batch_idxs', batch_idxs.shape)
                     _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
                         (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
                         feed_dict={
