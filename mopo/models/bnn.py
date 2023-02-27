@@ -417,10 +417,6 @@ class BNN:
     def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
-        print('train_pol_tot_loss', train_pol_tot_loss.shape)
-        print('train_pol_var_loss', train_pol_var_loss.shape)
-        print('train_mean_pol_loss', train_mean_pol_loss.shape)
-
         self.wlogger.wandb.log({**{'train_main/loss': train_loss,
                                    'train_main/core_loss': train_core_loss,
                                    'train/decay_loss': train_decay_loss,
@@ -571,6 +567,7 @@ class BNN:
             n_baches = 0
             for epoch in epoch_iter:
                 for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
+                    print('batch loop rex_training_loop', rex_training_loop)
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
@@ -920,6 +917,8 @@ class BNN:
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
             #policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
+            print('rex_training_loop_total_losses self.rex', self.rex)
+            print('rex_training_loop_total_losses self.rex_multiply', self.rex_multiply)
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses

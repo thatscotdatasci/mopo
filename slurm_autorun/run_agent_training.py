@@ -35,7 +35,6 @@ class MopoAgentExp:
     def __init__(
         self,
         config,
-        dynamics_model_exp,
         mopo_penalty_coeff,
         rollout_length,
         dataset,
@@ -48,18 +47,15 @@ class MopoAgentExp:
     ) -> None:
         """ This object is used to define a MOPO experiment.
         """
-        dynamics_exp = get_experiment_details(dynamics_model_exp)
-
         # Parameters that must always be specified by the user
         self.config = config
-        self.dynamics_model_exp = dynamics_model_exp
         self.mopo_penalty_coeff = mopo_penalty_coeff
         self.rollout_length = rollout_length
         self.dataset = dataset
         self.exp_id = exp_id
 
         # Parameters with defaults, or values that are taken from the dynamics experiment
-        self.exp_name = exp_name or '_'.join(dynamics_exp.base_dir.split('_')[:-1])
+        self.exp_name = exp_name
         self.seed = seed or dynamics_exp.seed
         self.bnn_retrain_epochs = bnn_retrain_epochs
         self.rollout_batch_size = rollout_batch_size or ROLLOUT_BATCH_SIZES[self.rollout_length]
@@ -82,7 +78,6 @@ class MopoAgentExp:
             "config": self.config,
             "exp_name": self.exp_name,
             "seed": self.seed,
-            "dynamics_model_exp": self.dynamics_model_exp,
             "bnn_retrain_epochs": self.bnn_retrain_epochs,
             "mopo_penalty_coeff": self.mopo_penalty_coeff,
             "rollout_length": self.rollout_length,
@@ -166,6 +161,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/exp_params.260922_2.json")
+    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/exp_params.1.json")
 
     run_experiment_set(params_filepath)

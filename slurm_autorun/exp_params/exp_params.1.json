@@ -1,4 +1,5 @@
 [
-    {"config":"halfcheetah_custom",  "mopo_penalty_coeff":0.0, "rollout_length":20, "dataset":"H-MIXED-RT-5", "seed": 1},
-    {"config":"halfcheetah_custom",  "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"H-MIXED-RT-5", "seed": 2}
+    {"config":"walker2d_custom_rl",  "mopo_penalty_coeff":0.0, "rollout_length":20, "dataset":"W-MIXED-RT-1", "seed": 1},
+    {"config":"walker2d_custom_rl",  "mopo_penalty_coeff":0.0, "rollout_length":20, "dataset":"W-MIXED-RT-1", "seed": 2},
+    {"config":"walker2d_custom_rl",  "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"W-MIXED-RT-1", "seed": 1}
 ]
