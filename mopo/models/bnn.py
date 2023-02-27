@@ -273,9 +273,11 @@ class BNN:
                                                     shape=(),
                                                     name="training_rex_loop")
 
+            print('self.deterministic', self.deterministic)
             if not self.deterministic:
                 self.train_core_losses, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=True)
                 self.train_core_loss = tf.reduce_sum(self.train_core_losses)
+                print('self.train_core_loss', self.train_core_loss)
                 self.train_decay_loss = tf.add_n(self.decays)
                 self.train_var_lim_loss = 0.01 * tf.reduce_sum(self.max_logvar) - 0.01 * tf.reduce_sum(self.min_logvar)
                 self.train_loss = self.train_core_loss + self.train_decay_loss + self.train_var_lim_loss
@@ -962,8 +964,8 @@ class BNN:
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
             #policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
-            print('policy_var_losses', policy_var_losses)
-            print('policy_total_losses', policy_total_losses)
+            print('rex_training_loop_total_losses policy_var_losses', policy_var_losses)
+            print('rex_training_loop_total_losses policy_total_losses', policy_total_losses)
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses
@@ -974,9 +976,10 @@ class BNN:
                     rex_tl_loss = policy_total_losses
                 else:
                     rex_tl_loss = (1/self.rex_beta) * policy_total_losses
-            print('rex_tl_loss', rex_tl_loss)
+            print('rex_training_loop_total_losses rex_tl_loss', rex_tl_loss)
             return rex_tl_loss
 
+        print('_compile_losses rex_training_loop', rex_training_loop)
         total_losses = tf.cond(rex_training_loop,
             rex_training_loop_total_losses,
             lambda: policy_total_losses
