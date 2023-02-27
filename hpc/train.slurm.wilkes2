@@ -41,7 +41,7 @@ options="run_local examples.development \
         --config=examples.config.d4rl.walker2d_custom_rex \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
-        --seed 10 \
+        --seed 11 \
         --rex-beta=10 \
         --exp-name rexb10 \
         --dataset W-MIXED-RT-1"
