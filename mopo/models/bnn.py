@@ -551,6 +551,11 @@ class BNN:
 
         # Complete two loops of training. First loop performs normal training
         # The second loop applies REx, if REx is enabled (else the first loop is effectively completed again)
+        save_every = 10
+        n_datapoints = 0
+        n_baches = 0
+        total_epoch = 0
+
         for o_loop in range(2):
             if o_loop == 0:
                 print('[ BNN ] Begginning training')
@@ -568,10 +573,8 @@ class BNN:
                 raise RuntimeError('Attempting to complete unexpected training loop')
 
             print('rex_training_loop', rex_training_loop)
-            save_every = 10
-            n_datapoints = 0
-            n_baches = 0
             for epoch in epoch_iter:
+                total_epoch += 1
                 for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
                     # print('batch loop rex_training_loop', rex_training_loop)
                     n_datapoints += batch_num * batch_size
@@ -587,7 +590,7 @@ class BNN:
                         }
                     )
                     if batch_num % save_every ==0:
-                        self._save_training_losses(train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop)
+                        self._save_training_losses(train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, total_epoch, rex_training_loop)
                     grad_updates += 1
 
                 idxs = shuffle_rows(idxs)
@@ -602,7 +605,7 @@ class BNN:
                                     self.sy_rex_training_loop: rex_training_loop,
                                 }
                             )
-                        self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, epoch)
+                        self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, total_epoch)
                         named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
                         progress.set_description(named_losses)
                     else:
@@ -624,8 +627,8 @@ class BNN:
                                     self.sy_rex_training_loop: rex_training_loop,
                                 }
                             )
-                        self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, epoch)
-                        self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout_mean_pol_losses, n_datapoints, n_baches, epoch, holdout=True)
+                        self._save_losses(losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, total_epoch)
+                        self._save_losses(holdout_losses, holdout_pol_total_losses, holdout_pol_var_losses, holdout_mean_pol_losses, n_datapoints, n_baches, total_epoch, holdout=True)
                         named_losses = [['M{}'.format(i), losses[i]] for i in range(len(losses))]
                         named_holdout_losses = [['V{}'.format(i), holdout_losses[i]] for i in range(len(holdout_losses))]
                         named_losses = named_losses + named_holdout_losses + [['T', time.time() - t0]]
