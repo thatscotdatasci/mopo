@@ -419,23 +419,22 @@ class BNN:
     def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
-        prefix = 'train/'
         print('train_pol_tot_loss', train_pol_tot_loss.shape)
         print('train_pol_var_loss', train_pol_var_loss.shape)
         print('train_mean_pol_loss', train_mean_pol_loss.shape)
 
-        self.wlogger.wandb.log({**{'train/loss': train_loss,
-                                   'train/core_loss': train_core_loss,
+        self.wlogger.wandb.log({**{'train_main/loss': train_loss,
+                                   'train_main/core_loss': train_core_loss,
                                    'train/decay_loss': train_decay_loss,
-                                   'train/rex_training_loop': int(rex_training_loop),
-                                   f'train/var_lim_loss': train_var_lim_loss,
+                                   'train_main/rex_training_loop': int(rex_training_loop),
+                                   'train/var_lim_loss': train_var_lim_loss,
                                    'train/n_datapoints': n_datapoints, 'train/n_baches': n_baches, 'train/epoch': epoch,
-                                   prefix + 'pol_total_losses_mean': np.mean(train_pol_tot_loss),
-                                   prefix + 'pol_var_losses_mean': np.mean(train_pol_var_loss),
-                                   prefix + 'mean_pol_losses_mean': np.mean(train_mean_pol_loss),
-                                   prefix + 'pol_total_losses_var': np.var(train_pol_tot_loss),
-                                   prefix + 'pol_var_losses_var': np.var(train_pol_var_loss),
-                                   prefix + 'mean_pol_losses_var': np.var(train_mean_pol_loss),
+                                   'train_main/pol_total_losses_mean': np.mean(train_pol_tot_loss),
+                                   'train_main/pol_var_losses_mean': np.mean(train_pol_var_loss),
+                                   'train/mean_pol_losses_mean': np.mean(train_mean_pol_loss),
+                                   'train/pol_total_losses_var': np.var(train_pol_tot_loss),
+                                   'train/pol_var_losses_var': np.var(train_pol_var_loss),
+                                   'train/mean_pol_losses_var': np.var(train_mean_pol_loss),
                                    },
                                **{f'train/M{i}_pol_tot_loss': train_pol_tot_loss[i] for i in range(len(train_pol_tot_loss))},
                                **{f'train/M{i}_pol_var_loss': train_pol_var_loss[i] for i in range(len(train_pol_var_loss))},
@@ -494,8 +493,6 @@ class BNN:
 
         Returns: None
         """
-        print('batch_size', batch_size)
-
         self._max_epochs_since_update = max_epochs_since_update
         self._start_train()
         break_train = False
@@ -580,7 +577,6 @@ class BNN:
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
-                    print('batch_idxs', batch_idxs.shape)
                     _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
                         (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
                         feed_dict={
