@@ -600,11 +600,13 @@ class BNN:
                 # and perform this number of epochs of additional training.
                 # Unless a pre-trained model has been loaded, in which case do not perform any further training.
                 epoch_iter = range(0) if self.model_loaded else range(repeat_dynamics_epochs*(epoch+1))
+                print('epoch_iter', epoch_iter)
                 print('[ BNN ] Begginning further {} epochs of training'.format(0 if self.model_loaded else repeat_dynamics_epochs*(epoch+1)))
                 rex_training_loop = True
             else:
                 raise RuntimeError('Attempting to complete unexpected training loop')
 
+            print('rex_training_loop', rex_training_loop)
             save_every = 10
             n_datapoints = 0
             n_baches = 0
@@ -959,7 +961,9 @@ class BNN:
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
-            policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
+            #policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
+            print('policy_var_losses', policy_var_losses)
+            print('policy_total_losses', policy_total_losses)
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses
@@ -970,6 +974,7 @@ class BNN:
                     rex_tl_loss = policy_total_losses
                 else:
                     rex_tl_loss = (1/self.rex_beta) * policy_total_losses
+            print('rex_tl_loss', rex_tl_loss)
             return rex_tl_loss
 
         total_losses = tf.cond(rex_training_loop,
