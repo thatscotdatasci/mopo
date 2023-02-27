@@ -494,6 +494,8 @@ class BNN:
 
         Returns: None
         """
+        print('batch_size', batch_size)
+
         self._max_epochs_since_update = max_epochs_since_update
         self._start_train()
         break_train = False
