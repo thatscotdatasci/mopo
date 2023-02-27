@@ -419,6 +419,8 @@ class BNN:
         """
 
         print('_save_training_losses rex_training_loop', rex_training_loop, int(rex_training_loop))
+        print('_save_training_losses self.rex', self.rex)
+        print('_save_training_losses self.rex_multiply', self.rex_multiply)
 
         self.wlogger.wandb.log({**{'train_main/loss': train_loss,
                                    'train_main/core_loss': train_core_loss,
@@ -922,8 +924,6 @@ class BNN:
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
             #policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
-            print('rex_training_loop_total_losses self.rex', self.rex)
-            print('rex_training_loop_total_losses self.rex_multiply', self.rex_multiply)
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses
