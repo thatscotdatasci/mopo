@@ -273,11 +273,9 @@ class BNN:
                                                     shape=(),
                                                     name="training_rex_loop")
 
-            print('self.deterministic', self.deterministic)
             if not self.deterministic:
                 self.train_core_losses, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss = self._compile_losses(self.sy_train_in, self.sy_train_targ, self.sy_train_pol, rex_training_loop=self.sy_rex_training_loop, inc_var_loss=True)
                 self.train_core_loss = tf.reduce_sum(self.train_core_losses)
-                print('self.train_core_loss', self.train_core_loss)
                 self.train_decay_loss = tf.add_n(self.decays)
                 self.train_var_lim_loss = 0.01 * tf.reduce_sum(self.max_logvar) - 0.01 * tf.reduce_sum(self.min_logvar)
                 self.train_loss = self.train_core_loss + self.train_decay_loss + self.train_var_lim_loss
@@ -438,7 +436,7 @@ class BNN:
                                    },
                                **{f'train/M{i}_pol_tot_loss': train_pol_tot_loss[i] for i in range(len(train_pol_tot_loss))},
                                **{f'train/M{i}_pol_var_loss': train_pol_var_loss[i] for i in range(len(train_pol_var_loss))},
-                               **{f'train/M{i}_mean_pol_loss': train_mean_pol_loss[i] for i in range(len(train_mean_pol_loss))},
+                               **{f'train/P{i}_mean_pol_loss': train_mean_pol_loss[i] for i in range(len(train_mean_pol_loss))},
                                 }, step=n_baches)
 
     def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, epoch, holdout=False):
@@ -459,7 +457,7 @@ class BNN:
              **{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
              **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
              **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
-             **{prefix + f'M{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))}}
+             **{prefix + f'P{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))}}
         self.wlogger.wandb.log(d)
 
 
@@ -555,7 +553,7 @@ class BNN:
             if o_loop == 0:
                 print('[ BNN ] Begginning training')
                 epoch = -1
-                rex_training_loop = True #False
+                rex_training_loop = False
             elif o_loop == 1:
                 # Multiply the number of epochs performed in the first training loop by `repeat_dynamics_epochs`
                 # and perform this number of epochs of additional training.
