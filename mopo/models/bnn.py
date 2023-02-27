@@ -419,29 +419,6 @@ class BNN:
     def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
-        train_loss_history_path           = os.path.join(self._log_dir, 'model_train_loss_history.txt')
-        train_core_loss_history_path      = os.path.join(self._log_dir, 'model_train_core_loss_history.txt')
-        train_pol_total_loss_history_path = os.path.join(self._log_dir, 'model_train_pol_total_loss_history.txt')
-        train_pol_var_loss_history_path   = os.path.join(self._log_dir, 'model_train_pol_var_loss_history.txt')
-        train_mean_pol_loss_history_path  = os.path.join(self._log_dir, 'model_train_mean_pol_loss_history.txt')
-        train_decay_loss_history_path     = os.path.join(self._log_dir, 'model_train_decay_loss_history.txt')
-        train_var_lim_loss_history_path   = os.path.join(self._log_dir, 'model_train_var_lim_loss_history.txt')
-
-        with open(train_loss_history_path, 'a') as f:
-            f.write(train_loss.astype(str)+"\n")
-        with open(train_core_loss_history_path, 'a') as f:
-            f.write(train_core_loss.astype(str)+"\n")
-        with open(train_pol_total_loss_history_path, 'a') as f:
-            f.write(",".join(list(train_pol_tot_loss.astype(str)))+"\n")
-        with open(train_pol_var_loss_history_path, 'a') as f:
-            f.write(",".join(list(train_pol_var_loss.astype(str)))+"\n")
-        with open(train_mean_pol_loss_history_path, 'a') as f:
-            f.write(",".join(list(train_mean_pol_loss.astype(str)))+"\n")
-        with open(train_decay_loss_history_path, 'a') as f:
-            f.write(train_decay_loss.astype(str)+"\n")
-        with open(train_var_lim_loss_history_path, 'a') as f:
-            f.write(train_var_lim_loss.astype(str)+"\n")
-
         prefix = 'train/'
         print('train_pol_tot_loss', train_pol_tot_loss.shape)
         print('train_pol_var_loss', train_pol_var_loss.shape)
@@ -468,26 +445,6 @@ class BNN:
     def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, epoch, holdout=False):
         """Save the current training/holdout evaluation losses.
         """
-        if holdout:
-            total_loss_history_path =     os.path.join(self._log_dir, 'model_holdout_loss_history.txt')
-            pol_total_loss_history_path = os.path.join(self._log_dir, 'model_holdout_pol_total_loss_history.txt')
-            pol_var_loss_history_path =   os.path.join(self._log_dir, 'model_holdout_pol_var_loss_history.txt')
-            mean_pol_loss_history_path =  os.path.join(self._log_dir, 'model_holdout_mean_pol_loss_history.txt')
-        else:
-            total_loss_history_path =     os.path.join(self._log_dir, 'model_loss_history.txt')
-            pol_total_loss_history_path = os.path.join(self._log_dir, 'model_pol_total_loss_history.txt')
-            pol_var_loss_history_path =   os.path.join(self._log_dir, 'model_pol_var_loss_history.txt')
-            mean_pol_loss_history_path =  os.path.join(self._log_dir, 'model_mean_pol_loss_history.txt')
-
-        with open(total_loss_history_path, 'a') as f:
-            f.write(",".join(list(total_losses.astype(str)))+"\n")
-        with open(pol_total_loss_history_path, 'a') as f:
-            f.write(",".join(list(pol_total_losses.astype(str)))+"\n")
-        with open(pol_var_loss_history_path, 'a') as f:
-            f.write(",".join(list(pol_var_losses.astype(str)))+"\n")
-        with open(mean_pol_loss_history_path, 'a') as f:
-            f.write(",".join(list(mean_pol_losses.astype(str)))+"\n")
-
         prefix = 'holdout/' if holdout else ''
 
         d = {**{'n_datapoints': n_datapoints, 'n_baches': n_baches, 'epoch': epoch,
@@ -920,6 +877,8 @@ class BNN:
         mean, log_var = self._compile_outputs(inputs, ret_log_var=True)
         inv_var = tf.exp(-log_var)
 
+        print('_compile_losses mean', mean.shape)
+
         # In the below the loss for each observation in each batch is determined
         # losses will have dimensions: [B N 1]; the final dimension is retained
         # as this is needed for future matrix multiplication
@@ -928,6 +887,7 @@ class BNN:
             mse_losses = tf.reduce_mean(tf.square(mean - targets) * inv_var, axis=-1, keepdims=True)
             var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
             losses = mse_losses + var_losses
+            print('_compile_losses losses', losses.shape)
         else:
             # MSE
             losses = tf.reduce_mean(tf.square(mean - targets), axis=-1, keepdims=True)
