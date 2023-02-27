@@ -416,7 +416,7 @@ class BNN:
         mean_elite_loss = np.sort(losses)[:self.num_elites].mean()
         return mean_elite_loss
 
-    def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch):
+    def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
         train_loss_history_path           = os.path.join(self._log_dir, 'model_train_loss_history.txt')
@@ -443,9 +443,14 @@ class BNN:
             f.write(train_var_lim_loss.astype(str)+"\n")
 
         prefix = 'train/'
+        print('train_pol_tot_loss', train_pol_tot_loss.shape)
+        print('train_pol_var_loss', train_pol_var_loss.shape)
+        print('train_mean_pol_loss', train_mean_pol_loss.shape)
+
         self.wlogger.wandb.log({**{'train/loss': train_loss,
                                    'train/core_loss': train_core_loss,
                                    'train/decay_loss': train_decay_loss,
+                                   'train/rex_training_loop': int(rex_training_loop),
                                    f'train/var_lim_loss': train_var_lim_loss,
                                    'train/n_datapoints': n_datapoints, 'train/n_baches': n_baches, 'train/epoch': epoch,
                                    prefix + 'pol_total_losses_mean': np.mean(train_pol_tot_loss),
@@ -532,7 +537,6 @@ class BNN:
 
         Returns: None
         """
-        print('max_t', max_t)
         self._max_epochs_since_update = max_epochs_since_update
         self._start_train()
         break_train = False
@@ -627,7 +631,7 @@ class BNN:
                         }
                     )
                     if batch_num % save_every ==0:
-                        self._save_training_losses(train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch)
+                        self._save_training_losses(train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop)
                     grad_updates += 1
 
                 idxs = shuffle_rows(idxs)
@@ -964,8 +968,6 @@ class BNN:
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
             #policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
-            print('rex_training_loop_total_losses policy_var_losses', policy_var_losses)
-            print('rex_training_loop_total_losses policy_total_losses', policy_total_losses)
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses
@@ -976,10 +978,8 @@ class BNN:
                     rex_tl_loss = policy_total_losses
                 else:
                     rex_tl_loss = (1/self.rex_beta) * policy_total_losses
-            print('rex_training_loop_total_losses rex_tl_loss', rex_tl_loss)
             return rex_tl_loss
 
-        print('_compile_losses rex_training_loop', rex_training_loop)
         total_losses = tf.cond(rex_training_loop,
             rex_training_loop_total_losses,
             lambda: policy_total_losses
