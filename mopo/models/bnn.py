@@ -417,12 +417,6 @@ class BNN:
     def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
-
-        print('_save_training_losses epoch', epoch)
-        print('_save_training_losses rex_training_loop', rex_training_loop, int(rex_training_loop))
-        print('_save_training_losses self.rex', self.rex)
-        print('_save_training_losses self.rex_multiply', self.rex_multiply)
-
         self.wlogger.wandb.log({**{'train_main/loss': train_loss,
                                    'train_main/core_loss': train_core_loss,
                                    'train/decay_loss': train_decay_loss,
@@ -643,8 +637,6 @@ class BNN:
                 # Break conditions apply only in the first, standard training loop
                 # In the second loop we force `repeat_dynamics_epochs` times the number of training epochs as in the first loop to be completed
                 print('o_loop', o_loop)
-                if epoch > 10:
-                    break
                 if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
                     print('breaking the first loop')
                     break
