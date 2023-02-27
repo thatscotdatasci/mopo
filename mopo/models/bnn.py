@@ -417,6 +417,9 @@ class BNN:
     def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
+
+        print('_save_training_losses rex_training_loop', rex_training_loop, int(rex_training_loop))
+
         self.wlogger.wandb.log({**{'train_main/loss': train_loss,
                                    'train_main/core_loss': train_core_loss,
                                    'train/decay_loss': train_decay_loss,
@@ -567,7 +570,7 @@ class BNN:
             n_baches = 0
             for epoch in epoch_iter:
                 for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
-                    print('batch loop rex_training_loop', rex_training_loop)
+                    # print('batch loop rex_training_loop', rex_training_loop)
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
