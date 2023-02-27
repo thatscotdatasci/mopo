@@ -634,6 +634,8 @@ class BNN:
                 # Break conditions apply only in the first, standard training loop
                 # In the second loop we force `repeat_dynamics_epochs` times the number of training epochs as in the first loop to be completed
                 print('o_loop', o_loop)
+                if epoch > 10:
+                    break
                 if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
                     print('breaking the first loop')
                     break
