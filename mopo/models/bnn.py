@@ -85,6 +85,7 @@ class BNN:
         self.rex_beta = float(params.get('rex_beta', 10.0))
         self.rex_multiply = params.get('rex_multiply', False)
         self.lr_decay = float(params.get('lr_decay', 1.0))
+        self.rex_std = params.get('rex_std', False)
 
         # Training objects
         self.optimizer = None
@@ -425,10 +426,10 @@ class BNN:
                                    'train/n_datapoints': n_datapoints, 'train/n_baches': n_baches, 'train/epoch': epoch,
                                    'train_main/pol_total_losses_mean': np.mean(train_pol_tot_loss),
                                    'train_main/pol_var_losses_mean': np.mean(train_pol_var_loss),
-                                   'train/mean_pol_losses_mean': np.mean(train_mean_pol_loss),
+                                   'train_main/mean_pol_losses_mean': np.mean(train_mean_pol_loss),
                                    'train/pol_total_losses_var': np.var(train_pol_tot_loss),
                                    'train/pol_var_losses_var': np.var(train_pol_var_loss),
-                                   'train/mean_pol_losses_var': np.var(train_mean_pol_loss),
+                                   'train_main/mean_pol_losses_var': np.var(train_mean_pol_loss),
                                    },
                                **{f'train/M{i}_pol_tot_loss': train_pol_tot_loss[i] for i in range(len(train_pol_tot_loss))},
                                **{f'train/M{i}_pol_var_loss': train_pol_var_loss[i] for i in range(len(train_pol_var_loss))},
@@ -919,7 +920,9 @@ class BNN:
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
-            #policy_var_losses = tf.math.sqrt(policy_var_losses) #ToDo: make a flag
+            print('rex_training_loop_total_losses self.rex_std', self.rex_std)
+            if self.rex_std:
+                policy_var_losses = tf.math.sqrt(policy_var_losses)
             if self.rex:
                 if self.rex_multiply:
                     rex_tl_loss = self.rex_beta * policy_var_losses + policy_total_losses

@@ -38,12 +38,12 @@ application="mopo"
 #options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 4321 --rex-beta=20 --exp-name halfcheetah_mixed_rt_5 --dataset MIXED-RT-5"
 #options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 7 --rex-beta=10 --exp-name rexb10 --dataset MIXED-RT-5"
 options="run_local examples.development \
-        --config=examples.config.d4rl.walker2d_custom_rex \
+        --config=examples.config.d4rl.walker2d_custom_rex_std \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
-        --seed 12 \
+        --seed 11 \
         --rex-beta=10 \
-        --exp-name rexb10 \
+        --exp-name rexstdb10 \
         --dataset W-MIXED-RT-1"
 
 
