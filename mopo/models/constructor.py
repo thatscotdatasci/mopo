@@ -15,7 +15,7 @@ def construct_model(obs_dim=11, act_dim=3, rew_dim=1, hidden_dim=200, num_networ
 	params = {'name': name, 'num_networks': num_networks, 'num_elites': num_elites,
 				'sess': session, 'separate_mean_var': separate_mean_var, 'deterministic': deterministic,
 				'rex': rex, 'rex_beta': rex_beta, 'rex_multiply': rex_multiply, 'lr_decay': lr_decay,
-				'log_dir': log_dir, 'train_bnn_only': train_bnn_only}
+				'log_dir': log_dir, 'train_bnn_only': train_bnn_only, 'rex_std': rex_std}
 
 	if load_dir is not None:
 		print('Specified load dir', load_dir)
