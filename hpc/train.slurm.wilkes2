@@ -41,11 +41,19 @@ options="run_local examples.development \
         --config=examples.config.d4rl.walker2d_custom_rex_std \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
-        --seed 11 \
+        --seed 2 \
         --rex-beta=10 \
         --exp-name rexstdb10 \
         --dataset W-MIXED-RT-1"
 
+#mopo run_local examples.development \
+#        --config=examples.config.d4rl.walker2d_custom_rex_std \
+#        --gpus=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 1 \
+#        --rex-beta=10 \
+#        --exp-name rexstdb10 \
+#        --dataset W-MIXED-RT-1
 
 # mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 4 --rex-beta=10 --exp-name rexb10 --dataset MIXED-RT-5
 #! Work directory (i.e. where the job will run):
