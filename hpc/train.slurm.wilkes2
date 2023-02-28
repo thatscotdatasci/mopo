@@ -42,8 +42,8 @@ options="run_local examples.development \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
         --seed 2 \
-        --rex-beta=10 \
-        --exp-name rexstdb10 \
+        --rex-beta=40 \
+        --exp-name rexstdb40 \
         --dataset W-MIXED-RT-1"
 
 #mopo run_local examples.development \
