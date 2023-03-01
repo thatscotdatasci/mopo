@@ -57,6 +57,7 @@ def cli():
 @click.argument("example_module_name", required=True, type=str)
 @click.argument('example_argv', nargs=-1, type=click.UNPROCESSED)
 def run_example_dry_cmd(example_module_name, example_argv):
+    print('run_example_dry_cmd', run_example_dry_cmd)
     """Print the variant spec and related information of an example."""
     return run_example_dry(example_module_name, example_argv)
 
@@ -67,7 +68,10 @@ def run_example_dry_cmd(example_module_name, example_argv):
 @click.argument("example_module_name", required=True, type=str)
 @click.argument('example_argv', nargs=-1, type=click.UNPROCESSED)
 def run_example_local_cmd(example_module_name, example_argv):
+    print('run_example_local_cmd')
     """Run example locally, potentially parallelizing across cpus/gpus."""
+    print('example_module_name', example_module_name)
+    print('example_argv', example_argv)
     return run_example_local(example_module_name, example_argv)
 
 
@@ -77,6 +81,7 @@ def run_example_local_cmd(example_module_name, example_argv):
 @click.argument("example_module_name", required=True, type=str)
 @click.argument('example_argv', nargs=-1, type=click.UNPROCESSED)
 def run_example_debug_cmd(example_module_name, example_argv):
+    print('run_example_debug_cmd')
     """The debug mode limits tune trial runs to enable use of debugger."""
     return run_example_debug(example_module_name, example_argv)
 
@@ -87,6 +92,7 @@ def run_example_debug_cmd(example_module_name, example_argv):
 @click.argument("example_module_name", required=True, type=str)
 @click.argument('example_argv', nargs=-1, type=click.UNPROCESSED)
 def run_example_cluster_cmd(example_module_name, example_argv):
+    print('run_example_cluster_cmd')
     """Run example on cluster mode.
 
     This functions is very similar to the local mode, except that it
@@ -135,6 +141,7 @@ def run_example_cluster_cmd(example_module_name, example_argv):
 @click.option(
     "--port-forward", required=False, type=int, help="Port to forward.")
 def launch_example_cluster_cmd(*args, **kwargs):
+    print('launch_example_cluster_cmd')
     """Launches the example on autoscaled ray cluster through ray exec_cmd.
 
     This handles basic validation and sanity checks for the experiment, and

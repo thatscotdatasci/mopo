@@ -308,7 +308,13 @@ def get_parser(allow_policy_list=False):
         type=str,
         default=None,
         help="The experiment whose dynamics model should be loaded.")
-    
+
+    parser.add_argument(
+        '--model-load-dir',
+        type=str,
+        default=None,
+        help="Path to models directory")
+
     parser.add_argument(
         '--penalty-coeff',
         type=float,

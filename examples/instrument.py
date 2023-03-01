@@ -317,6 +317,7 @@ def launch_example_cluster(example_module_name,
     also fill in more useful defaults for our workflow (i.e. for tmux and
     cluster_name).
     """
+    print('launch_example_cluster')
     example_module = importlib.import_module(example_module_name)
 
     example_args = example_module.get_parser().parse_args(example_argv)

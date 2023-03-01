@@ -21,7 +21,8 @@ def get_trainable_class(*args, **kwargs):
 
 def get_params_from_file(
     filepath, seed=None, exp_name=None, dataset=None, dynamics_model_exp=None, penalty_coeff=None,
-    rollout_length=None, rollout_batch_size=None, bnn_retrain_epochs=None, rex_beta=None, params_name='params'
+    rollout_length=None, rollout_batch_size=None, bnn_retrain_epochs=None, rex_beta=None, params_name='params',
+	model_load_dir=None,
 ):
 	import importlib
 	from dotmap import DotMap
@@ -67,6 +68,10 @@ def get_params_from_file(
 		load_exp_details = results_map[dynamics_model_exp]
 		params['kwargs']['model_load_dir'] = os.path.expanduser(f'~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/mopo/ray_mopo/{load_exp_details["environment"]}/{load_exp_details["base_dir"]}/{load_exp_details["experiment_dir"]}/models')
 		print("params['kwargs']['model_load_dir']", params['kwargs']['model_load_dir'])
+
+	if model_load_dir is not None:
+		params['kwargs']['model_load_dir'] = model_load_dir
+
 	params = DotMap(params)
 	return params
 
@@ -83,7 +88,8 @@ def get_variant_spec(command_line_args, *args, **kwargs):
         rollout_length=command_line_args.rollout_length,
         rollout_batch_size=command_line_args.rollout_batch_size,
         bnn_retrain_epochs=command_line_args.bnn_retrain_epochs,
-        rex_beta=command_line_args.rex_beta
+        rex_beta=command_line_args.rex_beta,
+		model_load_dir=command_line_args.model_load_dir,
     )
     # import pdb	
     # pdb.set_trace()
