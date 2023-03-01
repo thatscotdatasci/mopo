@@ -56,6 +56,7 @@ class MopoAgentExp:
 
         # Parameters with defaults, or values that are taken from the dynamics experiment
         self.exp_name = exp_name
+        self.exp_name = exp_name + '_' + str(seed)
         self.seed = seed or dynamics_exp.seed
         self.bnn_retrain_epochs = bnn_retrain_epochs
         self.rollout_batch_size = rollout_batch_size or ROLLOUT_BATCH_SIZES[self.rollout_length]
@@ -161,6 +162,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/exp_params.1.json")
+    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/exp_params.default.json")
 
     run_experiment_set(params_filepath)

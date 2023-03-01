@@ -11,7 +11,7 @@ params.update({
 params['kwargs'].update({
     'pool_load_path': os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/dogo_results/data/MIXED-RT-2.npy'),
     'model_load_dir': os.path.expanduser(
-        '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/Walker2d_W-MIXED-RT-1/rexb10/s7_2023-02-27_13-30-59bddsgs7a/models'),
+        '~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/Walker2d_W-MIXED-RT-1/default/s12_2023-02-27_15-47-18bs6_l049/models'),
     'bnn_retrain_epochs': 0,
     'pool_load_max_size': 101000,
     'rollout_length': 5,
