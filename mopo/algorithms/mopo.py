@@ -140,10 +140,54 @@ class MOPO(RLAlgorithm):
         print('self._log_dir', self._log_dir)
         self._writer = Writer(self._log_dir)
         if not train_bnn_only:
+            wparams = {**dict(training_environmen=training_environment,
+                              evaluation_environment=evaluation_environment,
+                              policy=policy, Qs=Qs, pool=pool, static_fns=static_fns, plotter=plotter,
+                              tf_summaries=tf_summaries,
+                              lr=lr,
+                              reward_scale=reward_scale,
+                            target_entropy=target_entropy,
+                            discount=discount,
+                            tau=tau,
+                            target_update_interval=target_update_interval,
+                            action_prior=action_prior,
+                            reparameterize=reparameterize,
+                            store_extra_policy_info=store_extra_policy_info,
+                            deterministic=deterministic,
+                            rollout_random=rollout_random,
+                            model_train_freq=model_train_freq,
+                            num_networks=num_networks,
+                            num_elites=num_elites,
+                            model_retain_epochs=model_retain_epochs,
+                            rollout_batch_size=rollout_batch_size,
+                            real_ratio=real_ratio,
+                            rollout_length=rollout_length,
+                            hidden_dim=hidden_dim,
+                            max_model_t=max_model_t,
+                            model_type=model_type,
+                            separate_mean_var=separate_mean_var,
+                            identity_terminal=identity_terminal,
+                            pool_load_path=pool_load_path,
+                            pool_load_max_size=pool_load_max_size,
+                            model_name=model_name,
+                            model_load_dir=model_load_dir,
+                            penalty_coeff=penalty_coeff,
+                            penalty_learned_var=penalty_learned_var,
+                            rex=rex,
+                            rex_beta=rex_beta,
+                            rex_multiply=rex_multiply,
+                            rex_std=rex_std,
+                            holdout_policy=holdout_policy,
+                            train_bnn_only=train_bnn_only,
+                            repeat_dynamics_epochs=repeat_dynamics_epochs,
+                            lr_decay=lr_decay,
+                            bnn_batch_size=bnn_batch_size,
+                            bnn_retrain_epochs=bnn_retrain_epochs),
+                            **kwargs}
             self.domain = self._log_dir.split('/')[-3]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
             self.exp_name = self._log_dir.split('/')[-2] + '_' + self.exp_seed
-            self.wlogger = Wandb(kwargs, name=self.exp_name, project='_'+self.domain+'_policy')
+            self.wlogger = Wandb(wparams, name=self.exp_name, project='_'+self.domain+'_policy')
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)
