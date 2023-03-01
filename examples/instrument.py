@@ -77,7 +77,13 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
     print('variant_spec', variant_spec)
     params = variant_spec.get('algorithm_params')
     print('params', params)
-    local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' + command_line_args.dataset)
+    if params.get('model_load_dir', None):
+        print("model_load_dir.slit('/')[:-1]", model_load_dir.slit('/')[:-1])
+        local_dir = "".join(model_load_dir.slit('/')[:-1])
+        print('local_dir', local_dir)
+        local_dir = model_load_dir + '/rl'
+    else:
+        local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' + command_line_args.dataset)
     print('local_dir', local_dir)
     resources_per_trial = _normalize_trial_resources(
         command_line_args.resources_per_trial,

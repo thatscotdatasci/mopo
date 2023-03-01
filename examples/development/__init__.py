@@ -70,7 +70,7 @@ def get_params_from_file(
 		print("params['kwargs']['model_load_dir']", params['kwargs']['model_load_dir'])
 
 	if model_load_dir is not None:
-		params['kwargs']['model_load_dir'] = model_load_dir
+		params['kwargs']['model_load_dir'] = os.path.expanduser(f'~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/{model_load_dir}/models')
 
 	params = DotMap(params)
 	return params
