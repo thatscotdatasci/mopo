@@ -35,16 +35,28 @@ application="mopo"
 #! Run options for the application:
 options="run_local examples.development \
         --config=examples.config.d4rl.walker2d_custom_rl \
-        --train_bnn_only False \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name default_mp0rl20_s5 \
-        --seed 5 \
-        --bnn-retrain-epochs 0 \
-        --penalty-coeff 0.0 \
-        --rollout-length 20 \
-        --rollout-batch-size 12500 \
-        --dataset W-MIXED-RT-1"
+        --exp-name=default_mp0rl20_s5 \
+        --seed=5 \
+        --bnn-retrain-epochs=0 \
+        --penalty-coeff=0.0 \
+        --rollout-length=20 \
+        --rollout-batch-size=12500 \
+        --dataset=W-MIXED-RT-1"
+
+mopo run_local examples.development \
+       --config=examples.config.d4rl.walker2d_custom_rl \
+       --train-bnn-only=False \
+       --cpus=1 --trial-cpus=1 \
+       --checkpoint-frequency=100 \
+       --exp-name=default_mp0rl20_s5 \
+       --seed=5 \
+       --bnn-retrain-epochs=0 \
+       --penalty-coeff=0.0 \
+       --rollout-length=20 \
+       --rollout-batch-size=12500 \
+       --dataset=W-MIXED-RT-1
 
 #! Work directory (i.e. where the job will run):
 workdir="/home/hpcanok1/rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo"   # The value of SLURM_SUBMIT_DIR sets workdir to the directory
