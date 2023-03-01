@@ -39,7 +39,6 @@ class MopoAgentExp:
         rollout_length,
         dataset,
         output_dir,
-        exp_id,
         exp_name=None,
         seed=None,
         bnn_retrain_epochs=0,
@@ -52,7 +51,6 @@ class MopoAgentExp:
         self.mopo_penalty_coeff = mopo_penalty_coeff
         self.rollout_length = rollout_length
         self.dataset = dataset
-        self.exp_id = exp_id
 
         # Parameters with defaults, or values that are taken from the dynamics experiment
         self.exp_name = exp_name
