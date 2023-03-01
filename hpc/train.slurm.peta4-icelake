@@ -52,13 +52,13 @@ mopo run_local examples.development \
        --cpus=1 --trial-cpus=1 \
        --checkpoint-frequency=100 \
        --exp-name=rexb10s12_mp0rl20 \
-       --seed=6 \
+       --seed=7 \
        --bnn-retrain-epochs=0 \
        --penalty-coeff=0.0 \
        --rollout-length=20 \
        --rollout-batch-size=12500 \
        --dataset=W-MIXED-RT-1 \
-       --model-load-dir /home/hpcanok1/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/Walker2d_W-MIXED-RT-1/rexb10/s12_2023-02-27_15-47-18ru2ygkfy/models
+       --model-load-dir Walker2d_W-MIXED-RT-1/rexb10/s12_2023-02-27_15-47-18ru2ygkfy
 
 #! Work directory (i.e. where the job will run):
 workdir="/home/hpcanok1/rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo"   # The value of SLURM_SUBMIT_DIR sets workdir to the directory
