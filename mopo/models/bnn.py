@@ -915,8 +915,17 @@ class BNN:
         # policies which appear in the batch (i.e., some batches may not have records for all policies).
         def determine_var(x):
             batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
+            print('batch_pol_losses', batch_pol_losses.shape)
             return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
-        policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
+
+        def determine_abs_var(x):
+            batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
+            mean = tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
+            batch_pol_losses_var_abs = tf.math.abs(batch_pol_losses - mean)
+            return tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses_var_abs, batch_pol_counts>0.))
+
+        # policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
+        policy_var_losses = tf.map_fn(determine_abs_var, tf.stack((policy_losses, pol_count), axis=-2)) #ToDo: make a flag
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
