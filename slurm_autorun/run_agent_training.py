@@ -23,7 +23,7 @@ SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
 # Thus, to keep the total pool size constant across experiments, `rollout_batch_size` needs
 # to decrease as `_rollout_length` increases.
 ROLLOUT_BATCH_SIZES = {
-    1: 250000,
+    1: 50000,
     5: 50000,
     10: 25000,
     20: 12500,
@@ -164,6 +164,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/default_MIXED-RT-5_exp_params.json")
+    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/MIXED-RT-5_exp_params.json")
 
     run_experiment_set(params_filepath)

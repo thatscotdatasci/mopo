@@ -185,7 +185,7 @@ class MOPO(RLAlgorithm):
                             bnn_retrain_epochs=bnn_retrain_epochs),
                             **kwargs}
             print('wandb self._log_dir', self._log_dir)
-            self.domain = self._log_dir.split('/')[-6]
+            self.domain = self._log_dir.split('/')[-3]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
             self.exp_name = self._log_dir.split('/')[-2]
             self.wlogger = Wandb(wparams, group_name=self.exp_name, name=self.exp_seed, project='_'+self.domain+'_policy')
