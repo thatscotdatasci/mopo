@@ -46,14 +46,23 @@ application="mopo"
 #        --exp-name meandevb100 \
 #        --dataset W-MIXED-RT-1"
 
+#options="run_local examples.development \
+#        --config=examples.config.d4rl.hopper_custom \
+#        --gpus=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 1 \
+#        --rex-beta=0 \
+#        --exp-name default \
+#        --dataset H-MIXED-RT-4"
+
 options="run_local examples.development \
-        --config=examples.config.d4rl.hopper_custom \
+        --config=examples.config.d4rl.halfcheetah_custom_rex \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
         --seed 1 \
         --rex-beta=20 \
         --exp-name rexb20 \
-        --dataset H-MIXED-RT-4"
+        --dataset MIXED-RT-5"
 
 #mopo run_local examples.development \
 #        --config=examples.config.d4rl.walker2d_custom_rex_std \
