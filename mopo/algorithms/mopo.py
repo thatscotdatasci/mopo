@@ -187,8 +187,8 @@ class MOPO(RLAlgorithm):
             print('wandb self._log_dir', self._log_dir)
             self.domain = self._log_dir.split('/')[-6]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
-            self.exp_name = self._log_dir.split('/')[-2] + '_' + self.exp_seed
-            self.wlogger = Wandb(wparams, name=self.exp_name, project='_'+self.domain+'_policy')
+            self.exp_name = self._log_dir.split('/')[-2]
+            self.wlogger = Wandb(wparams, group_name=self.exp_name, name=self.exp_seed, project='_'+self.domain+'_policy')
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)

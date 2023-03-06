@@ -176,7 +176,7 @@ if __name__ == '__main__':
 	progress.close()
 
 class Wandb():
-	def __init__(self, flags, name='', project=''):
+	def __init__(self, flags, name='', group_name='', project=''):
 		import wandb
 		print('wandb name', name)
 		self.wandb = wandb
@@ -185,6 +185,7 @@ class Wandb():
 			config=flags,
 			entity=os.getenv('WANDB_USER', 'avecplezir'),
 			reinit=False,
+			group=group_name,
 			# Restore parameters
 			# resume="allow",
 			# id=name,
