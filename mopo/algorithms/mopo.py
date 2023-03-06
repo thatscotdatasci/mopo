@@ -363,10 +363,6 @@ class MOPO(RLAlgorithm):
                     model_rollout_metrics = self._rollout_model(rollout_batch_size=self._rollout_batch_size, deterministic=self._deterministic)
                     model_metrics.update(model_rollout_metrics)
                     time_step_global = self._epoch_length * self._epoch + timestep
-                    print('_total_timestep', self._total_timestep)
-                    print('time_step_global', time_step_global)
-                    print('train-steps', self._num_train_steps)
-                    print('epoch', self._epoch)
                     self.wlogger.wandb.log({**{'rollout_model/' + key: value for key, value in model_rollout_metrics.items()}, **{'rollout_model/time_step_global': time_step_global}}, step=time_step_global)
                     
                     gt.stamp('epoch_rollout_model')
