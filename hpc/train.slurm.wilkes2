@@ -47,12 +47,12 @@ application="mopo"
 #        --dataset W-MIXED-RT-1"
 
 options="run_local examples.development \
-        --config=examples.config.d4rl.hopper_custom_rex \
+        --config=examples.config.d4rl.hopper_custom \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
         --seed 1 \
-        --rex-beta=5 \
-        --exp-name rexb5 \
+        --rex-beta=20 \
+        --exp-name rexb20 \
         --dataset H-MIXED-RT-4"
 
 #mopo run_local examples.development \
