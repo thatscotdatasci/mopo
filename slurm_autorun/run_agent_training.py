@@ -23,6 +23,7 @@ SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
 # Thus, to keep the total pool size constant across experiments, `rollout_batch_size` needs
 # to decrease as `_rollout_length` increases.
 ROLLOUT_BATCH_SIZES = {
+    1: 250000,
     5: 50000,
     10: 25000,
     20: 12500,
