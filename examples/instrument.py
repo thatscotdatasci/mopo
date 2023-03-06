@@ -79,7 +79,8 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
     print('params', params)
     if command_line_args.model_load_dir:
         print('command_line_args.model_load_dir', command_line_args.model_load_dir)
-        local_dir = params.get('log_dir') + '/' + command_line_args.model_load_dir + '/rl'
+        # local_dir = params.get('log_dir') + '/' + command_line_args.model_load_dir + '/rl'
+        local_dir = params.get('log_dir') + '/rl/' + params.get('domain') +'_' + command_line_args.dataset
     else:
         local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' + command_line_args.dataset)
     print('local_dir', local_dir)
