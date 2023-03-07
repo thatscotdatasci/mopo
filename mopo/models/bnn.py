@@ -60,10 +60,10 @@ class BNN:
         if self.train_bnn_only:
             self.domain = self._log_dir.split('/')[-3]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
-            self.exp_name = self._log_dir.split('/')[-2] + '_' + self.exp_seed
+            self.exp_name = self._log_dir.split('/')[-2]
             print('self.exp_name', self.exp_name)
             print("'_'+self.domain+'_bnn'", '_'+self.domain+'_bnn')
-            self.wlogger = Wandb(params, name=self.exp_name, project='_'+self.domain+'_bnn')
+            self.wlogger = Wandb(params, group_name=self.exp_name, name=self.exp_seed, project='_'+self.domain+'_bnn')
 
         print('[ BNN ] Initializing model: {} | {} networks | {} elites'.format(params['name'], params['num_networks'], params['num_elites']))
         if params.get('sess', None) is None:
