@@ -74,12 +74,12 @@ application="mopo"
 #        --dataset W-MIXED-RT-1
 
 options="run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom \
+        --config=examples.config.d4rl.halfcheetah_custom_rex_std \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
         --seed 1 \
-        --rex-beta=0 \
-        --exp-name default \
+        --rex-beta=0.5 \
+        --exp-name rexstd05 \
         --dataset MIXED-RT-1"
 
 # mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 4 --rex-beta=10 --exp-name rexb10 --dataset MIXED-RT-5
