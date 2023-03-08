@@ -418,6 +418,7 @@ class BNN:
     def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
+        print('np.mean(train_pol_var_loss)', np.mean(train_pol_var_loss))
         self.wlogger.wandb.log({**{'train_main/loss': train_loss,
                                    'train_main/core_loss': train_core_loss,
                                    'train/decay_loss': train_decay_loss,
@@ -575,12 +576,21 @@ class BNN:
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
+                    # print('policies', policies[batch_idxs].shape)
+                    # print('inputs[batch_idxs]', inputs[batch_idxs].shape)
+                    # policy_np = np.arange(inputs[batch_idxs].shape[1])
+                    # np.random.shuffle(policy_np)
+                    # policy_np = policy_np[None, :]
+                    # policy_np = np.tile(policy_np, [inputs[batch_idxs].shape[0], 1])[:, :, None]
+                    # print('policy_np', policy_np.shape)
+
                     _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
                         (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
                         feed_dict={
                             self.sy_train_in: inputs[batch_idxs],
                             self.sy_train_targ: targets[batch_idxs],
                             self.sy_train_pol: policies[batch_idxs],
+                            # self.sy_train_pol: policy_np,
                             self.sy_rex_training_loop: rex_training_loop,
                         }
                     )
@@ -887,7 +897,6 @@ class BNN:
 
         # Identify the unique policies present across all batches of data
         policies = tf.cast(policies, tf.int32)
-        print('policies', policies.shape)
         unique_pols = tf.unique(tf.reshape(policies, [-1])).y
 
         # Create a policy one-hot encoding - this will have dimensions: [B N P], where
@@ -911,7 +920,7 @@ class BNN:
 
         # Add the losses across all the policies. Results in vector of length B
         policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
-
+        # policy_total_losses = tf.reduce_mean(policy_losses, axis=-1)
         # Determine the variance of the losses - use boolean mask to ensure only taking variance for
         # policies which appear in the batch (i.e., some batches may not have records for all policies).
         def determine_var(x):
