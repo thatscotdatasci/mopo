@@ -433,7 +433,7 @@ class BNN:
                                    },
                                **{f'train/M{i}_pol_tot_loss': train_pol_tot_loss[i] for i in range(len(train_pol_tot_loss))},
                                **{f'train/M{i}_pol_var_loss': train_pol_var_loss[i] for i in range(len(train_pol_var_loss))},
-                               **{f'train/P{i}_mean_pol_loss': train_mean_pol_loss[i] for i in range(len(train_mean_pol_loss))},
+                               **{f'train/P{i}_mean_pol_loss': train_mean_pol_loss[i] for i in range(min(len(train_mean_pol_loss), 5))},
                                 }, step=n_baches)
 
     def _save_losses(self, total_losses, pol_total_losses, pol_var_losses, mean_pol_losses, n_datapoints, n_baches, epoch, holdout=False):
@@ -454,7 +454,7 @@ class BNN:
              **{prefix + f'M{i}_total_losses': total_losses[i] for i in range(len(total_losses))},
              **{prefix + f'M{i}_pol_total_losses': pol_total_losses[i] for i in range(len(pol_total_losses))},
              **{prefix + f'M{i}_pol_var_losses': pol_var_losses[i] for i in range(len(pol_var_losses))},
-             **{prefix + f'P{i}_mean_pol_losses': mean_pol_losses[i] for i in range(len(mean_pol_losses))}}
+             **{prefix + f'P{i}_mean_pol_losses': mean_pol_losses[i] for i in range(min(len(mean_pol_losses), 5))}}
         self.wlogger.wandb.log(d)
 
 
@@ -887,6 +887,7 @@ class BNN:
 
         # Identify the unique policies present across all batches of data
         policies = tf.cast(policies, tf.int32)
+        print('policies', policies.shape)
         unique_pols = tf.unique(tf.reshape(policies, [-1])).y
 
         # Create a policy one-hot encoding - this will have dimensions: [B N P], where

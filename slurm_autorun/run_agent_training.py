@@ -164,6 +164,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/H-MIXED-RT-4_exp_params.json")
+    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/MIXED-RT-4_exp_params.json")
 
     run_experiment_set(params_filepath)

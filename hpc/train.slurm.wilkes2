@@ -73,14 +73,23 @@ application="mopo"
 #        --exp-name rexstdb10 \
 #        --dataset W-MIXED-RT-1
 
+#options="run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --gpus=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 1 \
+#        --rex-beta=0 \
+#        --exp-name default \
+#        --dataset MIXED-RT-1"
+
 options="run_local examples.development \
         --config=examples.config.d4rl.halfcheetah_custom_rex_std \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
         --seed 1 \
         --rex-beta=0.5 \
-        --exp-name rexstd05 \
-        --dataset MIXED-RT-1"
+        --exp-name rexstdb05 \
+        --dataset MIXED-RT-4"
 
 # mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 4 --rex-beta=10 --exp-name rexb10 --dataset MIXED-RT-5
 #! Work directory (i.e. where the job will run):
