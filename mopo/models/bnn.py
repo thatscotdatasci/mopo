@@ -576,21 +576,12 @@ class BNN:
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
-                    # print('policies', policies[batch_idxs].shape)
-                    # print('inputs[batch_idxs]', inputs[batch_idxs].shape)
-                    # policy_np = np.arange(inputs[batch_idxs].shape[1])
-                    # np.random.shuffle(policy_np)
-                    # policy_np = policy_np[None, :]
-                    # policy_np = np.tile(policy_np, [inputs[batch_idxs].shape[0], 1])[:, :, None]
-                    # print('policy_np', policy_np.shape)
-
                     _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
                         (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
                         feed_dict={
                             self.sy_train_in: inputs[batch_idxs],
                             self.sy_train_targ: targets[batch_idxs],
                             self.sy_train_pol: policies[batch_idxs],
-                            # self.sy_train_pol: policy_np,
                             self.sy_rex_training_loop: rex_training_loop,
                         }
                     )
