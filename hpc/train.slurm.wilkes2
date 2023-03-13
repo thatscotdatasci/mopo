@@ -87,7 +87,7 @@ options="run_local examples.development \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
         --seed 6 \
-        --rex-beta=2 \
+        --rex-beta 2 \
         --exp-name rexmeandevb2 \
         --dataset MIXED-RT-4"
 

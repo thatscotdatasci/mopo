@@ -23,6 +23,7 @@ SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.wilkes2.j2' #'train.slurm.peta4-icelake
 # Thus, to keep the total pool size constant across experiments, `rollout_batch_size` needs
 # to decrease as `_rollout_length` increases.
 ROLLOUT_BATCH_SIZES = {
+    -1: -1,
     1: 50000,
     5: 50000,
     10: 25000,
@@ -38,8 +39,8 @@ class MopoAgentExp:
         output_dir,
         config=None,
         dataset=None,
-        mopo_penalty_coeff=None,
-        rollout_length=None,
+        mopo_penalty_coeff=0,
+        rollout_length=-1,
         exp_name=None,
         seed=None,
         bnn_retrain_epochs=0,
@@ -78,18 +79,31 @@ class MopoAgentExp:
 
     @property
     def exp_record(self):
-        return {
-            "config": self.config,
-            "exp_name": self.exp_name,
-            "seed": self.seed,
-            "bnn_retrain_epochs": self.bnn_retrain_epochs,
-            "mopo_penalty_coeff": self.mopo_penalty_coeff,
-            "rollout_length": self.rollout_length,
-            "rollout_batch_size": self.rollout_batch_size,
-            "dataset": self.dataset,
-            "model_load_dir": self.model_load_dir,
-            "self.rex_beta": self.rex_beta,
-        }
+        if self.model_load_dir:
+            return {
+                "config": self.config,
+                "exp_name": self.exp_name,
+                "seed": self.seed,
+                "bnn_retrain_epochs": self.bnn_retrain_epochs,
+                "mopo_penalty_coeff": self.mopo_penalty_coeff,
+                "rollout_length": self.rollout_length,
+                "rollout_batch_size": self.rollout_batch_size,
+                "dataset": self.dataset,
+                "model_load_dir": self.model_load_dir,
+                "rex_beta": self.rex_beta,
+            }
+        else:
+            return {
+                "config": self.config,
+                "exp_name": self.exp_name,
+                "seed": self.seed,
+                "bnn_retrain_epochs": self.bnn_retrain_epochs,
+                "mopo_penalty_coeff": self.mopo_penalty_coeff,
+                "rollout_length": self.rollout_length,
+                "rollout_batch_size": self.rollout_batch_size,
+                "dataset": self.dataset,
+                "rex_beta": self.rex_beta,
+            }
 
     @property
     def slurm_tmp_filename(self):
@@ -167,6 +181,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/bnn_test.json")
+    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/MIXED-RT-1_bnn_params.json")
 
     run_experiment_set(params_filepath)

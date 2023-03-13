@@ -1,5 +1,0 @@
-[
-    {"config":"walker2d_custom_rl",  "exp_name": "rexb10s12_mp0rl20", "mopo_penalty_coeff":0.0, "rollout_length":20, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexb10/s12_2023-02-27_15-47-18ru2ygkfy"},
-    {"config":"walker2d_custom_rl",  "exp_name": "rexb10s12_mp0rl20", "mopo_penalty_coeff":0.0, "rollout_length":20, "dataset":"W-MIXED-RT-1", "seed": 2, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexb10/s12_2023-02-27_15-47-18ru2ygkfy"},
-    {"config":"walker2d_custom_rl",  "exp_name": "rexb10s12_mp5rl20", "mopo_penalty_coeff":5.0, "rollout_length":20, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexb10/s12_2023-02-27_15-47-18ru2ygkfy"}
-]

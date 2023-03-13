@@ -1,0 +1,16 @@
+[
+  {"config": "walker2d_custom", "dataset": "W-MIXED-RT-1", "rex_beta": 0, "seed": 6, "exp_name": "default"},
+  {"config": "walker2d_custom", "dataset": "W-MIXED-RT-1", "rex_beta": 0, "seed": 6, "exp_name": "default"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-1", "rex_beta": 5, "seed": 6, "exp_name": "rexb5"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-1", "rex_beta": 10, "seed": 6, "exp_name": "rexb10"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-1", "rex_beta": 20, "seed": 6, "exp_name": "rexb20"},
+  {"config": "walker2d_custom_rex_std", "dataset": "W-MIXED-RT-1", "rex_beta": 1, "seed": 6, "exp_name": "rexstdb1"},
+  {"config": "walker2d_custom_rex_std", "dataset": "W-MIXED-RT-1", "rex_beta": 0.5, "seed": 6, "exp_name": "rexstdb05"},
+  {"config": "walker2d_custom_rex_std", "dataset": "W-MIXED-RT-1", "rex_beta": 2, "seed": 6, "exp_name": "rexstdb2"},
+  {"config": "walker2d_custom_rex_std", "dataset": "W-MIXED-RT-1", "rex_beta": 8, "seed": 6, "exp_name": "rexstdb8"},
+  {"config": "walker2d_custom_rex_std", "dataset": "W-MIXED-RT-1", "rex_beta": 0.1, "seed": 6, "exp_name": "rexstdb01"},
+  {"config": "walker2d_custom_rex_mean_dev", "dataset": "W-MIXED-RT-1", "rex_beta": 0.1, "seed": 6, "exp_name": "rexmeandevb01"},
+  {"config": "walker2d_custom_rex_mean_dev", "dataset": "W-MIXED-RT-1", "rex_beta": 1, "seed": 6, "exp_name": "rexmeandevb1"},
+  {"config": "walker2d_custom_rex_mean_dev", "dataset": "W-MIXED-RT-1", "rex_beta": 2, "seed": 6, "exp_name": "rexmeandevb2"},
+  {"config": "walker2d_custom_rex_mean_dev", "dataset": "W-MIXED-RT-1", "rex_beta": 0.5, "seed": 6, "exp_name": "rexmeandevb05"}
+]
