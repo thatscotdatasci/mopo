@@ -45,6 +45,7 @@ class MopoAgentExp:
         bnn_retrain_epochs=0,
         rollout_batch_size=None,
         model_load_dir=None,
+        rex_beta=None,
 
     ) -> None:
         """ This object is used to define a MOPO experiment.
@@ -61,6 +62,7 @@ class MopoAgentExp:
         self.bnn_retrain_epochs = bnn_retrain_epochs
         self.rollout_batch_size = rollout_batch_size or ROLLOUT_BATCH_SIZES[self.rollout_length]
         self.model_load_dir = model_load_dir
+        self.rex_beta = rex_beta
 
         # Other arguments
         self.output_dir = output_dir
@@ -86,6 +88,7 @@ class MopoAgentExp:
             "rollout_batch_size": self.rollout_batch_size,
             "dataset": self.dataset,
             "model_load_dir": self.model_load_dir,
+            "self.rex_beta": self.rex_beta,
         }
 
     @property
