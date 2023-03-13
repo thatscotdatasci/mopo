@@ -6,11 +6,15 @@ import pdb
 import numpy as np
 
 def restore_pool(replay_pool, experiment_root, max_size, save_path=None):
+    print("'d4rl' in experiment_root", 'd4rl' in experiment_root)
     if 'd4rl' in experiment_root:
+        print('experiment_root[5:]', experiment_root[5:])
         restore_pool_d4rl(replay_pool, experiment_root[5:])
     else:
         assert os.path.exists(experiment_root)
         if os.path.isdir(experiment_root):
+            print('path exists')
+            print('max_size', max_size)
             restore_pool_softlearning(replay_pool, experiment_root, max_size, save_path)
         else:
             try:

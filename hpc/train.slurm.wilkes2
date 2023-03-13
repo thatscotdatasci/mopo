@@ -83,12 +83,12 @@ application="mopo"
 #        --dataset MIXED-RT-1"
 
 options="run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom_rex_std \
+        --config=examples.config.d4rl.halfcheetah_custom \
         --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
-        --seed 1 \
-        --rex-beta=0.5 \
-        --exp-name rexstdb05 \
+        --seed 6 \
+        --rex-beta=0. \
+        --exp-name default \
         --dataset MIXED-RT-4"
 
 #options="run_local examples.development \

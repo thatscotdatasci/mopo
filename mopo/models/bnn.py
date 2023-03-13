@@ -46,7 +46,7 @@ class BNN:
                 .rex_beta (float): (optional) The penalty value to use in V-REx.
                 .rex_multiply (`bool`): If True, multiply variance by beta, else divide sum of losses
                     by beta.
-                .rex_std (`bool`): If True, use std instead of var in REx.
+                .rex_type (`bool`):
                 .lr_decay ('float'): (optional) Multiply the core loss by this number before returning.
                     Applies in REx training loop.
                 .log_dir (str): Where to save logs to during training.
@@ -85,7 +85,7 @@ class BNN:
         self.rex_beta = float(params.get('rex_beta', 10.0))
         self.rex_multiply = params.get('rex_multiply', False)
         self.lr_decay = float(params.get('lr_decay', 1.0))
-        self.rex_std = params.get('rex_std', False)
+        self.rex_type = params.get('rex_type', 'var')
 
         # Training objects
         self.optimizer = None
@@ -418,7 +418,6 @@ class BNN:
     def _save_training_losses(self, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss, n_datapoints, n_baches, epoch, rex_training_loop):
         """Save the current training losses.
         """
-        print('np.mean(train_pol_var_loss)', np.mean(train_pol_var_loss))
         self.wlogger.wandb.log({**{'train_main/loss': train_loss,
                                    'train_main/core_loss': train_core_loss,
                                    'train/decay_loss': train_decay_loss,
@@ -466,7 +465,8 @@ class BNN:
 
     def train(self, inputs, targets, policies,
               batch_size=32, max_epochs=None, max_epochs_since_update=5,
-              hide_progress=False, holdout_ratio=0.0, max_logging=1000, max_grad_updates=None, timer=None, max_t=None,
+              hide_progress=False, holdout_ratio=0.0, max_logging=1000,
+              max_grad_updates=None, timer=None, max_t=None,
               holdout_policy=None, repeat_dynamics_epochs=1):
         """Trains/Continues network training
 
@@ -924,12 +924,16 @@ class BNN:
             batch_pol_losses_var_abs = tf.math.abs(batch_pol_losses - mean)
             return tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses_var_abs, batch_pol_counts>0.))
 
-        policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
-        # policy_var_losses = tf.map_fn(determine_mean_deviation, tf.stack((policy_losses, pol_count), axis=-2)) #ToDo: make a flag
+        if self.rex_type == 'mean_deviation':
+            print('mean_deviation')
+            policy_var_losses = tf.map_fn(determine_mean_deviation, tf.stack((policy_losses, pol_count), axis=-2)) #ToDo: make a flag
+        else:
+            policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):
             # This function is only run in the REx training loop.
-            if self.rex_std:
+            if self.rex_type == 'std':
+                print('std')
                 policy_var_losses = tf.math.sqrt(policy_var_losses)
             if self.rex:
                 if self.rex_multiply:

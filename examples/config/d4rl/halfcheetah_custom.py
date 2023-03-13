@@ -15,6 +15,7 @@ params['kwargs'].update({
     # 'model_load_dir': os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/HalfCheetah/halfcheetah_mixed_rt_49_101e3/1/models'),
     'bnn_retrain_epochs': 0,
     'pool_load_max_size': 101000,
+    # 'pool_load_max_size': 10**6,
     'rollout_length': 5,
     'rollout_batch_size': 50e3,
     'penalty_coeff': 1.0,

@@ -35,11 +35,11 @@ ROLLOUT_BATCH_SIZES = {
 class MopoAgentExp:
     def __init__(
         self,
-        config,
-        mopo_penalty_coeff,
-        rollout_length,
-        dataset,
         output_dir,
+        config=None,
+        dataset=None,
+        mopo_penalty_coeff=None,
+        rollout_length=None,
         exp_name=None,
         seed=None,
         bnn_retrain_epochs=0,
@@ -94,7 +94,7 @@ class MopoAgentExp:
     @property
     def slurm_tmp_filename(self):
         t_stamp = datetime.utcfromtimestamp(int(time.time())).strftime(TIME_FORMAT)
-        return os.path.join(SLRUM_AUTORUN_DIR, 'output', self.output_dir, f'train.slurm.peta4-icelake.{t_stamp}')
+        return os.path.join(SLRUM_AUTORUN_DIR, 'output', self.output_dir, f'{SLURM_TRAIN_TEMPLATE_PATH}.{t_stamp}')
         
     def run_experiment(self):
         # Create the SLURM submission script, with the appropriate experiment parameters

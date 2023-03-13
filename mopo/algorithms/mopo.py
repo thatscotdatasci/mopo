@@ -87,7 +87,7 @@ class MOPO(RLAlgorithm):
             rex=False,
             rex_beta=10.0,
             rex_multiply=False,
-            rex_std=False,
+            rex_type='var',
             holdout_policy=None,
             train_bnn_only=False,
             repeat_dynamics_epochs=1,
@@ -176,7 +176,7 @@ class MOPO(RLAlgorithm):
                             rex=rex,
                             rex_beta=rex_beta,
                             rex_multiply=rex_multiply,
-                            rex_std=rex_std,
+                            rex_type=rex_type,
                             holdout_policy=holdout_policy,
                             train_bnn_only=train_bnn_only,
                             repeat_dynamics_epochs=repeat_dynamics_epochs,
@@ -201,7 +201,7 @@ class MOPO(RLAlgorithm):
                                       name=model_name, load_dir=model_load_dir, deterministic=deterministic,
                                       rex=rex, rex_beta=rex_beta, rex_multiply=rex_multiply, 
                                       lr_decay=lr_decay, log_dir=self._log_dir,
-                                      train_bnn_only=train_bnn_only, rex_std=rex_std)
+                                      train_bnn_only=train_bnn_only, rex_type=rex_type)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
@@ -231,6 +231,7 @@ class MOPO(RLAlgorithm):
         self._Qs = Qs
         self._Q_targets = tuple(tf.keras.models.clone_model(Q) for Q in Qs)
 
+        print('pool', pool)
         self._pool = pool
         self._plotter = plotter
         self._tf_summaries = tf_summaries
