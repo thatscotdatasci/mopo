@@ -47,6 +47,7 @@ class BNN:
                 .rex_multiply (`bool`): If True, multiply variance by beta, else divide sum of losses
                     by beta.
                 .rex_type (`bool`):
+                .policy_type
                 .lr_decay ('float'): (optional) Multiply the core loss by this number before returning.
                     Applies in REx training loop.
                 .log_dir (str): Where to save logs to during training.
@@ -86,6 +87,7 @@ class BNN:
         self.rex_multiply = params.get('rex_multiply', False)
         self.lr_decay = float(params.get('lr_decay', 1.0))
         self.rex_type = params.get('rex_type', 'var')
+        self.policy_type = params.get('policy_type', 'default')
 
         # Training objects
         self.optimizer = None
@@ -576,12 +578,31 @@ class BNN:
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
+                    print('self.policy_type ', self.policy_type )
+                    if self.policy_type == 'default':
+                        policy_np = policies[batch_idxs]
+
+                    if self.policy_type == 'random':
+                        # print('policies', policies[batch_idxs].shape)
+                        # print('inputs[batch_idxs]', inputs[batch_idxs].shape)
+                        policy_np = np.arange(inputs[batch_idxs].shape[1])
+                        np.random.shuffle(policy_np)
+                        policy_np = policy_np[None, :]
+                        policy_np = np.tile(policy_np, [inputs[batch_idxs].shape[0], 1])[:, :, None]
+                        # print('policy_np', policy_np.shape)
+
+                    if self.policy_type == 'random_5':
+                        policy_set = np.arange(5)
+                        policy_np = np.random.choice(policy_set, int(inputs[batch_idxs].shape[1]))
+                        policy_np = policy_np[None, :]
+                        policy_np = np.tile(policy_np, [inputs[batch_idxs].shape[0], 1])[:, :, None]
+
                     _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
                         (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
                         feed_dict={
                             self.sy_train_in: inputs[batch_idxs],
                             self.sy_train_targ: targets[batch_idxs],
-                            self.sy_train_pol: policies[batch_idxs],
+                            self.sy_train_pol: policy_np,
                             self.sy_rex_training_loop: rex_training_loop,
                         }
                     )
@@ -910,8 +931,11 @@ class BNN:
         mean_policy_losses = tf.reduce_mean(policy_losses, axis=0)
 
         # Add the losses across all the policies. Results in vector of length B
-        policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
-        # policy_total_losses = tf.reduce_mean(policy_losses, axis=-1)
+        if self.policy_type == 'random':
+            policy_total_losses = tf.reduce_mean(policy_losses, axis=-1)
+        else:
+            policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
+        #
         # Determine the variance of the losses - use boolean mask to ensure only taking variance for
         # policies which appear in the batch (i.e., some batches may not have records for all policies).
         def determine_var(x):

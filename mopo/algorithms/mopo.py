@@ -88,6 +88,7 @@ class MOPO(RLAlgorithm):
             rex_beta=10.0,
             rex_multiply=False,
             rex_type='var',
+            policy_type='default',
             holdout_policy=None,
             train_bnn_only=False,
             repeat_dynamics_epochs=1,
@@ -177,6 +178,7 @@ class MOPO(RLAlgorithm):
                             rex_beta=rex_beta,
                             rex_multiply=rex_multiply,
                             rex_type=rex_type,
+                            policy_type=policy_type,
                             holdout_policy=holdout_policy,
                             train_bnn_only=train_bnn_only,
                             repeat_dynamics_epochs=repeat_dynamics_epochs,
@@ -201,7 +203,8 @@ class MOPO(RLAlgorithm):
                                       name=model_name, load_dir=model_load_dir, deterministic=deterministic,
                                       rex=rex, rex_beta=rex_beta, rex_multiply=rex_multiply, 
                                       lr_decay=lr_decay, log_dir=self._log_dir,
-                                      train_bnn_only=train_bnn_only, rex_type=rex_type)
+                                      train_bnn_only=train_bnn_only, rex_type=rex_type,
+                                      policy_type=policy_type)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
