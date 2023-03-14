@@ -36,6 +36,8 @@ def normalize_observation_fields(observation_space, name='observations'):
 
 class SimpleReplayPool(FlexibleReplayPool):
     def __init__(self, observation_space, action_space, *args, **kwargs):
+        print('SimpleReplayPool observation_space', observation_space)
+        print('SimpleReplayPool action_space', action_space)
         self._observation_space = observation_space
         self._action_space = action_space
 

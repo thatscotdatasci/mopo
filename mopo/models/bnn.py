@@ -932,7 +932,7 @@ class BNN:
 
         # Add the losses across all the policies. Results in vector of length B
         if self.policy_type == 'random':
-            policy_total_losses = tf.reduce_mean(policy_losses, axis=-1)
+            policy_total_losses = 5*tf.reduce_mean(policy_losses, axis=-1) #compensate for the reduce sum in other policy_types by multiplying by 5
         else:
             policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
         #
