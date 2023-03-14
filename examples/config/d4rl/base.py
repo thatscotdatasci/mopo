@@ -11,6 +11,7 @@ base_params = {
         'eval_render_mode': None,
         'eval_n_episodes': 10,
         'eval_deterministic': True,
+        'policy_type': 'default',
 
         'discount': 0.99,
         'tau': 5e-3,
