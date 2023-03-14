@@ -111,7 +111,7 @@ def restore_pool_bear(replay_pool, load_path):
     replay_pool.add_samples(data)
 
 
-def restore_pool_contiguous(replay_pool, load_path):
+def restore_pool_contiguous(replay_pool, load_path, policy_type=None):
     print('[ mopo/off_policy ] Loading contiguous replay pool from: {}'.format(load_path))
     import numpy as np
     data = np.load(load_path)
@@ -150,15 +150,18 @@ def restore_pool_contiguous(replay_pool, load_path):
         rewards_policy = (rewards > limits).sum(-1)
         policies = rewards_policy
 
-    if policy_type in ['trajectory', 'value_partitioned']:
-        trajectories = np.zeros_like(dones, dtype=int)
+    if policy_type in ['trajectory_partitioned', 'value_partitioned']:
+        print('dones', dones.shape)
+        trajectories = np.zeros_like(policies, dtype=int)
         cur_trajectory_index = 0
         for i in range(len(dones)):
             if dones[i]:
                 cur_trajectory_index += 1
             trajectories[i] = cur_trajectory_index
+        print('trajectories', trajectories.shape)
 
         if policy_type == 'trajectory_partitioned':
+            print('policies', policies.shape)
             policies = trajectories
         if policy_type == 'value_partitioned':
             one_hot_trajectories = np.eye(trajectories.max() + 1)[trajectories[:, 0]]
@@ -170,7 +173,7 @@ def restore_pool_contiguous(replay_pool, load_path):
             value_policy = (values > limits).sum(-1)
             policies = value_policy
 
-    print(f'number of samples in each {policy_type} partition:', [(policies == i).sum() for i in range(policies.max() + 1)])
+    print(f'number of samples in each {policy_type} partition:', [(policies == i).sum() for i in range(int(policies.max()) + 1)])
 
     replay_pool.add_samples({
         'observations': states,
