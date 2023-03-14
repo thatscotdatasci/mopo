@@ -581,8 +581,7 @@ class BNN:
                     print('self.policy_type ', self.policy_type )
                     if self.policy_type == 'default':
                         policy_np = policies[batch_idxs]
-
-                    if self.policy_type == 'random':
+                    elif self.policy_type == 'random':
                         # print('policies', policies[batch_idxs].shape)
                         # print('inputs[batch_idxs]', inputs[batch_idxs].shape)
                         policy_np = np.arange(inputs[batch_idxs].shape[1])
@@ -590,12 +589,13 @@ class BNN:
                         policy_np = policy_np[None, :]
                         policy_np = np.tile(policy_np, [inputs[batch_idxs].shape[0], 1])[:, :, None]
                         # print('policy_np', policy_np.shape)
-
-                    if self.policy_type == 'random_5':
+                    elif self.policy_type == 'random_5':
                         policy_set = np.arange(5)
                         policy_np = np.random.choice(policy_set, int(inputs[batch_idxs].shape[1]))
                         policy_np = policy_np[None, :]
                         policy_np = np.tile(policy_np, [inputs[batch_idxs].shape[0], 1])[:, :, None]
+                    else:
+                        assert 0, f'{self.policy_type} policy_type is not implemented'
 
                     _, train_loss, train_core_loss, train_pol_tot_loss, train_pol_var_loss, train_mean_pol_loss, train_decay_loss, train_var_lim_loss = self.sess.run(
                         (self.train_op, self.train_loss, self.train_core_loss, self.train_pol_tot_loss, self.train_pol_var_loss, self.train_mean_pol_loss, self.train_decay_loss, self.train_var_lim_loss),
