@@ -88,6 +88,7 @@ class BNN:
         self.lr_decay = float(params.get('lr_decay', 1.0))
         self.rex_type = params.get('rex_type', 'var')
         self.policy_type = params.get('policy_type', 'default')
+        print('self.policy_type ', self.policy_type)
 
         # Training objects
         self.optimizer = None
@@ -578,7 +579,6 @@ class BNN:
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
-                    print('self.policy_type ', self.policy_type )
                     if self.policy_type == 'default':
                         policy_np = policies[batch_idxs]
                     elif self.policy_type == 'random':
