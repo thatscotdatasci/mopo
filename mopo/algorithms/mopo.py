@@ -271,7 +271,8 @@ class MOPO(RLAlgorithm):
         self._pool_load_path = pool_load_path
         self._pool_load_max_size = pool_load_max_size
 
-        loader.restore_pool(self._pool, self._pool_load_path, self._pool_load_max_size, save_path=self._log_dir)
+        loader.restore_pool(self._pool, self._pool_load_path, self._pool_load_max_size,
+                            save_path=self._log_dir, policy_type=policy_type)
         self._init_pool_size = self._pool.size
         print('[ MOPO ] Starting with pool size: {}'.format(self._init_pool_size))
         ####

@@ -579,7 +579,7 @@ class BNN:
                     n_datapoints += batch_num * batch_size
                     n_baches += batch_num
                     batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
-                    if self.policy_type == 'default':
+                    if self.policy_type in ['default', 'trajectory_partitioned', 'value_partitioned', 'reward_partioned']:
                         policy_np = policies[batch_idxs]
                     elif self.policy_type == 'random':
                         # print('policies', policies[batch_idxs].shape)
@@ -931,10 +931,10 @@ class BNN:
         mean_policy_losses = tf.reduce_mean(policy_losses, axis=0)
 
         # Add the losses across all the policies. Results in vector of length B
-        if self.policy_type == 'random':
-            policy_total_losses = 5*tf.reduce_mean(policy_losses, axis=-1) #compensate for the reduce sum in other policy_types by multiplying by 5
-        else:
+        if self.policy_type in ['default', 'random_5']:
             policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
+        else:
+            policy_total_losses = 5 * tf.reduce_mean(policy_losses, axis=-1)  # compensate for the reduce sum in other policy_types by multiplying by 5
         #
         # Determine the variance of the losses - use boolean mask to ensure only taking variance for
         # policies which appear in the batch (i.e., some batches may not have records for all policies).
