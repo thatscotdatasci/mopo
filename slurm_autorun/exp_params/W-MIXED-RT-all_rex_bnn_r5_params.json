@@ -1,0 +1,11 @@
+[
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-5", "rex_beta": 5, "seed": 6, "exp_name": "rp5_rexb5"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-5", "rex_beta": 10, "seed": 6, "exp_name": "rp5_rexb10"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-5", "rex_beta": 20, "seed": 6, "exp_name": "rp5_rexb20"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-1", "rex_beta": 5, "seed": 6, "exp_name": "rp5_rexb5"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-1", "rex_beta": 10, "seed": 6, "exp_name": "rp5_rexb10"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-1", "rex_beta": 20, "seed": 6, "exp_name": "rp5_rexb20"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-4", "rex_beta": 5, "seed": 6, "exp_name": "rp5_rexb5"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-4", "rex_beta": 10, "seed": 6, "exp_name": "rp5_rexb10"},
+  {"config": "walker2d_custom_rex", "dataset": "W-MIXED-RT-4", "rex_beta": 20, "seed": 6, "exp_name": "rp5_rexb20"}
+]
