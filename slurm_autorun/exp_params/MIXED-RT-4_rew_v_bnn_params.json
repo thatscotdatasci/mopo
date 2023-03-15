@@ -1,0 +1,8 @@
+[
+  {"config": "halfcheetah_custom_rex_rewp", "dataset": "MIXED-RT-4", "rex_beta": 5, "seed": 12, "exp_name": "rew_rexb5"},
+  {"config": "halfcheetah_custom_rex_rewp", "dataset": "MIXED-RT-4", "rex_beta": 10, "seed": 12, "exp_name": "rew_rexb10"},
+  {"config": "halfcheetah_custom_rex_rewp", "dataset": "MIXED-RT-4", "rex_beta": 20, "seed": 12, "exp_name": "rew_rexb20"},
+  {"config": "halfcheetah_custom_rex_vp", "dataset": "MIXED-RT-4", "rex_beta": 5, "seed": 12, "exp_name": "v_rexb5"},
+  {"config": "halfcheetah_custom_rex_vp", "dataset": "MIXED-RT-4", "rex_beta": 10, "seed": 12, "exp_name": "v_rexb10"},
+  {"config": "halfcheetah_custom_rex_vp", "dataset": "MIXED-RT-4", "rex_beta": 20, "seed": 12, "exp_name": "v_rexb20"}
+]
