@@ -44,7 +44,7 @@ options="run_local examples.development \
         --rollout-length=20 \
         --rollout-batch-size=12500 \
         --dataset=W-MIXED-RT-1 \
-        --model_load_dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c
+        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c
         "
 
 mopo run_local examples.development \

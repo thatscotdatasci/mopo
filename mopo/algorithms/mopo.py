@@ -415,7 +415,6 @@ class MOPO(RLAlgorithm):
             time_diagnostics = gt.get_times().stamps.itrs
 
             if self._epoch % 10 == 0:
-                print('diagnostics', diagnostics)
                 diagnostics.update(OrderedDict((
                     *(
                         (f'evaluation/{key}', evaluation_metrics[key])
@@ -441,7 +440,7 @@ class MOPO(RLAlgorithm):
                     ('time_step_global', time_step_global)
                 )))
 
-            self.wlogger.wandb.log(diagnostics, step=self._total_timestep)
+                self.wlogger.wandb.log(diagnostics, step=self._total_timestep)
 
             if self._eval_render_mode is not None and hasattr(
                     evaluation_environment, 'render_rollouts'):
