@@ -971,6 +971,9 @@ class BNN:
                     rex_tl_loss = (1/self.rex_beta) * policy_total_losses
             return rex_tl_loss
 
+        if self.policy_type not in ['default']:
+            policy_total_losses = 5 * tf.reduce_mean(losses, axis=-1)
+
         total_losses = tf.cond(rex_training_loop,
             rex_training_loop_total_losses,
             lambda: policy_total_losses
