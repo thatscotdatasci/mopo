@@ -368,8 +368,8 @@ class MOPO(RLAlgorithm):
                     model_rollout_metrics = self._rollout_model(rollout_batch_size=self._rollout_batch_size, deterministic=self._deterministic)
                     model_metrics.update(model_rollout_metrics)
                     time_step_global = self._epoch_length * self._epoch + timestep
-                    self.wlogger.wandb.log({**{'rollout_model/' + key: value for key, value in model_rollout_metrics.items()}, **{'rollout_model/time_step_global': time_step_global}}, step=time_step_global)
-                    
+                    # self.wlogger.wandb.log({**{'rollout_model/' + key: value for key, value in model_rollout_metrics.items()}, **{'rollout_model/time_step_global': time_step_global}}, step=time_step_global)
+
                     gt.stamp('epoch_rollout_model')
                     self._training_progress.resume()
 
@@ -414,29 +414,32 @@ class MOPO(RLAlgorithm):
 
             time_diagnostics = gt.get_times().stamps.itrs
 
-            diagnostics.update(OrderedDict((
-                *(
-                    (f'evaluation/{key}', evaluation_metrics[key])
-                    for key in sorted(evaluation_metrics.keys())
-                ),
-                *(
-                    (f'times/{key}', time_diagnostics[key][-1])
-                    for key in sorted(time_diagnostics.keys())
-                ),
-                *(
-                    (f'sampler/{key}', sampler_diagnostics[key])
-                    for key in sorted(sampler_diagnostics.keys())
-                ),
-                *(
-                    (f'model/{key}', model_metrics[key])
-                    for key in sorted(model_metrics.keys())
-                ),
-                ('epoch', self._epoch),
-                ('timestep', self._timestep),
-                ('timesteps_total', self._total_timestep),
-                ('train-steps', self._num_train_steps),
-                ('time_step_global', time_step_global)
-            )))
+            if self._epoch % 10 == 0:
+                print('diagnostics', diagnostics)
+                diagnostics.update(OrderedDict((
+                    *(
+                        (f'evaluation/{key}', evaluation_metrics[key])
+                        for key in sorted(evaluation_metrics.keys())
+                    ),
+                    *(
+                        (f'times/{key}', time_diagnostics[key][-1])
+                        for key in sorted(time_diagnostics.keys())
+                    ),
+                    *(
+                        (f'sampler/{key}', sampler_diagnostics[key])
+                        for key in sorted(sampler_diagnostics.keys())
+                    ),
+                    *(
+                        (f'model/{key}', model_metrics[key])
+                        for key in sorted(model_metrics.keys())
+                    ),
+                    *(('rollout_model/' + key, value) for key, value in model_rollout_metrics.items()),
+                    ('epoch', self._epoch),
+                    ('timestep', self._timestep),
+                    ('timesteps_total', self._total_timestep),
+                    ('train-steps', self._num_train_steps),
+                    ('time_step_global', time_step_global)
+                )))
 
             self.wlogger.wandb.log(diagnostics, step=self._total_timestep)
 

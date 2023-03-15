@@ -37,14 +37,14 @@ options="run_local examples.development \
         --config=examples.config.d4rl.walker2d_custom_rl \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=default_mp0rl20_s5 \
+        --exp-name=test \
         --seed=5 \
         --bnn-retrain-epochs=0 \
         --penalty-coeff=0.0 \
         --rollout-length=20 \
         --rollout-batch-size=12500 \
         --dataset=W-MIXED-RT-1 \
-        --model_load_dir /home/hpcanok1/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/ray_mopo/Walker2d_W-MIXED-RT-1/default/s12_2023-02-27_15-47-18bs6_l049/models
+        --model_load_dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c
         "
 
 mopo run_local examples.development \
