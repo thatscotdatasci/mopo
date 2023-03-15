@@ -94,8 +94,8 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
     experiment_id = params.get('exp_name')
 
     #### add pool_load_max_size to experiment_id
-    if 'pool_load_max_size' in variant_spec['algorithm_params']['kwargs']:
-        max_size = variant_spec['algorithm_params']['kwargs']['pool_load_max_size']
+    # if 'pool_load_max_size' in variant_spec['algorithm_params']['kwargs']:
+    #     max_size = variant_spec['algorithm_params']['kwargs']['pool_load_max_size']
         # experiment_id = '{}_{}e3'.format(experiment_id, int(max_size/1000)) #ToDo: why pool_load_max_size is important?
     ####
 
