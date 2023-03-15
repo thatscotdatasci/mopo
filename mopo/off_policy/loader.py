@@ -148,7 +148,11 @@ def restore_pool_contiguous(replay_pool, load_path, policy_type=None):
     if policy_type == 'reward_partioned':
         limits = get_limits(rewards[:, 0], N=5)
         rewards_policy = (rewards > limits).sum(-1)
-        policies = rewards_policy
+        print('policies 1', policies.shape)
+        print('policies 1', policies[:5])
+        policies = rewards_policy[:, None]
+        print('policies 2', policies.shape)
+        print('policies 2', policies[:5])
 
     if policy_type in ['trajectory_partitioned', 'value_partitioned']:
         print('dones', dones.shape)
@@ -171,7 +175,11 @@ def restore_pool_contiguous(replay_pool, load_path, policy_type=None):
             values = value_transactions_per_tragectories[trajectories]
             limits = get_limits(values[:, 0])
             value_policy = (values > limits).sum(-1)
-            policies = value_policy
+            print('policies 1', policies.shape)
+            print('policies 1', policies[:5])
+            policies = value_policy[:, None]
+            print('policies 2', policies.shape)
+            print('policies 2', policies[:5])
 
     print(f'number of samples in each {policy_type} partition:', [(policies == i).sum() for i in range(int(policies.max()) + 1)])
 

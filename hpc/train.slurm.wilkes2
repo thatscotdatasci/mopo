@@ -61,8 +61,8 @@ options="run_local examples.development \
         --checkpoint-frequency=100 \
         --seed 1 \
         --rex-beta=5 \
-        --exp-name vp_rexb5 \
-        --dataset MIXED-RT-5"
+        --exp-name v_rexb5 \
+        --dataset MIXED-RT-4"
 
 #mopo run_local examples.development \
 #        --config=examples.config.d4rl.walker2d_custom_rex_std \
