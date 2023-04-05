@@ -31,15 +31,26 @@ module load rhel8/default-amp              # REQUIRED - loads the basic environm
 # module load miniconda/3
 source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
-#! Full path to application executable: 
+#! Full path to application executable:
+
 application="mopo run_local examples.development \
-            --config=examples.config.d4rl.walker2d_custom \
+            --config=examples.config.d4rl.humanoid_custom \
             --gpus=1 --trial-gpus=1 \
             --checkpoint-frequency=100 \
             --seed 1 \
             --rex-beta 0 \
             --exp-name default_vel5 \
-            --dataset W-MIXED-RT-1"
+            --dataset Humanoid-Expert"
+
+#application="mopo run_local examples.development \
+#            --config=examples.config.d4rl.walker2d_custom \
+#            --gpus=1 --trial-gpus=1 \
+#            --checkpoint-frequency=100 \
+#            --seed 1 \
+#            --rex-beta 0 \
+#            --exp-name default_vel5 \
+#            --dataset W-MIXED-RT-1"
+
 
 #! Run options for the application:
 #options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 4321 --rex-beta=20 --exp-name halfcheetah_mixed_rt_5 --dataset MIXED-RT-5"
