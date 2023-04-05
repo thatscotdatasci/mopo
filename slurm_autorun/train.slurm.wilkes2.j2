@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 ##SBATCH --exclusive
-#SBATCH --time=6:00:00
+#SBATCH --time=32:00:00
 #SBATCH --mail-type=FAIL
 #! Uncomment this to prevent the job from being requeued (e.g. if
 #! interrupted by node failure or system downtime):
@@ -35,18 +35,9 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 application="mopo"
 
 #! Run options for the application:
-#options="run_local examples.development \
-#        --config=examples.config.d4rl.hopper_custom_rex_std \
-#        --gpus=1 --trial-gpus=1 \
-#        --checkpoint-frequency=100 \
-#        --seed 1 \
-#        --rex-beta=100 \
-#        --exp-name rexstdb100 \
-#        --dataset H-MIXED-RT-4"
-
 options="run_local examples.development \
         --config=examples.config.d4rl.{{ config }} \
-        --cpus=1 --trial-cpus=1 \
+        --gpus=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
         --seed {{ seed }} \
         --exp-name {{ exp_name }} \

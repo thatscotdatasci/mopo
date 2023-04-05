@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
 ##SBATCH --exclusive
-#SBATCH --time=6:00:00
+#SBATCH --time=32:00:00
 #SBATCH --mail-type=FAIL
 #! Uncomment this to prevent the job from being requeued (e.g. if
 #! interrupted by node failure or system downtime):
@@ -34,13 +34,22 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #! Full path to application executable:
 
 application="mopo run_local examples.development \
-            --config=examples.config.d4rl.humanoid_custom \
+            --config=examples.config.d4rl.humanoid_custom_rex \
             --gpus=1 --trial-gpus=1 \
             --checkpoint-frequency=100 \
-            --seed 1 \
-            --rex-beta 0 \
-            --exp-name default_vel5 \
+            --seed 3 \
+            --rex-beta 20 \
+            --exp-name rexb20 \
             --dataset Humanoid-Expert"
+
+#application="mopo run_local examples.development \
+#            --config=examples.config.d4rl.humanoid_custom \
+#            --gpus=1 --trial-gpus=1 \
+#            --checkpoint-frequency=100 \
+#            --seed 3 \
+#            --rex-beta 0 \
+#            --exp-name default \
+#            --dataset Humanoid-Expert"
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.walker2d_custom \
