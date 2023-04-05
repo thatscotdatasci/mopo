@@ -44,6 +44,7 @@ def rollout(env,
 
     pool = replay_pools.SimpleReplayPool(
         observation_space, action_space, max_size=path_length)
+    # print('rollout path_length', path_length)
     sampler = simple_sampler.SimpleSampler(
         max_path_length=path_length,
         min_pool_size=None,

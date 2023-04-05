@@ -900,12 +900,22 @@ class BNN:
         # as this is needed for future matrix multiplication
         if inc_var_loss:
             # Log-likelihood
-            mse_losses = tf.reduce_mean(tf.square(mean - targets) * inv_var, axis=-1, keepdims=True)
+            dif2 = tf.square(mean - targets)
+            mul = tf.constant(np.array([[[1]*9 + [5]*9]], dtype='float32'))
+            print('mul', mul.shape)
+            print('dif2', dif2.shape)
+            dif2 = dif2 * mul
+            # print('dif2[:, :, 9:]', dif2[:, :, 9:].shape)
+            # dif2[:, :, 9:] = dif2[:, :, 9:] * 10
+            mse_losses = tf.reduce_mean(dif2 * inv_var, axis=-1, keepdims=True)
             var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
             losses = mse_losses + var_losses
         else:
             # MSE
             losses = tf.reduce_mean(tf.square(mean - targets), axis=-1, keepdims=True)
+
+        # print('ff mean', mean.shape)
+        # print('ff targets', targets.shape)
 
         # Identify the unique policies present across all batches of data
         policies = tf.cast(policies, tf.int32)
@@ -971,8 +981,8 @@ class BNN:
                     rex_tl_loss = (1/self.rex_beta) * policy_total_losses
             return rex_tl_loss
 
-        if self.policy_type not in ['default']:
-            policy_total_losses = 5 * tf.reduce_mean(losses, axis=-1)
+        # if self.policy_type not in ['default']:
+        #     policy_total_losses = 5 * tf.reduce_mean(losses, axis=-1)
 
         total_losses = tf.cond(rex_training_loop,
             rex_training_loop_total_losses,

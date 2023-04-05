@@ -30,22 +30,33 @@ module load miniconda/3
 source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable: 
-application="mopo"
-
-#! Run options for the application:
-options="run_local examples.development \
+application="mopo run_local examples.development \
         --config=examples.config.d4rl.walker2d_custom_rl \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=test \
+        --exp-name=fff \
         --seed=5 \
         --bnn-retrain-epochs=0 \
         --penalty-coeff=0.0 \
         --rollout-length=20 \
         --rollout-batch-size=12500 \
         --dataset=W-MIXED-RT-1 \
-        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c
-        "
+        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c"
+
+#! Run options for the application:
+#options="run_local examples.development \
+#        --config=examples.config.d4rl.walker2d_custom_rl \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=test \
+#        --seed=5 \
+#        --bnn-retrain-epochs=0 \
+#        --penalty-coeff=0.0 \
+#        --rollout-length=20 \
+#        --rollout-batch-size=12500 \
+#        --dataset=W-MIXED-RT-1 \
+#        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c
+#        "
 
 mopo run_local examples.development \
        --config=examples.config.d4rl.walker2d_custom_rl \

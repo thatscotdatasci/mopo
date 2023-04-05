@@ -306,6 +306,7 @@ class MOPO(RLAlgorithm):
             self._init_training()
 
         self.sampler.initialize(training_environment, policy, pool)
+        print('self.sampler._max_path_length', self.sampler._max_path_length)
 
         gt.reset_root()
         gt.rename_root('RLAlgorithm')
