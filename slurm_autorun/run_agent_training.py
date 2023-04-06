@@ -12,7 +12,7 @@ from dogo.results import get_experiment_details
 TIME_FORMAT = '%Y%m%d%H%M%S'
 SLRUM_AUTORUN_DIR = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun')
 # SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
-SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.wilkes.j2'
+SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.wilkes2.j2'
 
 # Map rollout lengths to rollout batch sizes
 # The following calculation is performed in the `_reallocate_model_pool` function of mopo.py:
