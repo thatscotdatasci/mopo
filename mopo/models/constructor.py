@@ -17,7 +17,7 @@ def construct_model(obs_dim=11, act_dim=3, rew_dim=1, hidden_dim=200, num_networ
 				'sess': session, 'separate_mean_var': separate_mean_var, 'deterministic': deterministic,
 				'rex': rex, 'rex_beta': rex_beta, 'rex_multiply': rex_multiply, 'lr_decay': lr_decay,
 				'log_dir': log_dir, 'train_bnn_only': train_bnn_only,
-			    'rex_type': rex_type, 'policy_type': policy_type}
+			    'rex_type': rex_type, 'policy_type': policy_type, 'hidden_dim': hidden_dim}
 
 	if load_dir is not None:
 		print('Specified load dir', load_dir)
@@ -33,7 +33,8 @@ def construct_model(obs_dim=11, act_dim=3, rew_dim=1, hidden_dim=200, num_networ
 			print('[ BNN ] Training linear model')
 			model.add(FC(obs_dim+rew_dim, input_dim=obs_dim+act_dim, weight_decay=0.000025))
 		elif model_type == 'mlp':
-			print('[ BNN ] Training non-linear model | Obs: {} | Act: {} | Rew: {}'.format(obs_dim, act_dim, rew_dim))
+			print('[ BNN ] Training non-linear model | Obs: {} | Act: {} | Rew: {}, hidden_dim: {}'.format(
+				obs_dim, act_dim, rew_dim, hidden_dim))
 			model.add(FC(hidden_dim, input_dim=obs_dim+act_dim, activation="swish", weight_decay=0.000025))
 			model.add(FC(hidden_dim, activation="swish", weight_decay=0.00005))
 			model.add(FC(hidden_dim, activation="swish", weight_decay=0.000075))

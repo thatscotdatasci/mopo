@@ -46,8 +46,7 @@ options="run_local examples.development \
         --bnn-retrain-epochs {{ bnn_retrain_epochs }} \
         --penalty-coeff {{ mopo_penalty_coeff }} \
         --rollout-length {{ rollout_length }} \
-        --rollout-batch-size {{ rollout_batch_size }} \
-        --model-load-dir {{ model_load_dir }}"
+        --rollout-batch-size {{ rollout_batch_size }}"
 
 # mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 4 --rex-beta=10 --exp-name rexb10 --dataset MIXED-RT-5
 #! Work directory (i.e. where the job will run):

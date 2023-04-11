@@ -363,7 +363,7 @@ class BNN:
             current = holdout_losses[i]
             _, best = self._snapshots[i]
             improvement = (best - current) / np.abs(best)
-            if improvement > 0.01:
+            if improvement > 0.0001:
                 self._snapshots[i] = (epoch, current)
                 self._save_state(i)
                 updated = True

@@ -197,6 +197,7 @@ class MOPO(RLAlgorithm):
         self._model_type = model_type
         self._identity_terminal = identity_terminal
         print('model_load_dir', model_load_dir)
+        print('deterministic', deterministic)
         self._model = construct_model(obs_dim=obs_dim, act_dim=act_dim, hidden_dim=hidden_dim,
                                       num_networks=num_networks, num_elites=num_elites,
                                       model_type=model_type, separate_mean_var=separate_mean_var,

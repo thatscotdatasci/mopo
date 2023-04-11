@@ -16,6 +16,7 @@ base_params = {
         'discount': 0.99,
         'tau': 5e-3,
         'reward_scale': 1.0,
+        'hidden_dim': 1024,
 
         'model_train_freq': 1000,
         'model_retain_epochs': 5,
