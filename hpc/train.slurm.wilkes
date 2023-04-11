@@ -31,23 +31,44 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable:
 
+
+
+application="mopo run_local examples.development \
+            --config=examples.config.d4rl.humanoid_custom_rex_std \
+            --gpus=1 --trial-gpus=1 \
+            --checkpoint-frequency=100 \
+            --seed 10 \
+            --rex-beta 8 \
+            --exp-name rexstdb8_br_rexF \
+            --dataset Humanoid-Mixed-Expert"
+
+
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.humanoid_custom_rex \
 #            --gpus=1 --trial-gpus=1 \
 #            --checkpoint-frequency=100 \
-#            --seed 5 \
-#            --rex-beta 5 \
-#            --exp-name rexb5 \
+#            --seed 10 \
+#            --rex-beta 10 \
+#            --exp-name rexb10_br_rexT \
 #            --dataset Humanoid-Novice-10"
 
-application="mopo run_local examples.development \
-            --config=examples.config.d4rl.humanoid_custom \
-            --gpus=1 --trial-gpus=1 \
-            --checkpoint-frequency=100 \
-            --seed 4 \
-            --rex-beta 0 \
-            --exp-name default \
-            --dataset Humanoid-Novice-10"
+#application="mopo run_local examples.development \
+#            --config=examples.config.d4rl.humanoid_custom \
+#            --gpus=1 --trial-gpus=1 \
+#            --checkpoint-frequency=100 \
+#            --seed 4 \
+#            --rex-beta 0 \
+#            --exp-name default_br_rexF \
+#            --dataset Humanoid-Expert-100"
+
+#application="mopo run_local examples.development \
+#            --config=examples.config.d4rl.humanoid_custom \
+#            --gpus=1 --trial-gpus=1 \
+#            --checkpoint-frequency=100 \
+#            --seed 4 \
+#            --rex-beta 0 \
+#            --exp-name default \
+#            --dataset Humanoid-Novice-10"
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.walker2d_custom \

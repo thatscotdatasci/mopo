@@ -56,6 +56,9 @@ class BNN:
         self.name = get_required_argument(params, 'name', 'Must provide name.')
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
+        self.params = params
+        self.break_train_rex = params.get('break_train_rex')
+        print('self.break_train_rex', self.break_train_rex)
 
         self.train_bnn_only = params.get('train_bnn_only', None)
         if self.train_bnn_only:
@@ -80,6 +83,7 @@ class BNN:
         self.decays, self.optvars, self.nonoptvars = [], [], []
         self.end_act, self.end_act_name = None, None
         self.scaler = None
+        self.bnn_lr = params.get('bnn_lr')
         
         # REx parameters
         self.rex = params.get('rex', False)
@@ -363,7 +367,7 @@ class BNN:
             current = holdout_losses[i]
             _, best = self._snapshots[i]
             improvement = (best - current) / np.abs(best)
-            if improvement > 0.0001:
+            if improvement > self.params.get('improvement_threshold'): #.0001:
                 self._snapshots[i] = (epoch, current)
                 self._save_state(i)
                 updated = True
@@ -662,7 +666,14 @@ class BNN:
                 print('o_loop', o_loop)
                 if o_loop == 0 and (break_train or (max_grad_updates and grad_updates > max_grad_updates)):
                     print('breaking the first loop')
+                    self._epochs_since_update = 0
                     break
+                    # if break_train_counts > 2:
+                    #     print('breaking the first loop')
+                    #     break
+                    # else:
+                    #     break_train_counts += 1
+                    #     self
                 if max_t and t > max_t:
                     descr = 'Breaking because of timeout: {}! (max: {})'.format(t, max_t)
                     progress.append_description(descr)
@@ -670,6 +681,10 @@ class BNN:
                     print('breaking the second loop')
                     # time.sleep(5)
                     break
+                if self.break_train_rex and o_loop == 1 and break_train:
+                    print('breaking the second loop')
+                    break
+
 
         progress.stamp()
         if timer: timer.stamp('bnn_train')

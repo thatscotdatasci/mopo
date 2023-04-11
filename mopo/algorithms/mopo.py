@@ -51,6 +51,9 @@ class MOPO(RLAlgorithm):
             tf_summaries=False,
 
             lr=3e-4,
+            bnn_lr=0.001,
+            improvement_threshold=0.0001,
+            break_train_rex=False,
             reward_scale=1.0,
             target_entropy='auto',
             discount=0.99,
@@ -205,7 +208,8 @@ class MOPO(RLAlgorithm):
                                       rex=rex, rex_beta=rex_beta, rex_multiply=rex_multiply, 
                                       lr_decay=lr_decay, log_dir=self._log_dir,
                                       train_bnn_only=train_bnn_only, rex_type=rex_type,
-                                      policy_type=policy_type)
+                                      policy_type=policy_type, bnn_lr=bnn_lr, improvement_threshold=improvement_threshold,
+                                      break_train_rex=break_train_rex)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
