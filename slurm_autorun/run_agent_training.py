@@ -11,8 +11,8 @@ from dogo.results import get_experiment_details
 
 TIME_FORMAT = '%Y%m%d%H%M%S'
 SLRUM_AUTORUN_DIR = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun')
-# SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
-SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.wilkes2.j2'
+SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
+# SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.wilkes2.j2'
 
 # Map rollout lengths to rollout batch sizes
 # The following calculation is performed in the `_reallocate_model_pool` function of mopo.py:
@@ -47,7 +47,7 @@ class MopoAgentExp:
         bnn_retrain_epochs=0,
         rollout_batch_size=None,
         model_load_dir=None,
-        rex_beta=None,
+        rex_beta=-1,
 
     ) -> None:
         """ This object is used to define a MOPO experiment.
@@ -182,6 +182,6 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/Humanoid-Expert_bnn_min.json")
+    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/Walker-Expert_bnn_min.json")
 
     run_experiment_set(params_filepath)

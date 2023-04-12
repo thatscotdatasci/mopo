@@ -1,0 +1,11 @@
+[
+  {"config": "walker2d_custom", "dataset": "Walker-Mixed-Expert", "rex_beta": 0, "seed": 12, "exp_name": "default"},
+  {"config": "walker2d_custom_rex", "dataset": "Walker-Mixed-Expert", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
+  {"config": "walker2d_custom_rex", "dataset": "Walker-Mixed-Expert", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
+  {"config": "walker2d_custom_rex", "dataset": "Walker-Mixed-Expert", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"},
+  {"config": "walker2d_custom", "dataset": "Walker-Mixed-Novice", "rex_beta": 0, "seed": 12, "exp_name": "default"},
+  {"config": "walker2d_custom_rex", "dataset": "Walker-Mixed-Novice", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
+  {"config": "walker2d_custom_rex", "dataset": "Walker-Mixed-Novice", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
+  {"config": "walker2d_custom_rex", "dataset": "Walker-Mixed-Novice", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"}
+
+]

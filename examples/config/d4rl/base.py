@@ -16,10 +16,14 @@ base_params = {
         'discount': 0.99,
         'tau': 5e-3,
         'reward_scale': 1.0,
-        'hidden_dim': 2048,
-        'bnn_lr': 0.0001, #0.001
-        'improvement_threshold': 0.00001,
+        'hidden_dim': 200,
+        'bnn_lr': 0.001,  # 0.001
+        'improvement_threshold': 0.0001,
         'break_train_rex': False,
+        # 'hidden_dim': 2048,
+        # 'bnn_lr': 0.0001, #0.001
+        # 'improvement_threshold': 0.00001,
+        # 'break_train_rex': False,
 
         'model_train_freq': 1000,
         'model_retain_epochs': 5,

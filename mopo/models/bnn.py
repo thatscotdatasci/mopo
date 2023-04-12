@@ -916,12 +916,10 @@ class BNN:
         if inc_var_loss:
             # Log-likelihood
             dif2 = tf.square(mean - targets)
-            # mul = tf.constant(np.array([[[1]*9 + [5]*9]], dtype='float32'))
+            # mul = tf.constant(np.array([[[1]*9 + [20]*9]], dtype='float32'))
             # print('mul', mul.shape)
             # print('dif2', dif2.shape)
             # dif2 = dif2 * mul
-            # print('dif2[:, :, 9:]', dif2[:, :, 9:].shape)
-            # dif2[:, :, 9:] = dif2[:, :, 9:] * 10
             mse_losses = tf.reduce_mean(dif2 * inv_var, axis=-1, keepdims=True)
             var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
             losses = mse_losses + var_losses

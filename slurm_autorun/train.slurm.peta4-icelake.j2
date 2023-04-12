@@ -44,8 +44,8 @@ options="run_local examples.development \
         --bnn-retrain-epochs {{ bnn_retrain_epochs }} \
         --penalty-coeff {{ mopo_penalty_coeff }} \
         --rollout-length {{ rollout_length }} \
-        --rollout-batch-size {{ rollout_batch_size }} \
-        --model-load-dir {{ model_load_dir }}"
+        --rollout-batch-size {{ rollout_batch_size }}" #\
+       # --model-load-dir {{ model_load_dir }}"
 
 #! Work directory (i.e. where the job will run):
 workdir="/home/hpcanok1/rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
