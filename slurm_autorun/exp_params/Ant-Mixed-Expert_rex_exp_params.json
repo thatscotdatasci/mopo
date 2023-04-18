@@ -2,11 +2,65 @@
 {
 "config": "ant_custom_rl",
 "dataset": "Ant-Mixed-Expert",
+"rollout_length": 1,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp0rl1"
+},
+{
+"config": "ant_custom_rl",
+"dataset": "Ant-Mixed-Expert",
+"rollout_length": 1,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp0rl1"
+},
+{
+"config": "ant_custom_rl",
+"dataset": "Ant-Mixed-Expert",
+"rollout_length": 1,
+"mopo_penalty_coeff": 1,
+"seed": 1,
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp1rl1"
+},
+{
+"config": "ant_custom_rl",
+"dataset": "Ant-Mixed-Expert",
+"rollout_length": 1,
+"mopo_penalty_coeff": 1,
+"seed": 2,
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp1rl1"
+},
+{
+"config": "ant_custom_rl",
+"dataset": "Ant-Mixed-Expert",
+"rollout_length": 1,
+"mopo_penalty_coeff": 5,
+"seed": 1,
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp5rl1"
+},
+{
+"config": "ant_custom_rl",
+"dataset": "Ant-Mixed-Expert",
+"rollout_length": 1,
+"mopo_penalty_coeff": 5,
+"seed": 2,
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp5rl1"
+},
+{
+"config": "ant_custom_rl",
+"dataset": "Ant-Mixed-Expert",
 "rollout_length": 10,
 "mopo_penalty_coeff": 0,
 "seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp0rl10"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp0rl10"
 },
 {
 "config": "ant_custom_rl",
@@ -14,8 +68,8 @@
 "rollout_length": 10,
 "mopo_penalty_coeff": 0,
 "seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp0rl10"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp0rl10"
 },
 {
 "config": "ant_custom_rl",
@@ -23,8 +77,8 @@
 "rollout_length": 10,
 "mopo_penalty_coeff": 1,
 "seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp1rl10"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp1rl10"
 },
 {
 "config": "ant_custom_rl",
@@ -32,8 +86,8 @@
 "rollout_length": 10,
 "mopo_penalty_coeff": 1,
 "seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp1rl10"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp1rl10"
 },
 {
 "config": "ant_custom_rl",
@@ -41,8 +95,8 @@
 "rollout_length": 10,
 "mopo_penalty_coeff": 5,
 "seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp5rl10"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp5rl10"
 },
 {
 "config": "ant_custom_rl",
@@ -50,62 +104,8 @@
 "rollout_length": 10,
 "mopo_penalty_coeff": 5,
 "seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp5rl10"
-},
-{
-"config": "ant_custom_rl",
-"dataset": "Ant-Mixed-Expert",
-"rollout_length": 20,
-"mopo_penalty_coeff": 0,
-"seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp0rl20"
-},
-{
-"config": "ant_custom_rl",
-"dataset": "Ant-Mixed-Expert",
-"rollout_length": 20,
-"mopo_penalty_coeff": 0,
-"seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp0rl20"
-},
-{
-"config": "ant_custom_rl",
-"dataset": "Ant-Mixed-Expert",
-"rollout_length": 20,
-"mopo_penalty_coeff": 1,
-"seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp1rl20"
-},
-{
-"config": "ant_custom_rl",
-"dataset": "Ant-Mixed-Expert",
-"rollout_length": 20,
-"mopo_penalty_coeff": 1,
-"seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp1rl20"
-},
-{
-"config": "ant_custom_rl",
-"dataset": "Ant-Mixed-Expert",
-"rollout_length": 20,
-"mopo_penalty_coeff": 5,
-"seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp5rl20"
-},
-{
-"config": "ant_custom_rl",
-"dataset": "Ant-Mixed-Expert",
-"rollout_length": 20,
-"mopo_penalty_coeff": 5,
-"seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp5rl20"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp5rl10"
 },
 {
 "config": "ant_custom_rl",
@@ -113,8 +113,8 @@
 "rollout_length": 5,
 "mopo_penalty_coeff": 0,
 "seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp0rl5"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp0rl5"
 },
 {
 "config": "ant_custom_rl",
@@ -122,8 +122,8 @@
 "rollout_length": 5,
 "mopo_penalty_coeff": 0,
 "seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp0rl5"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp0rl5"
 },
 {
 "config": "ant_custom_rl",
@@ -131,8 +131,8 @@
 "rollout_length": 5,
 "mopo_penalty_coeff": 1,
 "seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp1rl5"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp1rl5"
 },
 {
 "config": "ant_custom_rl",
@@ -140,8 +140,8 @@
 "rollout_length": 5,
 "mopo_penalty_coeff": 1,
 "seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp1rl5"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp1rl5"
 },
 {
 "config": "ant_custom_rl",
@@ -149,8 +149,8 @@
 "rollout_length": 5,
 "mopo_penalty_coeff": 5,
 "seed": 1,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp5rl5"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp5rl5"
 },
 {
 "config": "ant_custom_rl",
@@ -158,7 +158,7 @@
 "rollout_length": 5,
 "mopo_penalty_coeff": 5,
 "seed": 2,
-"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg",
-"exp_name": "default-1024-iths10_mp5rl5"
+"model_load_dir": "Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r",
+"exp_name": "default-1024s10_mp5rl5"
 }
 ]

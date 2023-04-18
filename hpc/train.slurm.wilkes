@@ -38,7 +38,7 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #            --checkpoint-frequency=100 \
 #            --seed 1 \
 #            --rex-beta 0 \
-#            --exp-name default-512 \
+#            --exp-name default-1024 \
 #            --dataset W-MIXED-RT-1"
 
 #application="mopo run_local examples.development \
@@ -55,20 +55,20 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #            --config=examples.config.d4rl.walker2d_custom_rex \
 #            --gpus=1 --trial-gpus=1 \
 #            --checkpoint-frequency=100 \
-#            --seed 1 \
+#            --seed 6 \
 #            --rex-beta 5 \
-#            --exp-name rexb5-check \
+#            --exp-name rexb5-check-6 \
 #            --dataset W-MIXED-RT-1"
 
 
-application="mopo run_local examples.development \
-            --config=examples.config.d4rl.ant_custom \
-            --gpus=1 --trial-gpus=1 \
-            --checkpoint-frequency=100 \
-            --seed 10 \
-            --rex-beta 0 \
-            --exp-name default-1024 \
-            --dataset Ant-Mixed-Expert"
+#application="mopo run_local examples.development \
+#            --config=examples.config.d4rl.ant_custom \
+#            --gpus=1 --trial-gpus=1 \
+#            --checkpoint-frequency=100 \
+#            --seed 10 \
+#            --rex-beta 0 \
+#            --exp-name default-1024 \
+#            --dataset Ant-Mixed-Expert"
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.ant_custom_sr \
@@ -115,7 +115,21 @@ application="mopo run_local examples.development \
 #        --penalty-coeff 0 \
 #        --rollout-length 10 \
 #        --rollout-batch-size 25000 \
-#        --model-load-dir Ant_Ant-Mixed-Expert/default-1024-ith/s10_2023-04-18_09-31-30diblh5fg"
+#        --model-load-dir Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r"
+
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.walker2d_custom_rl \
+        --gpus=1 --trial-gpus=1 \
+        --checkpoint-frequency=100 \
+        --seed 1 \
+        --exp-name test \
+        --dataset W-MIXED-RT-1 \
+        --rex-beta 0 \
+        --bnn-retrain-epochs 0 \
+        --penalty-coeff 0 \
+        --rollout-length 10 \
+        --rollout-batch-size 25000 \
+        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20-ra/s1_2023-04-18_13-16-17x3qjukap"
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.humanoid_custom_rex_std \
@@ -158,9 +172,9 @@ application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.walker2d_custom \
 #            --gpus=1 --trial-gpus=1 \
 #            --checkpoint-frequency=100 \
-#            --seed 1 \
+#            --seed 3 \
 #            --rex-beta 0 \
-#            --exp-name default \
+#            --exp-name default-check2 \
 #            --dataset W-MIXED-RT-1"
 
 

@@ -25,6 +25,6 @@ params['kwargs'].update({
     'lr_decay': 1.0,
     'bnn_batch_size': 256,
     # 'rex_type': 'scale_reward',
-    # 'hidden_dim': 200,
+    # 'hidden_dim': 1024,
     # 'bnn_lr': 0.0001,  # 0.001
 })
