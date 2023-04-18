@@ -1,0 +1,83 @@
+[
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp0rl10"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 10,
+"mopo_penalty_coeff": 1,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp1rl10"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 10,
+"mopo_penalty_coeff": 5,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp5rl10"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 20,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp0rl20"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 20,
+"mopo_penalty_coeff": 1,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp1rl20"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 20,
+"mopo_penalty_coeff": 5,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp5rl20"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp0rl5"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 5,
+"mopo_penalty_coeff": 1,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp1rl5"
+},
+{
+"config": "humanoid_custom_rl",
+"dataset": "Humanoid-Mixed-Expert",
+"rollout_length": 5,
+"mopo_penalty_coeff": 5,
+"seed": 1,
+"model_load_dir": "Humanoid_Humanoid-Mixed-Expert/default-2048/s12_2023-04-13_11-32-358r21z1ek",
+"exp_name": "default-2048s12_mp5rl5"
+}
+]

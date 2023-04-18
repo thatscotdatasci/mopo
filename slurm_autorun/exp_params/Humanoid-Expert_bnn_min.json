@@ -1,19 +1,10 @@
 [
-  {"config": "humanoid_custom", "dataset": "Humanoid-Novice-10", "rex_beta": 0, "seed": 12, "exp_name": "default"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Novice-10", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Novice-10", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Novice-10", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"},
-  {"config": "humanoid_custom", "dataset": "Humanoid-Novice-20", "rex_beta": 0, "seed": 12, "exp_name": "default"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Novice-20", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Novice-20", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Novice-20", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"},
-  {"config": "humanoid_custom", "dataset": "Humanoid-Expert-100", "rex_beta": 0, "seed": 12, "exp_name": "default"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Expert-100", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Expert-100", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Expert-100", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"},
-  {"config": "humanoid_custom", "dataset": "Humanoid-Expert-200", "rex_beta": 0, "seed": 12, "exp_name": "default"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Expert-200", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Expert-200", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
-  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Expert-200", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"}
-
+  {"config": "humanoid_custom", "dataset": "Humanoid-Mixed-Novice", "rex_beta": 0, "seed": 12, "exp_name": "default"},
+  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Mixed-Novice", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
+  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Mixed-Novice", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
+  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Mixed-Novice", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"},
+  {"config": "humanoid_custom", "dataset": "Humanoid-Mixed-Expert", "rex_beta": 0, "seed": 12, "exp_name": "default"},
+  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Mixed-Expert", "rex_beta": 5, "seed": 12, "exp_name": "rexb5"},
+  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Mixed-Expert", "rex_beta": 10, "seed": 12, "exp_name": "rexb10"},
+  {"config": "humanoid_custom_rex", "dataset": "Humanoid-Mixed-Expert", "rex_beta": 20, "seed": 12, "exp_name": "rexb20"}
 ]

@@ -961,20 +961,41 @@ class BNN:
         #
         # Determine the variance of the losses - use boolean mask to ensure only taking variance for
         # policies which appear in the batch (i.e., some batches may not have records for all policies).
-        def determine_var(x):
-            batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
-            return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
-
-        def determine_mean_deviation(x):
-            batch_pol_losses, batch_pol_counts = x[0,:], x[1,:]
-            mean = tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses, batch_pol_counts>0.))
-            batch_pol_losses_var_abs = tf.math.abs(batch_pol_losses - mean)
-            return tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses_var_abs, batch_pol_counts>0.))
 
         if self.rex_type == 'mean_deviation':
+            def determine_mean_deviation(x):
+                batch_pol_losses, batch_pol_counts = x[0, :], x[1, :]
+                mean = tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses, batch_pol_counts > 0.))
+                batch_pol_losses_var_abs = tf.math.abs(batch_pol_losses - mean)
+                return tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses_var_abs, batch_pol_counts > 0.))
             print('mean_deviation')
-            policy_var_losses = tf.map_fn(determine_mean_deviation, tf.stack((policy_losses, pol_count), axis=-2)) #ToDo: make a flag
+            policy_var_losses = tf.map_fn(determine_mean_deviation, tf.stack((policy_losses, pol_count), axis=-2))
+        elif self.rex_type == 'running_mean':
+            def determine_mean(x):
+                batch_pol_losses, batch_pol_counts = x[0, :], x[1, :]
+                return tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses, batch_pol_counts > 0.))
+            print('running_mean')
+            policy_means = tf.map_fn(determine_mean, tf.stack((policy_losses, pol_count), axis=-2))
+            print('policy_means', policy_means.shape)
+            print('policy_losses', policy_losses.shape)
+            print('self.policy_means', self.policy_means)
+            def pol_mean_init(policy_means=policy_means):
+                self.policy_means = policy_means
+            def pol_mean_av(policy_means=policy_means):
+                koef = 0.01
+                self.policy_means = (1 - koef) * self.policy_means + koef * policy_means,
+            tf.cond(self.policy_means is None,
+                                   pol_mean_init,
+                                   pol_mean_av,
+                                   )
+
+            print('self.policy_means', self.policy_means.shape)
+            dif2 = (policy_losses - self.policy_means) ** 2
+            policy_var_losses = tf.map_fn(determine_mean, tf.stack((dif2, pol_count), axis=-2))
         else:
+            def determine_var(x):
+                batch_pol_losses, batch_pol_counts = x[0, :], x[1, :]
+                return tf.math.reduce_variance(tf.boolean_mask(batch_pol_losses, batch_pol_counts > 0.))
             policy_var_losses = tf.map_fn(determine_var, tf.stack((policy_losses, pol_count), axis=-2))
 
         def rex_training_loop_total_losses(policy_var_losses=policy_var_losses, policy_total_losses=policy_total_losses):

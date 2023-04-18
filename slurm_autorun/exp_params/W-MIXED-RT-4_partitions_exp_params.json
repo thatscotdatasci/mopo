@@ -1,0 +1,812 @@
+[
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb5/s12_2023-03-15_14-59-459m7fs_m1",
+"exp_name": "v_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb5/s12_2023-03-15_14-59-459m7fs_m1",
+"exp_name": "v_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb5/s12_2023-03-15_14-59-459m7fs_m1",
+"exp_name": "v_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb5/s12_2023-03-15_14-59-459m7fs_m1",
+"exp_name": "v_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb5/s12_2023-03-15_14-59-459m7fs_m1",
+"exp_name": "v_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb5/s12_2023-03-15_14-59-459m7fs_m1",
+"exp_name": "v_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb10/s12_2023-03-15_14-31-43_6e47mkn",
+"exp_name": "r5_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb10/s12_2023-03-15_14-31-43_6e47mkn",
+"exp_name": "r5_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb10/s12_2023-03-15_14-31-43_6e47mkn",
+"exp_name": "r5_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb10/s12_2023-03-15_14-31-43_6e47mkn",
+"exp_name": "r5_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb10/s12_2023-03-15_14-31-43_6e47mkn",
+"exp_name": "r5_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb10/s12_2023-03-15_14-31-43_6e47mkn",
+"exp_name": "r5_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb10/s12_2023-03-15_14-32-52lbqx173y",
+"exp_name": "t_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb10/s12_2023-03-15_14-32-52lbqx173y",
+"exp_name": "t_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb10/s12_2023-03-15_14-32-52lbqx173y",
+"exp_name": "t_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb10/s12_2023-03-15_14-32-52lbqx173y",
+"exp_name": "t_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb10/s12_2023-03-15_14-32-52lbqx173y",
+"exp_name": "t_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb10/s12_2023-03-15_14-32-52lbqx173y",
+"exp_name": "t_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb20/s12_2023-03-15_14-31-437qpm5qjb",
+"exp_name": "r5_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb20/s12_2023-03-15_14-31-437qpm5qjb",
+"exp_name": "r5_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb20/s12_2023-03-15_14-31-437qpm5qjb",
+"exp_name": "r5_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb20/s12_2023-03-15_14-31-437qpm5qjb",
+"exp_name": "r5_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb20/s12_2023-03-15_14-31-437qpm5qjb",
+"exp_name": "r5_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb20/s12_2023-03-15_14-31-437qpm5qjb",
+"exp_name": "r5_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb20/s12_2023-03-15_14-59-475fw8ejpl",
+"exp_name": "v_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb20/s12_2023-03-15_14-59-475fw8ejpl",
+"exp_name": "v_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb20/s12_2023-03-15_14-59-475fw8ejpl",
+"exp_name": "v_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb20/s12_2023-03-15_14-59-475fw8ejpl",
+"exp_name": "v_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb20/s12_2023-03-15_14-59-475fw8ejpl",
+"exp_name": "v_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb20/s12_2023-03-15_14-59-475fw8ejpl",
+"exp_name": "v_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb10/s12_2023-03-15_14-32-43vijheh3d",
+"exp_name": "rew_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb10/s12_2023-03-15_14-32-43vijheh3d",
+"exp_name": "rew_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb10/s12_2023-03-15_14-32-43vijheh3d",
+"exp_name": "rew_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb10/s12_2023-03-15_14-32-43vijheh3d",
+"exp_name": "rew_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb10/s12_2023-03-15_14-32-43vijheh3d",
+"exp_name": "rew_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb10/s12_2023-03-15_14-32-43vijheh3d",
+"exp_name": "rew_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb10/s12_2023-03-15_14-31-43k0jrxl7y",
+"exp_name": "r_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb10/s12_2023-03-15_14-31-43k0jrxl7y",
+"exp_name": "r_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb10/s12_2023-03-15_14-31-43k0jrxl7y",
+"exp_name": "r_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb10/s12_2023-03-15_14-31-43k0jrxl7y",
+"exp_name": "r_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb10/s12_2023-03-15_14-31-43k0jrxl7y",
+"exp_name": "r_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb10/s12_2023-03-15_14-31-43k0jrxl7y",
+"exp_name": "r_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb10/s12_2023-03-15_14-59-45m7maayus",
+"exp_name": "v_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb10/s12_2023-03-15_14-59-45m7maayus",
+"exp_name": "v_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb10/s12_2023-03-15_14-59-45m7maayus",
+"exp_name": "v_rexb10s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb10/s12_2023-03-15_14-59-45m7maayus",
+"exp_name": "v_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb10/s12_2023-03-15_14-59-45m7maayus",
+"exp_name": "v_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/v_rexb10/s12_2023-03-15_14-59-45m7maayus",
+"exp_name": "v_rexb10s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb5/s12_2023-03-15_14-31-206a33bi45",
+"exp_name": "r_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb5/s12_2023-03-15_14-31-206a33bi45",
+"exp_name": "r_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb5/s12_2023-03-15_14-31-206a33bi45",
+"exp_name": "r_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb5/s12_2023-03-15_14-31-206a33bi45",
+"exp_name": "r_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb5/s12_2023-03-15_14-31-206a33bi45",
+"exp_name": "r_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb5/s12_2023-03-15_14-31-206a33bi45",
+"exp_name": "r_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb20/s12_2023-03-15_14-31-430wc8kgre",
+"exp_name": "r_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb20/s12_2023-03-15_14-31-430wc8kgre",
+"exp_name": "r_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb20/s12_2023-03-15_14-31-430wc8kgre",
+"exp_name": "r_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb20/s12_2023-03-15_14-31-430wc8kgre",
+"exp_name": "r_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb20/s12_2023-03-15_14-31-430wc8kgre",
+"exp_name": "r_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r_rexb20/s12_2023-03-15_14-31-430wc8kgre",
+"exp_name": "r_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb5/s12_2023-03-15_14-32-41zxoqk_qh",
+"exp_name": "rew_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb5/s12_2023-03-15_14-32-41zxoqk_qh",
+"exp_name": "rew_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb5/s12_2023-03-15_14-32-41zxoqk_qh",
+"exp_name": "rew_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb5/s12_2023-03-15_14-32-41zxoqk_qh",
+"exp_name": "rew_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb5/s12_2023-03-15_14-32-41zxoqk_qh",
+"exp_name": "rew_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb5/s12_2023-03-15_14-32-41zxoqk_qh",
+"exp_name": "rew_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb20/s12_2023-03-15_14-32-52sj46wiww",
+"exp_name": "t_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb20/s12_2023-03-15_14-32-52sj46wiww",
+"exp_name": "t_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb20/s12_2023-03-15_14-32-52sj46wiww",
+"exp_name": "t_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb20/s12_2023-03-15_14-32-52sj46wiww",
+"exp_name": "t_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb20/s12_2023-03-15_14-32-52sj46wiww",
+"exp_name": "t_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb20/s12_2023-03-15_14-32-52sj46wiww",
+"exp_name": "t_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb5/s12_2023-03-15_14-31-43umb21fti",
+"exp_name": "r5_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb5/s12_2023-03-15_14-31-43umb21fti",
+"exp_name": "r5_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb5/s12_2023-03-15_14-31-43umb21fti",
+"exp_name": "r5_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb5/s12_2023-03-15_14-31-43umb21fti",
+"exp_name": "r5_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb5/s12_2023-03-15_14-31-43umb21fti",
+"exp_name": "r5_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/r5_rexb5/s12_2023-03-15_14-31-43umb21fti",
+"exp_name": "r5_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb5/s12_2023-03-15_14-32-52llt6ys0f",
+"exp_name": "t_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb5/s12_2023-03-15_14-32-52llt6ys0f",
+"exp_name": "t_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb5/s12_2023-03-15_14-32-52llt6ys0f",
+"exp_name": "t_rexb5s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb5/s12_2023-03-15_14-32-52llt6ys0f",
+"exp_name": "t_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb5/s12_2023-03-15_14-32-52llt6ys0f",
+"exp_name": "t_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/t_rexb5/s12_2023-03-15_14-32-52llt6ys0f",
+"exp_name": "t_rexb5s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb20/s12_2023-03-15_14-32-52htd0h0s0",
+"exp_name": "rew_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb20/s12_2023-03-15_14-32-52htd0h0s0",
+"exp_name": "rew_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 10,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb20/s12_2023-03-15_14-32-52htd0h0s0",
+"exp_name": "rew_rexb20s12_mp0rl10"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb20/s12_2023-03-15_14-32-52htd0h0s0",
+"exp_name": "rew_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb20/s12_2023-03-15_14-32-52htd0h0s0",
+"exp_name": "rew_rexb20s12_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl",
+"dataset": "W-MIXED-RT-4",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-4/rew_rexb20/s12_2023-03-15_14-32-52htd0h0s0",
+"exp_name": "rew_rexb20s12_mp0rl5"
+}
+]
