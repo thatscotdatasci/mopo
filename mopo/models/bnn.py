@@ -233,6 +233,7 @@ class BNN:
                                                   name="max_log_var")
                     self.min_logvar = tf.Variable(-np.ones([1, self.layers[-1].get_output_dim() // 2])*10., dtype=tf.float32,
                                                   name="min_log_var")
+                    self.policy_losses_ra = tf.Variable(np.zeros([7, 5]), dtype=tf.float32, name="policy_losses_ra")
                     for i, layer in enumerate(self.layers):
                         with tf.variable_scope("Layer%i" % i):
                             layer.construct_vars()
@@ -247,6 +248,7 @@ class BNN:
                                                   name="max_log_var")
                     self.min_logvar = tf.Variable(-np.ones([1, self.var_layers[-1].get_output_dim()])*10., dtype=tf.float32,
                                                   name="min_log_var")
+                    self.policy_losses_ra = tf.Variable(np.zeros([7, 5]), dtype=tf.float32, name="policy_losses_ra")
                     for i, layer in enumerate(self.layers):
                         with tf.variable_scope("Layer%i_mean" % i):
                             layer.construct_vars()
@@ -258,7 +260,7 @@ class BNN:
                             self.decays.extend(layer.get_decays())
                             self.optvars.extend(layer.get_vars())
         self.optvars.extend([self.max_logvar, self.min_logvar])
-        self.nonoptvars.extend(self.scaler.get_vars())
+        self.nonoptvars.extend(self.scaler.get_vars() + [self.policy_losses_ra])
 
         # Set up training
         with tf.variable_scope(self.name):
@@ -916,10 +918,13 @@ class BNN:
         if inc_var_loss:
             # Log-likelihood
             dif2 = tf.square(mean - targets)
-            # mul = tf.constant(np.array([[[1]*9 + [20]*9]], dtype='float32'))
-            # print('mul', mul.shape)
-            # print('dif2', dif2.shape)
-            # dif2 = dif2 * mul
+            if self.rex_type == 'scale_reward':
+                print('scale_reward dif2', dif2.shape)
+                # mul = tf.constant(np.array([[[1]*9 + [20]*9]], dtype='float32'))
+                mul = tf.constant(np.array([[[5] + [1] * (dif2.shape[-1] - 1) ]], dtype='float32'))
+                print('mul', mul.shape)
+                # print('dif2', dif2.shape)
+                dif2 = dif2 * mul
             mse_losses = tf.reduce_mean(dif2 * inv_var, axis=-1, keepdims=True)
             var_losses = tf.reduce_mean(log_var, axis=-1, keepdims=True)
             losses = mse_losses + var_losses
@@ -975,22 +980,17 @@ class BNN:
                 batch_pol_losses, batch_pol_counts = x[0, :], x[1, :]
                 return tf.math.reduce_mean(tf.boolean_mask(batch_pol_losses, batch_pol_counts > 0.))
             print('running_mean')
-            policy_means = tf.map_fn(determine_mean, tf.stack((policy_losses, pol_count), axis=-2))
-            print('policy_means', policy_means.shape)
             print('policy_losses', policy_losses.shape)
-            print('self.policy_means', self.policy_means)
-            def pol_mean_init(policy_means=policy_means):
-                self.policy_means = policy_means
-            def pol_mean_av(policy_means=policy_means):
-                koef = 0.01
-                self.policy_means = (1 - koef) * self.policy_means + koef * policy_means,
-            tf.cond(self.policy_means is None,
-                                   pol_mean_init,
-                                   pol_mean_av,
-                                   )
+            print('pol_count', pol_count.shape)
+            print('self.policy_losses_ra', self.policy_losses_ra)
+            koef = 0.05
+            self.policy_losses_ra = (1 - koef) * self.policy_losses_ra + koef * policy_losses
 
-            print('self.policy_means', self.policy_means.shape)
-            dif2 = (policy_losses - self.policy_means) ** 2
+            print('self.policy_losses_ra', self.policy_losses_ra.shape)
+            policy_losses_ra_mean = tf.reduce_mean(self.policy_losses_ra, axis=-1, keepdims=True)
+            print('policy_losses_ra_mean', policy_losses_ra_mean.shape)
+            dif2 = (policy_losses - policy_losses_ra_mean) ** 2
+            print('dif2', dif2.shape)
             policy_var_losses = tf.map_fn(determine_mean, tf.stack((dif2, pol_count), axis=-2))
         else:
             def determine_var(x):

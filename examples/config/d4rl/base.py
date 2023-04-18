@@ -18,7 +18,7 @@ base_params = {
         'reward_scale': 1.0,
         'hidden_dim': 200,
         'bnn_lr': 0.001,  # 0.001
-        'improvement_threshold': 0.0001,
+        'improvement_threshold': 0.001,
         'break_train_rex': False,
         # 'hidden_dim': 2048,
         # 'bnn_lr': 0.0001, #0.001
