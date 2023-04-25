@@ -116,7 +116,9 @@ class RLAlgorithm(tf.contrib.checkpoint.Checkpointable):
         pass
 
     def _training_batch(self, batch_size=None):
-        return self.sampler.random_batch(batch_size)
+        batch = self.sampler.random_batch(batch_size)
+        print('_training_batch batch', batch)
+        return batch
 
     def _evaluation_batch(self, *args, **kwargs):
         return self._training_batch(*args, **kwargs)

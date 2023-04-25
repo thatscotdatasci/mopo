@@ -41,23 +41,32 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #            --exp-name default-1024 \
 #            --dataset W-MIXED-RT-1"
 
-#application="mopo run_local examples.development \
-#            --config=examples.config.d4rl.walker2d_custom_ra \
-#            --gpus=1 --trial-gpus=1 \
-#            --checkpoint-frequency=100 \
-#            --seed 1 \
-#            --rex-beta 20 \
-#            --exp-name rexb20-ra \
-#            --dataset W-MIXED-RT-1"
+application="mopo run_local examples.development \
+            --config=examples.config.d4rl.walker2d_custom_ra \
+            --gpus=1 --trial-gpus=1 \
+            --checkpoint-frequency=100 \
+            --seed 1 \
+            --rex-beta 5 \
+            --exp-name rexb5-ra-k05 \
+            --dataset W-MIXED-RT-1"
 
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.walker2d_custom_rex \
 #            --gpus=1 --trial-gpus=1 \
 #            --checkpoint-frequency=100 \
-#            --seed 6 \
+#            --seed 7 \
 #            --rex-beta 5 \
-#            --exp-name rexb5-check-6 \
+#            --exp-name rexb5-check-s7 \
+#            --dataset W-MIXED-RT-1"
+
+#application="mopo run_local examples.development \
+#            --config=examples.config.d4rl.walker2d_custom \
+#            --gpus=1 --trial-gpus=1 \
+#            --checkpoint-frequency=100 \
+#            --seed 11 \
+#            --rex-beta 0 \
+#            --exp-name default-check-s11 \
 #            --dataset W-MIXED-RT-1"
 
 
@@ -104,6 +113,22 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 
 #application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.walker2d_custom_rl_1024 \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 1 \
+#        --exp-name default-2048s12_mp0rl10 \
+#        --dataset W-MIXED-RT-1  \
+#        --rex-beta 0 \
+#        --bnn-retrain-epochs 0 \
+#        --penalty-coeff 0 \
+#        --rollout-length 10 \
+#        --rollout-batch-size 25000 \
+#        --model-load-dir Walker2d_W-MIXED-RT-1/default-1024-2/s3_2023-04-18_18-11-49km76jrt1"
+
+
+
+#application="mopo run_local examples.development \
 #        --config=examples.config.d4rl.ant_custom_rl \
 #        --gpus=1 --trial-gpus=1 \
 #        --checkpoint-frequency=100 \
@@ -115,21 +140,21 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --penalty-coeff 0 \
 #        --rollout-length 10 \
 #        --rollout-batch-size 25000 \
-#        --model-load-dir Ant_Ant-Mixed-Expert/default-1024/s10_2023-04-18_14-01-162w5s370r"
+#        --model-load-dir Ant_Ant-Mixed-Novice/default-1024-sr/s10_2023-04-18_16-49-35po4cyah0"
 
-application="mopo run_local examples.development \
-        --config=examples.config.d4rl.walker2d_custom_rl \
-        --gpus=1 --trial-gpus=1 \
-        --checkpoint-frequency=100 \
-        --seed 1 \
-        --exp-name test \
-        --dataset W-MIXED-RT-1 \
-        --rex-beta 0 \
-        --bnn-retrain-epochs 0 \
-        --penalty-coeff 0 \
-        --rollout-length 10 \
-        --rollout-batch-size 25000 \
-        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20-ra/s1_2023-04-18_13-16-17x3qjukap"
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.walker2d_custom_rl \
+#        --gpus=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 1 \
+#        --exp-name test \
+#        --dataset W-MIXED-RT-1 \
+#        --rex-beta 0 \
+#        --bnn-retrain-epochs 0 \
+#        --penalty-coeff 0 \
+#        --rollout-length 10 \
+#        --rollout-batch-size 25000 \
+#        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20-ra/s1_2023-04-18_13-16-17x3qjukap"
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.humanoid_custom_rex_std \
@@ -174,7 +199,7 @@ application="mopo run_local examples.development \
 #            --checkpoint-frequency=100 \
 #            --seed 3 \
 #            --rex-beta 0 \
-#            --exp-name default-check2 \
+#            --exp-name default-1024-2 \
 #            --dataset W-MIXED-RT-1"
 
 

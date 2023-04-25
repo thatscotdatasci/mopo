@@ -233,7 +233,7 @@ class BNN:
                                                   name="max_log_var")
                     self.min_logvar = tf.Variable(-np.ones([1, self.layers[-1].get_output_dim() // 2])*10., dtype=tf.float32,
                                                   name="min_log_var")
-                    self.policy_losses_ra = tf.Variable(np.zeros([7, 5]), dtype=tf.float32, name="policy_losses_ra")
+                    self.policy_losses_ra = tf.Variable(np.zeros([7, 5]), dtype=tf.float32, name="policy_losses_ra") if self.rex_type == 'running_mean' else None
                     for i, layer in enumerate(self.layers):
                         with tf.variable_scope("Layer%i" % i):
                             layer.construct_vars()
@@ -248,7 +248,7 @@ class BNN:
                                                   name="max_log_var")
                     self.min_logvar = tf.Variable(-np.ones([1, self.var_layers[-1].get_output_dim()])*10., dtype=tf.float32,
                                                   name="min_log_var")
-                    self.policy_losses_ra = tf.Variable(np.zeros([7, 5]), dtype=tf.float32, name="policy_losses_ra")
+                    self.policy_losses_ra = tf.Variable(np.zeros([7, 5]), dtype=tf.float32, name="policy_losses_ra") if self.rex_type == 'running_mean' else None
                     for i, layer in enumerate(self.layers):
                         with tf.variable_scope("Layer%i_mean" % i):
                             layer.construct_vars()
@@ -260,7 +260,8 @@ class BNN:
                             self.decays.extend(layer.get_decays())
                             self.optvars.extend(layer.get_vars())
         self.optvars.extend([self.max_logvar, self.min_logvar])
-        self.nonoptvars.extend(self.scaler.get_vars() + [self.policy_losses_ra])
+        self.nonoptvars.extend(self.scaler.get_vars())
+        self.nonoptvars.extend([self.policy_losses_ra]) if self.rex_type == 'running_mean' else None
 
         # Set up training
         with tf.variable_scope(self.name):
@@ -983,7 +984,7 @@ class BNN:
             print('policy_losses', policy_losses.shape)
             print('pol_count', pol_count.shape)
             print('self.policy_losses_ra', self.policy_losses_ra)
-            koef = 0.05
+            koef = .5
             self.policy_losses_ra = (1 - koef) * self.policy_losses_ra + koef * policy_losses
 
             print('self.policy_losses_ra', self.policy_losses_ra.shape)

@@ -311,6 +311,7 @@ class MOPO(RLAlgorithm):
             self._init_training()
 
         self.sampler.initialize(training_environment, policy, pool)
+        print(' self.sampler',  self.sampler)
         print('self.sampler._max_path_length', self.sampler._max_path_length)
 
         gt.reset_root()
@@ -965,6 +966,7 @@ class MOPO(RLAlgorithm):
     def _get_feed_dict(self, iteration, batch):
         """Construct TensorFlow feed_dict from sample batch."""
 
+        print("_get_feed_dict batch['observations']", batch['observations'].shape)
         feed_dict = {
             self._observations_ph: batch['observations'],
             self._actions_ph: batch['actions'],
