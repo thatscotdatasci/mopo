@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH -J mopo
-#SBATCH -A KRUEGER-SL2-CPU
+#SBATCH -A KRUEGER-SL3-CPU
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=8000
 ##SBATCH --array=1-3
-#SBATCH --time=32:00:00
+#SBATCH --time=12:00:00
 #SBATCH --mail-type=FAIL
 #! Uncomment this to prevent the job from being requeued (e.g. if
 #! interrupted by node failure or system downtime):
