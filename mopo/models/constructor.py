@@ -10,7 +10,7 @@ def construct_model(obs_dim=11, act_dim=3, rew_dim=1, hidden_dim=200, num_networ
 					name=None, load_dir=None, deterministic=False, rex=False, rex_beta=10.0,
 					rex_multiply=False, lr_decay=1.0, log_dir=None, train_bnn_only=False,
 					rex_type='var', policy_type='default', bnn_lr=None, improvement_threshold=None,
-					break_train_rex=None):
+					break_train_rex=None, wlogger=None):
 	if name is None:
 		name = 'BNN'
 	print('[ BNN ] Name {} | Observation dim {} | Action dim: {} | Hidden dim: {} | REx: {} | REx Beta: {}'.format(name, obs_dim, act_dim, hidden_dim, rex, rex_beta))
@@ -19,7 +19,8 @@ def construct_model(obs_dim=11, act_dim=3, rew_dim=1, hidden_dim=200, num_networ
 				'rex': rex, 'rex_beta': rex_beta, 'rex_multiply': rex_multiply, 'lr_decay': lr_decay,
 				'log_dir': log_dir, 'train_bnn_only': train_bnn_only,
 			    'rex_type': rex_type, 'policy_type': policy_type, 'hidden_dim': hidden_dim, 'bnn_lr': bnn_lr,
-			    'improvement_threshold': improvement_threshold, 'break_train_rex': break_train_rex}
+			    'improvement_threshold': improvement_threshold, 'break_train_rex': break_train_rex,
+			  	'wlogger': wlogger}
 
 	if load_dir is not None:
 		print('Specified load dir', load_dir)

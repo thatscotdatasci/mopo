@@ -193,6 +193,7 @@ class MOPO(RLAlgorithm):
             self.domain = self._log_dir.split('/')[-3]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
             self.exp_name = self._log_dir.split('/')[-2]
+            print('creating wandb logger policy!!!')
             self.wlogger = Wandb(wparams, group_name=self.exp_name, name=self.exp_seed, project='_'+self.domain+'_policy')
 
         obs_dim = np.prod(training_environment.active_observation_shape)
@@ -209,7 +210,8 @@ class MOPO(RLAlgorithm):
                                       lr_decay=lr_decay, log_dir=self._log_dir,
                                       train_bnn_only=train_bnn_only, rex_type=rex_type,
                                       policy_type=policy_type, bnn_lr=bnn_lr, improvement_threshold=improvement_threshold,
-                                      break_train_rex=break_train_rex)
+                                      break_train_rex=break_train_rex,
+                                      wlogger=self.wlogger)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)
@@ -375,7 +377,6 @@ class MOPO(RLAlgorithm):
                     model_rollout_metrics = self._rollout_model(rollout_batch_size=self._rollout_batch_size, deterministic=self._deterministic)
                     model_metrics.update(model_rollout_metrics)
                     time_step_global = self._epoch_length * self._epoch + timestep
-                    # self.wlogger.wandb.log({**{'rollout_model/' + key: value for key, value in model_rollout_metrics.items()}, **{'rollout_model/time_step_global': time_step_global}}, step=time_step_global)
 
                     gt.stamp('epoch_rollout_model')
                     self._training_progress.resume()
@@ -447,6 +448,8 @@ class MOPO(RLAlgorithm):
                     ('time_step_global', time_step_global)
                 )))
 
+                # print('logging diagnostics!')
+                # print('diagnostics', diagnostics)
                 self.wlogger.wandb.log(diagnostics, step=self._total_timestep)
 
             if self._eval_render_mode is not None and hasattr(
@@ -966,7 +969,6 @@ class MOPO(RLAlgorithm):
     def _get_feed_dict(self, iteration, batch):
         """Construct TensorFlow feed_dict from sample batch."""
 
-        print("_get_feed_dict batch['observations']", batch['observations'].shape)
         feed_dict = {
             self._observations_ph: batch['observations'],
             self._actions_ph: batch['actions'],

@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH -J mopo
-#SBATCH -A KRUEGER-SL2-CPU
+#SBATCH -A KRUEGER-SL3-CPU
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 ##SBATCH --array=1-3
-#SBATCH --time=36:00:00
+#SBATCH --time=12:00:00
 #SBATCH --mail-type=FAIL
 #! Uncomment this to prevent the job from being requeued (e.g. if
 #! interrupted by node failure or system downtime):
@@ -43,13 +43,29 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --dataset=W-MIXED-RT-1 \
 #        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c"
 
-application ="mopo run_local examples.development \
+application="mopo run_local examples.development \
         --config=examples.config.d4rl.halfcheetah_mixed \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
         --seed 2 \
         --rex-beta=0 \
-        --exp-name mopo"
+        --exp-name mopo_test_2"
+
+#application ="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_mixed_rex_rewp \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 2 \
+#        --rex-beta 5 \
+#        --exp-name rew_rexb5"
+
+#application ="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_mixed_rex_r5 \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 2 \
+#        --rex-beta 5 \
+#        --exp-name r5_rexb5"
 
 #application="mopo run_local examples.development \
 #        --config=examples.config.d4rl.humanoid_custom_rl \

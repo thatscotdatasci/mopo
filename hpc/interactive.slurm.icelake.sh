@@ -1,5 +1,5 @@
 # Use the following command to request a single CPU node and one CPU
-sintr -t 10:0:0 -N1 -n1 -A KRUEGER-SL2-CPU -p icelake
+sintr -t 10:0:0 -N1 -n1 -A KRUEGER-SL3-CPU -p icelake
 
 module load rhel8/default-amp
 module load cuda/10.0 cudnn/7.4_cuda-10.0
