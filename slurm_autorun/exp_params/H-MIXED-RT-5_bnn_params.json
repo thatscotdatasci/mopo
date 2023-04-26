@@ -1,0 +1,12 @@
+[
+  {"config": "hopper_custom", "dataset": " H-MIXED-RT-5", "rex_beta": 0, "seed": 18, "exp_name": "default"},
+  {"config": "hopper_custom_rex", "dataset": " H-MIXED-RT-5", "rex_beta": 5, "seed": 18, "exp_name": "rexb5"},
+  {"config": "hopper_custom_rex", "dataset": " H-MIXED-RT-5", "rex_beta": 10, "seed": 18, "exp_name": "rexb10"},
+  {"config": "hopper_custom_rex", "dataset": " H-MIXED-RT-5", "rex_beta": 20, "seed": 18, "exp_name": "rexb20"},
+  {"config": "hopper_custom_rex_r5", "dataset": " H-MIXED-RT-5", "rex_beta": 5, "seed": 18, "exp_name": "r5_rexb5"},
+  {"config": "hopper_custom_rex_r5", "dataset": " H-MIXED-RT-5", "rex_beta": 10, "seed": 18, "exp_name": "r5_rexb10"},
+  {"config": "hopper_custom_rex_r5", "dataset": " H-MIXED-RT-5", "rex_beta": 20, "seed": 18, "exp_name": "r5_rexb20"},
+  {"config": "hopper_custom_rex_rewp", "dataset": " H-MIXED-RT-5", "rex_beta": 5, "seed": 18, "exp_name": "rew_rexb5"},
+  {"config": "hopper_custom_rex_rewp", "dataset": " H-MIXED-RT-5", "rex_beta": 10, "seed": 18, "exp_name": "rew_rexb10"},
+  {"config": "hopper_custom_rex_rewp", "dataset": " H-MIXED-RT-5", "rex_beta": 20, "seed": 18, "exp_name": "rew_rexb20"}
+]
