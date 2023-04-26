@@ -77,12 +77,16 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
     print('variant_spec', variant_spec)
     params = variant_spec.get('algorithm_params')
     print('params', params)
+    if command_line_args.dataset is not None:
+        dataset = command_line_args.dataset
+    else:
+        dataset = params.get('task')
     if command_line_args.model_load_dir:
         print('command_line_args.model_load_dir', command_line_args.model_load_dir)
         # local_dir = params.get('log_dir') + '/' + command_line_args.model_load_dir + '/rl'
-        local_dir = params.get('log_dir') + '/rl/' + params.get('domain') +'_' + command_line_args.dataset
+        local_dir = params.get('log_dir') + '/rl/' + params.get('domain') +'_' + dataset
     else:
-        local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' + command_line_args.dataset)
+        local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' +dataset)
     print('local_dir', local_dir)
     resources_per_trial = _normalize_trial_resources(
         command_line_args.resources_per_trial,

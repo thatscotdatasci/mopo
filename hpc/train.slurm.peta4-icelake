@@ -43,20 +43,27 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --dataset=W-MIXED-RT-1 \
 #        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c"
 
-
-application="mopo run_local examples.development \
-        --config=examples.config.d4rl.humanoid_custom_rl \
-        --gpus=1 --trial-gpus=1 \
+application ="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_mixed \
+        --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
         --seed 1 \
-        --exp-name default-2048s12_mp0rl10 \
-        --dataset Humanoid-Mixed-Novice \
-        --rex-beta 0 \
-        --bnn-retrain-epochs 0 \
-        --penalty-coeff 0 \
-        --rollout-length 10 \
-        --rollout-batch-size 25000 \
-        --model-load-dir Humanoid_Humanoid-Mixed-Novice/default-2048/s12_2023-04-13_11-32-35sizc9185"
+        --rex-beta=0 \
+        --exp-name mopo"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.humanoid_custom_rl \
+#        --gpus=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 1 \
+#        --exp-name default-2048s12_mp0rl10 \
+#        --dataset Humanoid-Mixed-Novice \
+#        --rex-beta 0 \
+#        --bnn-retrain-epochs 0 \
+#        --penalty-coeff 0 \
+#        --rollout-length 10 \
+#        --rollout-batch-size 25000 \
+#        --model-load-dir Humanoid_Humanoid-Mixed-Novice/default-2048/s12_2023-04-13_11-32-35sizc9185"
 
 #mopo run_local examples.development \
 #        --config=examples.config.d4rl.walker2d_custom \

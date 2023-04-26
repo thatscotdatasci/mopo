@@ -59,9 +59,11 @@ class BNN:
         self.params = params
         self.break_train_rex = params.get('break_train_rex')
         print('self.break_train_rex', self.break_train_rex)
+        self.rex_type = params.get('rex_type', 'var')
 
         self.train_bnn_only = params.get('train_bnn_only', None)
-        if self.train_bnn_only:
+        if self.train_bnn_only or ('mopo' in self.rex_type):
+            print('CREAting wandb logger!!!')
             self.domain = self._log_dir.split('/')[-3]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
             self.exp_name = self._log_dir.split('/')[-2]
@@ -90,7 +92,6 @@ class BNN:
         self.rex_beta = float(params.get('rex_beta', 10.0))
         self.rex_multiply = params.get('rex_multiply', False)
         self.lr_decay = float(params.get('lr_decay', 1.0))
-        self.rex_type = params.get('rex_type', 'var')
         self.policy_type = params.get('policy_type', 'default')
         print('self.policy_type ', self.policy_type)
 
@@ -960,11 +961,15 @@ class BNN:
         mean_policy_losses = tf.reduce_mean(policy_losses, axis=0)
 
         # Add the losses across all the policies. Results in vector of length B
-        if self.policy_type in ['default', 'random_5']:
-            policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
+        if 'mopo' in self.rex_type:
+            print('mopo rex_type')
+            policy_total_losses = tf.reduce_mean(policy_losses, axis=-1)
         else:
-            policy_total_losses = 5 * tf.reduce_mean(policy_losses, axis=-1)  # compensate for the reduce sum in other policy_types by multiplying by 5
-        #
+            if self.policy_type in ['default', 'random_5']:
+                policy_total_losses = tf.reduce_sum(policy_losses, axis=-1)
+            else:
+                policy_total_losses = 5 * tf.reduce_mean(policy_losses, axis=-1)  # compensate for the reduce sum in other policy_types by multiplying by 5
+
         # Determine the variance of the losses - use boolean mask to ensure only taking variance for
         # policies which appear in the batch (i.e., some batches may not have records for all policies).
 
