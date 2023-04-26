@@ -11,7 +11,7 @@ mopo_params['kwargs'].update({
     'rex': False,
     'rex_beta': 0.,
     'rex_multiply': True,
-    'repeat_dynamics_epochs': 1,
+    'repeat_dynamics_epochs': 0,
     'lr_decay': 1.0,
     'bnn_batch_size': 256,
     'rex_type': 'mopo',
