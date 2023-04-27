@@ -7,7 +7,7 @@ mopo_params['kwargs'].update({
     'penalty_learned_var': True,
     'bnn_retrain_epochs': 0,
     'holdout_policy': None,
-    'train_bnn_only': False,
+    'train_bnn_only': True,
     'rex': False,
     'rex_beta': 0.,
     'rex_multiply': True,

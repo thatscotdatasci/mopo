@@ -220,6 +220,7 @@ NUM_CHECKPOINTS = 10
 
 
 def get_variant_spec_base(universe, domain, task, policy, algorithm, env_params):
+    print('get_variant_spec_base domain', domain)
     algorithm_params = deep_update(
         env_params,
         ALGORITHM_PARAMS_PER_DOMAIN.get(domain, {})

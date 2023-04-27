@@ -1,4 +1,4 @@
-from .halfcheetah_mixed import params, deepcopy
+from .halfcheetah_medium_expert import params, deepcopy
 
 params = deepcopy(params)
 params['kwargs'].update({

@@ -145,11 +145,11 @@ class MOPO(RLAlgorithm):
         self._writer = Writer(self._log_dir)
         if not train_bnn_only:
             wparams = {**dict(training_environmen=training_environment,
-                              evaluation_environment=evaluation_environment,
-                              policy=policy, Qs=Qs, pool=pool, static_fns=static_fns, plotter=plotter,
-                              tf_summaries=tf_summaries,
-                              lr=lr,
-                              reward_scale=reward_scale,
+                            evaluation_environment=evaluation_environment,
+                            policy=policy, Qs=Qs, pool=pool, static_fns=static_fns, plotter=plotter,
+                            tf_summaries=tf_summaries,
+                            lr=lr,
+                            reward_scale=reward_scale,
                             target_entropy=target_entropy,
                             discount=discount,
                             tau=tau,
@@ -211,7 +211,7 @@ class MOPO(RLAlgorithm):
                                       train_bnn_only=train_bnn_only, rex_type=rex_type,
                                       policy_type=policy_type, bnn_lr=bnn_lr, improvement_threshold=improvement_threshold,
                                       break_train_rex=break_train_rex,
-                                      wlogger=self.wlogger)
+                                      wlogger=None)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)

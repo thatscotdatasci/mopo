@@ -51,6 +51,22 @@ application="mopo run_local examples.development \
         --rex-beta=0 \
         --exp-name mopo_test_2"
 
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_mixed_rex_r5 \
+        --cpus=1 --trial-cpus=1 \
+        --checkpoint-frequency=100 \
+        --seed 2 \
+        --rex-beta=0 \
+        --exp-name r5_mopo_test"
+
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_mixed_rex_rewp \
+        --cpus=1 --trial-cpus=1 \
+        --checkpoint-frequency=100 \
+        --seed 2 \
+        --rex-beta=0 \
+        --exp-name rewp_mopo_test"
+
 #application ="mopo run_local examples.development \
 #        --config=examples.config.d4rl.halfcheetah_mixed_rex_rewp \
 #        --cpus=1 --trial-cpus=1 \

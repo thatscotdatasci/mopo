@@ -1,6 +1,6 @@
-from .halfcheetah_mixed import mopo_params, deepcopy
+from .halfcheetah_mixed import params, deepcopy
 
-params = deepcopy(mopo_params)
+params = deepcopy(params)
 params['kwargs'].update({
     'break_train_rex': True,
     'rex': True,

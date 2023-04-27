@@ -10,6 +10,6 @@ params['kwargs'].update({
     'pool_load_path': 'd4rl/halfcheetah-medium-expert-v0',
     'pool_load_max_size': 2 * 10**6,
     'rollout_length': 5,
-    'penalty_coeff': 5.0,
+    'penalty_coeff': 1.0,
 })
 
