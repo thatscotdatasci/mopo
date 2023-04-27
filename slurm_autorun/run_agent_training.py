@@ -187,6 +187,6 @@ if __name__ == '__main__':
     # params_filepath = os.path.expanduser(
     #     "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/Ant-Mixed-Novice_rex_exp_params.json")
     params_filepath = os.path.expanduser(
-        "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/halfcheetah_medium-replay-v0_2_rex_exp_params.json")
+        "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/halfcheetah_medium-expert-v0_pomdp_rex_exp_params.json")
 
     run_experiment_set(params_filepath)
