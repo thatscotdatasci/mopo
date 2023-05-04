@@ -9,7 +9,7 @@ def restore_pool(replay_pool, experiment_root, max_size, save_path=None, policy_
     print("'d4rl' in experiment_root", 'd4rl' in experiment_root)
     if 'd4rl' in experiment_root:
         print('experiment_root[5:]', experiment_root[5:])
-        restore_pool_d4rl(replay_pool, experiment_root[5:])
+        restore_pool_d4rl(replay_pool, experiment_root[5:], policy_type=policy_type)
     else:
         assert os.path.exists(experiment_root)
         if os.path.isdir(experiment_root):
@@ -40,6 +40,16 @@ def restore_pool_d4rl(replay_pool, name, policy_type=None):
 
     states, actions, next_states, rewards, dones, policies = \
         data['observations'], data['actions'], data['next_observations'], data['rewards'], data['terminals'], data['policies']
+
+    done_idx = 0
+    for i in range(len(dones)):
+        done_idx += 1
+        if dones[i]:
+            done_idx = 0
+        if done_idx == 1000:
+            dones[i] = 1
+            done_idx = 0
+
     def get_limits(arr, N=5):
         size = len(arr) // N
         limits = sorted(arr)[::size][1:N]
@@ -48,21 +58,15 @@ def restore_pool_d4rl(replay_pool, name, policy_type=None):
     if policy_type == 'reward_partioned':
         limits = get_limits(rewards[:, 0], N=5)
         rewards_policy = (rewards > limits).sum(-1)
-        print('policies 1', policies.shape)
-        print('policies 1', policies[:5])
         policies = rewards_policy[:, None]
-        print('policies 2', policies.shape)
-        print('policies 2', policies[:5])
 
     if policy_type in ['trajectory_partitioned', 'value_partitioned']:
-        print('dones', dones.shape)
         trajectories = np.zeros_like(policies, dtype=int)
         cur_trajectory_index = 0
         for i in range(len(dones)):
             if dones[i]:
                 cur_trajectory_index += 1
             trajectories[i] = cur_trajectory_index
-        print('trajectories', trajectories.shape)
 
         if policy_type == 'trajectory_partitioned':
             print('policies', policies.shape)
@@ -75,11 +79,7 @@ def restore_pool_d4rl(replay_pool, name, policy_type=None):
             values = value_transactions_per_tragectories[trajectories]
             limits = get_limits(values[:, 0])
             value_policy = (values > limits).sum(-1)
-            print('policies 1', policies.shape)
-            print('policies 1', policies[:5])
             policies = value_policy[:, None]
-            print('policies 2', policies.shape)
-            print('policies 2', policies[:5])
 
     print(f'number of samples in each {policy_type} partition:', [(policies == i).sum() for i in range(int(policies.max()) + 1)])
 
@@ -193,6 +193,15 @@ def restore_pool_contiguous(replay_pool, load_path, policy_type=None):
         current_end += d
         ends.append(current_end)
     states, actions, next_states, rewards, dones, policies = np.split(data, ends, axis=1)[:6]
+
+    done_idx = 0
+    for i in range(len(dones)):
+        done_idx += 1
+        if dones[i]:
+            done_idx = 0
+        if done_idx == 1000:
+            dones[i] = 1
+            done_idx = 0
 
     def get_limits(arr, N=5):
         size = len(arr) // N
