@@ -112,9 +112,9 @@ class SimpleReplayPool(FlexibleReplayPool):
                 # print("batch[field_name][:, obs_indices]", batch[field_name][:, obs_indices].shape)
                 # print("batch[field_name][:, obs_indices]", batch[field_name][:3, obs_indices])
 
-        for field_name in self.field_names:
-            print(field_name, '(batch[field_name] == batch_[field_name]).all()',
-                  (batch[field_name] == batch_[field_name]).all())
+        # for field_name in self.field_names:
+        #     print(field_name, '(batch[field_name] == batch_[field_name]).all()',
+        #           (batch[field_name] == batch_[field_name]).all())
 
         if field_name_filter is not None:
             filtered_fields = self.filter_fields(

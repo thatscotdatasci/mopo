@@ -57,6 +57,10 @@ class BNN:
         self.model_dir = params.get('model_dir', None)
         self._log_dir = params.get('log_dir', None)
         self.params = params
+        self.obs_indices = params.get('obs_indices', None)
+        self.obs_dim = params.get('obs_dim', None)
+        self.obs_availavle_ratio = 1 - len(self.obs_indices)/self.obs_dim
+        print('self.obs_availavle_ratio', self.obs_availavle_ratio)
         self.break_train_rex = params.get('break_train_rex')
         print('self.break_train_rex', self.break_train_rex)
         self.rex_type = params.get('rex_type', 'var')

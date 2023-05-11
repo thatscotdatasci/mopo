@@ -47,15 +47,13 @@ class SimpleSampler(BaseSampler):
                 self._reset_state_vector = self.env.unwrapped.state_vector()
             ####
 
-        obs = [
-            self.env.convert_to_active_observation(
+        obs = self.env.convert_to_active_observation(
                 self._current_observation)[None]
-        ]
 
-        print('sample evaluation?? obs', obs.shape)
+        # print('sample evaluation?? obs', obs.shape)
         obs[:, self.obs_indices] = 0
 
-        action = self.policy.actions_np(obs)[0]
+        action = self.policy.actions_np([obs])[0]
 
         try:
             next_observation, reward, terminal, info = self.env.step(action)
