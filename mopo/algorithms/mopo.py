@@ -590,6 +590,7 @@ class MOPO(RLAlgorithm):
         ))
         batch = self.sampler.random_batch(rollout_batch_size, obs_indices=self.obs_indices)
         obs = batch['observations']
+        obs[:, self.obs_indices] = 0
         steps_added = []
         unpenalised_rewards = []
         penalised_rewards = []
