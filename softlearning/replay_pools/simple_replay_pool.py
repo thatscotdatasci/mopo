@@ -36,8 +36,6 @@ def normalize_observation_fields(observation_space, name='observations'):
 
 class SimpleReplayPool(FlexibleReplayPool):
     def __init__(self, observation_space, action_space, *args, **kwargs):
-        print('SimpleReplayPool observation_space', observation_space)
-        print('SimpleReplayPool action_space', action_space)
         self._observation_space = observation_space
         self._action_space = action_space
 
@@ -98,22 +96,25 @@ class SimpleReplayPool(FlexibleReplayPool):
             return super(SimpleReplayPool, self).batch_by_indices(
                 indices, field_name_filter=field_name_filter)
 
-        batch = {
+        batch_ = {
             field_name: self.fields[field_name][indices]
             for field_name in self.field_names
         }
 
-        # batch = {}
-        #
-        # for field_name in self.field_names:
-        #     batch[field_name] = self.fields[field_name][indices]
-        #     if 'observation' in field_name:
-        #         print('SimpleReplayPool field_name', field_name)
-        #         batch[field_name][:, obs_indices] = 0
+        batch = {}
 
-        # for field_name in self.field_names:
-        #     print('field_name', '(batch[field_name] == batch_[field_name]).all()',
-        #           (batch[field_name] == batch_[field_name]).all())
+        for field_name in self.field_names:
+            batch[field_name] = self.fields[field_name][indices]
+            if 'observation' in field_name:
+                print('SimpleReplayPool', field_name, 'obs_indices', obs_indices)
+                batch[field_name][:, obs_indices] = 0
+                print('batch[field_name]', batch[field_name].shape)
+                print("batch[field_name][:, obs_indices]", batch[field_name][:, obs_indices].shape)
+                print("batch[field_name][:, obs_indices]", batch[field_name][:3, obs_indices])
+
+        for field_name in self.field_names:
+            print(field_name, '(batch[field_name] == batch_[field_name]).all()',
+                  (batch[field_name] == batch_[field_name]).all())
 
         if field_name_filter is not None:
             filtered_fields = self.filter_fields(

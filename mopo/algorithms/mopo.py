@@ -730,11 +730,11 @@ class MOPO(RLAlgorithm):
         model_batch_size = batch_size - env_batch_size
 
         ## can sample from the env pool even if env_batch_size == 0
-        print('self._pool', self._pool)
+        print('real self._pool', self._pool)
         env_batch = self._pool.random_batch(env_batch_size, obs_indices=self.obs_indices)
 
         if model_batch_size > 0:
-            print('self._model_pool', self._model_pool)
+            print('model self._model_pool', self._model_pool)
             model_batch = self._model_pool.random_batch(model_batch_size, obs_indices=self.obs_indices)
 
             # keys = env_batch.keys()

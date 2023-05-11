@@ -85,7 +85,8 @@ def rollout(env,
 
     path = pool.batch_by_indices(
         np.arange(pool._size),
-        observation_keys=getattr(env, 'observation_keys', None))
+        observation_keys=getattr(env, 'observation_keys', None),
+        obs_indices=obs_indices)
     path['infos'] = infos
 
     if render_mode == 'rgb_array':
