@@ -28,6 +28,7 @@ base_params = {
         'num_elites': 5,
         'real_ratio': 0.05,
         'target_entropy': -3,
-        'max_model_t': None
+        'max_model_t': None,
+        'obs_indices': [],
     }
 }

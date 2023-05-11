@@ -62,6 +62,7 @@ class MOPO(RLAlgorithm):
             action_prior='uniform',
             reparameterize=False,
             store_extra_policy_info=False,
+            obs_indices=None,
 
             deterministic=False,
             rollout_random=False,
@@ -140,6 +141,7 @@ class MOPO(RLAlgorithm):
 
         super(MOPO, self).__init__(**kwargs)
 
+        self.obs_indices = obs_indices
         self._log_dir = os.getcwd()
         print('self._log_dir', self._log_dir)
         self._writer = Writer(self._log_dir)
@@ -211,7 +213,7 @@ class MOPO(RLAlgorithm):
                                       train_bnn_only=train_bnn_only, rex_type=rex_type,
                                       policy_type=policy_type, bnn_lr=bnn_lr, improvement_threshold=improvement_threshold,
                                       break_train_rex=break_train_rex,
-                                      wlogger=None)
+                                      wlogger=None, obs_indices=obs_indices)
         self._static_fns = static_fns
         self.fake_env = FakeEnv(self._model, self._static_fns, penalty_coeff=penalty_coeff,
                                 penalty_learned_var=penalty_learned_var)

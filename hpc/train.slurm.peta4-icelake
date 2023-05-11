@@ -30,42 +30,52 @@ module load miniconda/3
 source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable: 
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_custom_rl \
+        --cpus=1 --trial-cpus=1 \
+        --checkpoint-frequency=100 \
+        --exp-name=defaults18_check_mp5rl5 \
+        --seed=18 \
+        --penalty-coeff=5 \
+        --rollout-length=5 \
+        --rollout-batch-size=50000 \
+        --dataset=MIXED-RT-1 \
+        --model-load-dir=HalfCheetah_MIXED-RT-1/default/s18_2023-04-25_18-05-59kzrwddnw"
+
+#{
+#"config": "halfcheetah_custom",
+#"dataset": "MIXED-RT-1",
+#"rollout_length": 5,
+#"mopo_penalty_coeff": 5,
+#"seed": 18,
+#"model_load_dir": "HalfCheetah_MIXED-RT-1/default/s18_2023-04-25_18-05-59kzrwddnw",
+#"exp_name": "defaults18_mp5rl5",
+#"train_bnn_only": 0
+#}
+
 #application="mopo run_local examples.development \
-#        --config=examples.config.d4rl.walker2d_custom_rl \
+#        --config=examples.config.d4rl.halfcheetah_mixed \
 #        --cpus=1 --trial-cpus=1 \
 #        --checkpoint-frequency=100 \
-#        --exp-name=fff \
-#        --seed=5 \
-#        --bnn-retrain-epochs=0 \
-#        --penalty-coeff=0.0 \
-#        --rollout-length=20 \
-#        --rollout-batch-size=12500 \
-#        --dataset=W-MIXED-RT-1 \
-#        --model-load-dir Walker2d_W-MIXED-RT-1/rexb20/s6_2023-03-13_22-05-07i8mfaq4c"
-
-application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_mixed \
-        --cpus=1 --trial-cpus=1 \
-        --checkpoint-frequency=100 \
-        --seed 2 \
-        --rex-beta=0 \
-        --exp-name mopo_test_2"
-
-application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_mixed_rex_r5 \
-        --cpus=1 --trial-cpus=1 \
-        --checkpoint-frequency=100 \
-        --seed 2 \
-        --rex-beta=0 \
-        --exp-name r5_mopo_test"
-
-application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_mixed_rex_rewp \
-        --cpus=1 --trial-cpus=1 \
-        --checkpoint-frequency=100 \
-        --seed 2 \
-        --rex-beta=0 \
-        --exp-name rewp_mopo_test"
+#        --seed 2 \
+#        --rex-beta=0 \
+#        --exp-name mopo_test_2"
+#
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_mixed_rex_r5 \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 2 \
+#        --rex-beta=0 \
+#        --exp-name r5_mopo_test"
+#
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_mixed_rex_rewp \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --seed 2 \
+#        --rex-beta=0 \
+#        --exp-name rewp_mopo_test"
 
 #application ="mopo run_local examples.development \
 #        --config=examples.config.d4rl.halfcheetah_mixed_rex_rewp \
