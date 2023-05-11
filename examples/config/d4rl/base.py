@@ -29,6 +29,6 @@ base_params = {
         'real_ratio': 0.05,
         'target_entropy': -3,
         'max_model_t': None,
-        'obs_indices': [1, ],
+        'obs_indices': [],
     }
 }
