@@ -25,3 +25,11 @@ params['kwargs'].update({
     'lr_decay': 1.0,
     'bnn_batch_size': 256
 })
+
+from .halfcheetah_custom import params, deepcopy
+
+params = deepcopy(params)
+params['kwargs'].update({
+    'obs_indices': [13],
+})
+
