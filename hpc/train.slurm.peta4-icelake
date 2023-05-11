@@ -35,7 +35,7 @@ application="mopo run_local examples.development \
         --config=examples.config.d4rl.halfcheetah_custom \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=defaults18_check5_mp5rl5 \
+        --exp-name=defaults18_check_i1_mp5rl5 \
         --seed=18 \
         --penalty-coeff=5 \
         --rollout-length=5 \
