@@ -5,6 +5,7 @@
 #SBATCH --ntasks=1
 ##SBATCH --array=1-3
 #SBATCH --time=12:00:00
+#SBATCH --mem=8000
 #SBATCH --mail-type=FAIL
 #! Uncomment this to prevent the job from being requeued (e.g. if
 #! interrupted by node failure or system downtime):
@@ -31,10 +32,10 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable: 
 application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom_rl \
+        --config=examples.config.d4rl.halfcheetah_custom \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=defaults18_check2_mp5rl5 \
+        --exp-name=defaults18_check4_mp5rl5 \
         --seed=18 \
         --penalty-coeff=5 \
         --rollout-length=5 \
