@@ -26,10 +26,3 @@ params['kwargs'].update({
     'bnn_batch_size': 256
 })
 
-from .halfcheetah_custom import params, deepcopy
-
-params = deepcopy(params)
-params['kwargs'].update({
-    'obs_indices': [13],
-})
-
