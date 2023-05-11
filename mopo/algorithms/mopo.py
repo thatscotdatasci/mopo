@@ -617,9 +617,11 @@ class MOPO(RLAlgorithm):
 
             # Adding a policy identifier to the rollouts - this will not be used during SAC training
             pol = np.zeros((len(obs), 1))
+            print('add_samples next_obs', next_obs.shape)
+            next_obs[:, self.obs_indices] = 0
 
             samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol, 'penalties': pen}
-            print('add_samples samples observations shape', samples['observations'].shape)
+            # print('add_samples samples observations shape', samples['observations'].shape)
             self._model_pool.add_samples(samples)
 
             nonterm_mask = ~term.squeeze(-1)
@@ -627,8 +629,6 @@ class MOPO(RLAlgorithm):
                 print('[ Model Rollout ] Breaking early: {} | {} / {}'.format(i, nonterm_mask.sum(), nonterm_mask.shape))
                 break
 
-            print('next_obs', next_obs.shape)
-            next_obs[:, self.obs_indices] = 0
             obs = next_obs[nonterm_mask]
 
         # Horizontally stack all of the reward vectors - necessary when dealing with environments that have variable episode lengths.
@@ -665,6 +665,8 @@ class MOPO(RLAlgorithm):
         
         # Sample starting locations from the real environment
         obs = np.vstack(self._evaluation_environment.reset()['observations'] for _ in range(self._eval_n_episodes))
+        print('_eval_model obs shape', obs.shape)
+        obs[:, self.obs_indices] = 0
 
         # Episodes can finish at different times - keep track of those that are still running
         nonterm_mask = np.ones(self._eval_n_episodes).astype(bool)
@@ -686,7 +688,8 @@ class MOPO(RLAlgorithm):
                 info = {}
             else:
                 next_obs, rew, term, info = self.fake_env.step(obs, act)
-            
+
+            next_obs[:, self.obs_indices] = 0
             # Determine those episodes that did not terminate in the current step
             step_nonterm_mask = ~term.squeeze(-1)
 
