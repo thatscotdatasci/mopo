@@ -305,6 +305,7 @@ class MOPO(RLAlgorithm):
                 If None, then all exploration is done using policy
             pool (`PoolBase`): Sample pool to add samples to
         """
+        print('start training')
         training_environment = self._training_environment
         evaluation_environment = self._evaluation_environment
         policy = self._policy
@@ -334,6 +335,7 @@ class MOPO(RLAlgorithm):
         # Changes made to the code mean that we can now specify `self._bnn_retrain_epochs=0`
         print('save_path', os.path.join(self._log_dir, 'models'))
         max_epochs = self._bnn_retrain_epochs if self._model.model_loaded else None
+        print('train model')
         model_train_metrics = self._train_model(
             batch_size=self._bnn_batch_size,
             max_epochs=max_epochs,
@@ -344,6 +346,7 @@ class MOPO(RLAlgorithm):
         )
         model_metrics.update(model_train_metrics)
         self._log_model()
+        print('finished training model')
         gt.stamp('epoch_train_model')
 
         # If we are only learning a dynamics model, tell Ray to stop training at this point
@@ -375,8 +378,12 @@ class MOPO(RLAlgorithm):
                 if timestep % self._model_train_freq == 0 and self._real_ratio < 1.0:
                     self._training_progress.pause()
                     self._set_rollout_length()
+                    print('_reallocate_model_pool')
                     self._reallocate_model_pool()
-                    model_rollout_metrics = self._rollout_model(rollout_batch_size=self._rollout_batch_size, deterministic=self._deterministic)
+                    print('model rollout')
+                    model_rollout_metrics = self._rollout_model(rollout_batch_size=self._rollout_batch_size,
+                                                                deterministic=self._deterministic)
+                    print('model rollout finished')
                     model_metrics.update(model_rollout_metrics)
                     time_step_global = self._epoch_length * self._epoch + timestep
 
@@ -398,8 +405,11 @@ class MOPO(RLAlgorithm):
             training_paths = self.sampler.get_last_n_paths(
                 math.ceil(self._epoch_length / self.sampler._max_path_length))
 
+            print('evaluating policy')
             evaluation_paths = self._evaluation_paths(
                 policy, evaluation_environment, obs_indices=self.obs_indices)
+            print('evaluated policy finished')
+
             gt.stamp('evaluation_paths')
 
             if evaluation_paths:
@@ -578,7 +588,7 @@ class MOPO(RLAlgorithm):
         print('[ Model Rollout ] Starting | Epoch: {} | Rollout length: {} | Batch size: {} | Type: {}'.format(
             self._epoch, self._rollout_length, rollout_batch_size, self._model_type
         ))
-        batch = self.sampler.random_batch(rollout_batch_size)
+        batch = self.sampler.random_batch(rollout_batch_size, obs_indices=self.obs_indices)
         obs = batch['observations']
         steps_added = []
         unpenalised_rewards = []
@@ -609,6 +619,7 @@ class MOPO(RLAlgorithm):
             pol = np.zeros((len(obs), 1))
 
             samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol, 'penalties': pen}
+            print('add_samples samples observations shape', samples['observations'].shape)
             self._model_pool.add_samples(samples)
 
             nonterm_mask = ~term.squeeze(-1)
@@ -616,6 +627,8 @@ class MOPO(RLAlgorithm):
                 print('[ Model Rollout ] Breaking early: {} | {} / {}'.format(i, nonterm_mask.sum(), nonterm_mask.shape))
                 break
 
+            print('next_obs', next_obs.shape)
+            next_obs[:, self.obs_indices] = 0
             obs = next_obs[nonterm_mask]
 
         # Horizontally stack all of the reward vectors - necessary when dealing with environments that have variable episode lengths.

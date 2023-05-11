@@ -156,7 +156,7 @@ class FlexibleReplayPool(ReplayPool):
         output = {}
         for field_name in self.field_names:
             output[field_name] = self.fields[field_name][:self.size]
-            if 'observations' in field_name:
+            if 'observations' in field_name and obs_indices is not None:
                 print('return_all_samples', field_name, 'obs_indices', obs_indices)
                 output[field_name][:, obs_indices] = 0
                 print('output[field_name]', output[field_name].shape)
