@@ -44,6 +44,21 @@ application="mopo run_local examples.development \
         --dataset=MIXED-RT-1 \
         --model-load-dir=HalfCheetah_MIXED-RT-1/default/s18_2023-04-25_18-05-59kzrwddnw"
 
+
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_custom \
+        --cpus=1 --trial-cpus=1 \
+        --checkpoint-frequency=100 \
+        --exp-name=defaults18_check_i20out_mp5rl5 \
+        --seed=18 \
+        --penalty-coeff=5 \
+        --rollout-length=5 \
+        --rollout-batch-size=50000 \
+        --train_bnn_only=0 \
+        --dataset=MIXED-RT-1 \
+        --model-load-dir=HalfCheetah_MIXED-RT-1/p1_default/s38_2023-05-05_14-23-06w395icp2"
+
+
 #{
 #"config": "halfcheetah_custom",
 #"dataset": "MIXED-RT-1",
