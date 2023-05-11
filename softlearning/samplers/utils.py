@@ -26,6 +26,8 @@ def get_sampler_from_variant(variant, *args, **kwargs):
 
     sampler_args = deepcopy(sampler_params.get('args', ()))
     sampler_kwargs = deepcopy(sampler_params.get('kwargs', {}))
+    kwargs['obs_indices'] = variant['algorithm_params']['kwargs']['obs_indices']
+    print('sampler_type', sampler_type)
 
     sampler = SAMPLERS[sampler_type](
         *sampler_args, *args, **sampler_kwargs, **kwargs)
@@ -38,17 +40,19 @@ def rollout(env,
             path_length,
             callback=None,
             render_mode=None,
-            break_on_terminal=True):
+            break_on_terminal=True,
+            **kwargs):
     observation_space = env.observation_space
     action_space = env.action_space
 
     pool = replay_pools.SimpleReplayPool(
         observation_space, action_space, max_size=path_length)
-    # print('rollout path_length', path_length)
+    obs_indices = kwargs['obs_indices']
     sampler = simple_sampler.SimpleSampler(
         max_path_length=path_length,
         min_pool_size=None,
-        batch_size=None)
+        batch_size=None,
+        obs_indices=obs_indices)
 
     sampler.initialize(env, policy, pool)
 

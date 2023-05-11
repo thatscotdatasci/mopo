@@ -18,6 +18,8 @@ class SimpleSampler(BaseSampler):
         self._n_episodes = 0
         self._current_observation = None
         self._total_samples = 0
+        self.obs_indices = kwargs['obs_indices']
+        print('SimpleSampler obs_indices', self.obs_indices)
 
     def _process_observations(self,
                               observation,

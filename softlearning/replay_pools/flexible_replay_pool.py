@@ -83,10 +83,10 @@ class FlexibleReplayPool(ReplayPool):
         if self._size == 0: return np.arange(0, 0)
         return np.random.randint(0, self._size, batch_size)
 
-    def random_batch(self, batch_size, field_name_filter=None, **kwargs):
+    def random_batch(self, batch_size, field_name_filter=None, obs_indices=None, **kwargs):
         random_indices = self.random_indices(batch_size)
         return self.batch_by_indices(
-            random_indices, field_name_filter=field_name_filter, **kwargs)
+            random_indices, field_name_filter=field_name_filter, obs_indices=obs_indices, **kwargs)
 
     def last_n_batch(self, last_n, field_name_filter=None, **kwargs):
         last_n_indices = np.arange(

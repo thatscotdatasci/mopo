@@ -92,7 +92,8 @@ class SimpleReplayPool(FlexibleReplayPool):
     def batch_by_indices(self,
                          indices,
                          field_name_filter=None,
-                         observation_keys=None):
+                         observation_keys=None,
+                         obs_indices=None):
         if not isinstance(self._observation_space, Dict):
             return super(SimpleReplayPool, self).batch_by_indices(
                 indices, field_name_filter=field_name_filter)

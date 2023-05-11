@@ -399,7 +399,7 @@ class MOPO(RLAlgorithm):
                 math.ceil(self._epoch_length / self.sampler._max_path_length))
 
             evaluation_paths = self._evaluation_paths(
-                policy, evaluation_environment)
+                policy, evaluation_environment, obs_indices=self.obs_indices)
             gt.stamp('evaluation_paths')
 
             if evaluation_paths:
@@ -558,7 +558,7 @@ class MOPO(RLAlgorithm):
             print('[ MOPO ] Updating model pool | {:.2e} --> {:.2e}'.format(
                 self._model_pool._max_size, new_pool_size
             ))
-            samples = self._model_pool.return_all_samples()
+            samples = self._model_pool.return_all_samples(self.obs_indices)
             new_pool = SimpleReplayPool(obs_space, act_space, new_pool_size)
             new_pool.add_samples(samples)
             assert self._model_pool.size == new_pool.size
@@ -569,7 +569,7 @@ class MOPO(RLAlgorithm):
             print('[ MOPO ] Identity model, skipping model')
             model_metrics = {}
         else:
-            env_samples = self._pool.return_all_samples()
+            env_samples = self._pool.return_all_samples(self.obs_indices)
             train_inputs, train_outputs, train_policies = format_samples_for_training(env_samples)
             model_metrics = self._model.train(train_inputs, train_outputs, train_policies, **kwargs)
         return model_metrics
@@ -730,10 +730,12 @@ class MOPO(RLAlgorithm):
         model_batch_size = batch_size - env_batch_size
 
         ## can sample from the env pool even if env_batch_size == 0
-        env_batch = self._pool.random_batch(env_batch_size)
+        print('self._pool', self._pool)
+        env_batch = self._pool.random_batch(env_batch_size, obs_indices=self.obs_indices)
 
         if model_batch_size > 0:
-            model_batch = self._model_pool.random_batch(model_batch_size)
+            print('self._model_pool', self._model_pool)
+            model_batch = self._model_pool.random_batch(model_batch_size, obs_indices=self.obs_indices)
 
             # keys = env_batch.keys()
             keys = set(env_batch.keys()) & set(model_batch.keys())
