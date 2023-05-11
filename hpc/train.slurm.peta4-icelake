@@ -34,11 +34,12 @@ application="mopo run_local examples.development \
         --config=examples.config.d4rl.halfcheetah_custom_rl \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=defaults18_check_mp5rl5 \
+        --exp-name=defaults18_check2_mp5rl5 \
         --seed=18 \
         --penalty-coeff=5 \
         --rollout-length=5 \
         --rollout-batch-size=50000 \
+        --train_bnn_only=0 \
         --dataset=MIXED-RT-1 \
         --model-load-dir=HalfCheetah_MIXED-RT-1/default/s18_2023-04-25_18-05-59kzrwddnw"
 
