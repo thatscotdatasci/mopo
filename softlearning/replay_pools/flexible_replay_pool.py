@@ -152,24 +152,24 @@ class FlexibleReplayPool(ReplayPool):
         self._samples_since_save = 0
 
     def return_all_samples(self, obs_indices):
-        print('return_all_samples obs_indices', obs_indices)
+        # print('return_all_samples obs_indices', obs_indices)
         output = {}
         for field_name in self.field_names:
             output[field_name] = self.fields[field_name][:self.size]
-            if 'observations' in field_name and obs_indices is not None:
-                print('return_all_samples', field_name, 'obs_indices', obs_indices)
-                output[field_name][:, obs_indices] = 0
-                print('output[field_name]', output[field_name].shape)
-                print("output[field_name][:, obs_indices]", output[field_name][:, obs_indices].shape)
-                print("output[field_name][:, obs_indices]", output[field_name][:3, obs_indices])
+            # if 'observations' in field_name and obs_indices is not None:
+            #     print('return_all_samples', field_name, 'obs_indices', obs_indices)
+            #     output[field_name][:, obs_indices] = 0
+            #     print('output[field_name]', output[field_name].shape)
+            #     print("output[field_name][:, obs_indices]", output[field_name][:, obs_indices].shape)
+            #     print("output[field_name][:, obs_indices]", output[field_name][:3, obs_indices])
 
-        output_ = {
-            field_name: self.fields[field_name][:self.size]
-            for field_name in self.field_names
-        }
-
-        for field_name in self.field_names:
-            print('return_all_samples', field_name, (output_[field_name] == output[field_name]).all())
+        # output_ = {
+        #     field_name: self.fields[field_name][:self.size]
+        #     for field_name in self.field_names
+        # }
+        #
+        # for field_name in self.field_names:
+        #     print('return_all_samples', field_name, (output_[field_name] == output[field_name]).all())
 
         return output
 

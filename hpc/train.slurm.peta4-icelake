@@ -31,12 +31,25 @@ module load miniconda/3
 source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable: 
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=defaults18_check_i2out_mp5rl5 \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default/s18_2023-04-25_18-05-59kzrwddnw"
+
 application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom \
+        --config=examples.config.d4rl.halfcheetah_custom_easy \
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=defaults17_check_i2out_mp5rl5 \
-        --seed=17 \
+        --exp-name=default_out13_mp5rl5 \
+        --seed=18 \
         --penalty-coeff=5 \
         --rollout-length=5 \
         --rollout-batch-size=50000 \

@@ -8,6 +8,7 @@ from numbers import Number
 from itertools import count
 import gtimer as gt
 import pdb
+import copy
 
 import numpy as np
 import tensorflow as tf
@@ -420,7 +421,7 @@ class MOPO(RLAlgorithm):
                 evaluation_metrics = {}
 
             # Evaluate the policy against the learned environment model
-            model_metrics.update(self._eval_model())
+            # model_metrics.update(self._eval_model())
 
             gt.stamp('epoch_after_hook')
 
@@ -590,16 +591,20 @@ class MOPO(RLAlgorithm):
         ))
         batch = self.sampler.random_batch(rollout_batch_size, obs_indices=self.obs_indices)
         obs = batch['observations']
-        obs[:, self.obs_indices] = 0
+
+        # obs[:, self.obs_indices] = 0
+
         steps_added = []
         unpenalised_rewards = []
         penalised_rewards = []
         penalties = []
         for i in range(self._rollout_length):
+            obs_act = copy.deepcopy(obs)
+            obs_act[:, self.obs_indices] = 0
             if not self._rollout_random:
-                act = self._policy.actions_np(obs)
+                act = self._policy.actions_np(obs_act)
             else:
-                act_ = self._policy.actions_np(obs)
+                act_ = self._policy.actions_np(obs_act)
                 act = np.random.uniform(low=-1, high=1, size=act_.shape)
 
             if self._model_type == 'identity':
@@ -618,8 +623,9 @@ class MOPO(RLAlgorithm):
 
             # Adding a policy identifier to the rollouts - this will not be used during SAC training
             pol = np.zeros((len(obs), 1))
-            print('add_samples next_obs', next_obs.shape)
-            next_obs[:, self.obs_indices] = 0
+
+            # print('add_samples next_obs', next_obs.shape)
+            # next_obs[:, self.obs_indices] = 0
 
             samples = {'observations': obs, 'actions': act, 'next_observations': next_obs, 'rewards': rew, 'terminals': term, 'policies': pol, 'penalties': pen}
             # print('add_samples samples observations shape', samples['observations'].shape)
@@ -761,6 +767,12 @@ class MOPO(RLAlgorithm):
             ## if real_ratio == 1.0, no model pool was ever allocated,
             ## so skip the model pool sampling
             batch = env_batch
+
+        for field_name in batch.keys():
+            if 'observation' in field_name:
+                print('_training_batch field_name', field_name)
+                batch[field_name][:, self.obs_indices] = 0
+
         return batch
 
     def _init_global_step(self):
