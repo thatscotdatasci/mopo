@@ -32,6 +32,20 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable:
 
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_custom_p1 \
+        --gpu=1 --trial-gpus=1 \
+        --checkpoint-frequency=100 \
+        --exp-name=default_p1 \
+        --seed=5 \
+        --rex 0 \
+        --rex-beta 0 \
+        --rex_type var \
+        --policy_type default \
+        --train_bnn_only  1 \
+        --dataset=MIXED-RT-1"
+
+
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.walker2d_custom \
 #            --gpus=1 --trial-gpus=1 \
@@ -41,14 +55,14 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #            --exp-name default-1024 \
 #            --dataset W-MIXED-RT-1"
 
-application="mopo run_local examples.development \
-            --config=examples.config.d4rl.walker2d_custom_ra \
-            --gpus=1 --trial-gpus=1 \
-            --checkpoint-frequency=100 \
-            --seed 1 \
-            --rex-beta 5 \
-            --exp-name rexb5-ra-k05 \
-            --dataset W-MIXED-RT-1"
+#application="mopo run_local examples.development \
+#            --config=examples.config.d4rl.walker2d_custom_ra \
+#            --gpus=1 --trial-gpus=1 \
+#            --checkpoint-frequency=100 \
+#            --seed 1 \
+#            --rex-beta 5 \
+#            --exp-name rexb5-ra-k05 \
+#            --dataset W-MIXED-RT-1"
 
 
 #application="mopo run_local examples.development \
