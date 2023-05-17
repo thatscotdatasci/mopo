@@ -32,11 +32,37 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
 #! Full path to application executable:
 
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_p1 \
+#        --gpu=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_p1 \
+#        --seed=5 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-1"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_easy_2 \
+#        --gpu=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_e2 \
+#        --seed=5 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-1"
+
 application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom_p1 \
+        --config=examples.config.d4rl.halfcheetah_custom_easy_13\
         --gpu=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=default_p1 \
+        --exp-name=default_e13 \
         --seed=5 \
         --rex 0 \
         --rex-beta 0 \
@@ -44,7 +70,6 @@ application="mopo run_local examples.development \
         --policy_type default \
         --train_bnn_only  1 \
         --dataset=MIXED-RT-1"
-
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.walker2d_custom \
