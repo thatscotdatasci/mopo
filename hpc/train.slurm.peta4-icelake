@@ -70,11 +70,37 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --dataset=MIXED-RT-1 \
 #        --model-load-dir=HalfCheetah_MIXED-RT-1/default/s18_2023-04-25_18-05-59kzrwddnw"
 
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_p1 \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_p1 \
+#        --seed=5 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-1"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_easy_13\
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_e13 \
+#        --seed=5 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-1"
+
 application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom_p1 \
+        --config=examples.config.d4rl.halfcheetah_custom_easy_2\
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=default_p1 \
+        --exp-name=default_e2 \
         --seed=5 \
         --rex 0 \
         --rex-beta 0 \
