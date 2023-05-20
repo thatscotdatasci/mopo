@@ -71,18 +71,44 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --train_bnn_only  1 \
 #        --dataset=MIXED-RT-1"
 
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --gpu=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_pomdp_s18 \
+#        --seed=18 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-1"
+
 application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom\
+        --config=examples.config.d4rl.halfcheetah_custom \
         --gpu=1 --trial-gpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=default_obs_check_s18 \
-        --seed=18 \
+        --exp-name=default_pomdp_s17 \
+        --seed=17 \
         --rex 0 \
         --rex-beta 0 \
         --rex_type var \
         --policy_type default \
         --train_bnn_only  1 \
-        --dataset=MIXED-RT-1"
+        --dataset=MIXED-RT-5"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_easy_2 \
+#        --gpu=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_obs_check_s18 \
+#        --seed=18 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-5"
 
 #application="mopo run_local examples.development \
 #            --config=examples.config.d4rl.walker2d_custom \
