@@ -180,6 +180,32 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --config=examples.config.d4rl.halfcheetah_custom \
 #        --cpus=1 --trial-cpus=1 \
 #        --checkpoint-frequency=100 \
+#        --exp-name=default_pomdp_e13 \
+#        --seed=18 \
+#        --penalty-coeff=0 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-5 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-5/default_pomdp_e13/s17_2023-05-20_12-22-53m6hyfvwf"
+
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_custom \
+        --cpus=1 --trial-cpus=1 \
+        --checkpoint-frequency=100 \
+        --exp-name=default_pomdp_e2 \
+        --seed=18 \
+        --penalty-coeff=0 \
+        --rollout-length=5 \
+        --rollout-batch-size=50000 \
+        --train_bnn_only=0 \
+        --dataset=MIXED-RT-5 \
+        --model-load-dir=HalfCheetah_MIXED-RT-5/default_pomdp_e2/s17_2023-05-20_12-22-5311r5hsov"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
 #        --exp-name=default_pomdp_s18 \
 #        --seed=18 \
 #        --penalty-coeff=0 \
