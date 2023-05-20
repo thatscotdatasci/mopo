@@ -71,6 +71,47 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --model-load-dir=HalfCheetah_MIXED-RT-1/default/s18_2023-04-25_18-05-59kzrwddnw"
 
 #application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_easy_13 \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_e13_mp5rl5 \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default_e13/s5_2023-05-17_22-08-05qoowm0xz"
+
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_easy_2 \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_e2_mp5rl5 \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default_e2/s5_2023-05-17_22-08-053irb1p0r"
+
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_p1 \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_np1_mp5rl5 \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default_p1/s5_2023-05-17_22-08-05kn_w0gqr"
+
+#application="mopo run_local examples.development \
 #        --config=examples.config.d4rl.halfcheetah_custom_p1 \
 #        --cpus=1 --trial-cpus=1 \
 #        --checkpoint-frequency=100 \
@@ -97,17 +138,30 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --dataset=MIXED-RT-1"
 
 application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom_easy_2\
+        --config=examples.config.d4rl.halfcheetah_custom\
         --cpus=1 --trial-cpus=1 \
         --checkpoint-frequency=100 \
-        --exp-name=default_e2 \
-        --seed=5 \
+        --exp-name=default_obs_check \
+        --seed=18 \
         --rex 0 \
         --rex-beta 0 \
         --rex_type var \
-        --policy_type default \
+        --policy_type default_s18 \
         --train_bnn_only  1 \
         --dataset=MIXED-RT-1"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom_easy_2\
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_e2 \
+#        --seed=5 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-1"
 
 #application="mopo run_local examples.development \
 #        --config=examples.config.d4rl.halfcheetah_custom_easy \
