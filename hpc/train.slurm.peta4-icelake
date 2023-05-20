@@ -112,6 +112,110 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --model-load-dir=HalfCheetah_MIXED-RT-1/default_p1/s5_2023-05-17_22-08-05kn_w0gqr"
 
 #application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_s18_hum_branch \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default_s18_hum_branch/s18_2023-05-20_10-32-038zcxw3lx"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_s17_hum_branch \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default_s17_hum_branch/s17_2023-05-20_10-32-043ush3_7w"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_pomdp_s5 \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default_pomdp_s5/s5_2023-05-20_10-53-4152nxbg1n"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_pomdp_s18 \
+#        --seed=18 \
+#        --penalty-coeff=5 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-1 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-1/default_pomdp_s18/s18_2023-05-20_10-53-42pwq2qlc5"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_pomdp_s17 \
+#        --seed=18 \
+#        --penalty-coeff=0 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-5 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-5/default_pomdp_s17/s17_2023-05-20_10-55-18i3yh2n98"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_pomdp_s18 \
+#        --seed=18 \
+#        --penalty-coeff=0 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-5 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-5/default_pomdp_s18/s18_2023-05-20_10-55-0432joj6sh"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_s18_hum_branch \
+#        --seed=18 \
+#        --penalty-coeff=0 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-5 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-5/default_s18_hum_branch/s18_2023-05-20_11-01-52m6mvsq85"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_s17_hum_branch \
+#        --seed=18 \
+#        --penalty-coeff=0 \
+#        --rollout-length=5 \
+#        --rollout-batch-size=50000 \
+#        --train_bnn_only=0 \
+#        --dataset=MIXED-RT-5 \
+#        --model-load-dir=HalfCheetah_MIXED-RT-5/default_s17_hum_branch/s17_2023-05-20_11-01-38jzxfih415"
+
+#application="mopo run_local examples.development \
 #        --config=examples.config.d4rl.halfcheetah_custom_p1 \
 #        --cpus=1 --trial-cpus=1 \
 #        --checkpoint-frequency=100 \
@@ -137,18 +241,21 @@ source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #        --train_bnn_only  1 \
 #        --dataset=MIXED-RT-1"
 
-application="mopo run_local examples.development \
-        --config=examples.config.d4rl.halfcheetah_custom\
-        --cpus=1 --trial-cpus=1 \
-        --checkpoint-frequency=100 \
-        --exp-name=default_obs_check \
-        --seed=18 \
-        --rex 0 \
-        --rex-beta 0 \
-        --rex_type var \
-        --policy_type default_s18 \
-        --train_bnn_only  1 \
-        --dataset=MIXED-RT-1"
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom\
+#        --cpus=1 --trial-cpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=default_obs_check \
+#        --seed=18 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default_s18 \
+#        --train_bnn_only  1 \
+#        --dataset=MIXED-RT-1"
+
+
+
 
 #application="mopo run_local examples.development \
 #        --config=examples.config.d4rl.halfcheetah_custom_easy_2\
