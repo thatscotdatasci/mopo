@@ -207,6 +207,6 @@ if __name__ == '__main__':
     params_filepath = os.path.expanduser(
         "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/MIXED-RT-5_rex_exp_params.json")
     # params_filepath = os.path.expanduser(
-    #     "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/hopm_bnn_params.json")
+    #     "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/pomdp3_bnn.json")
 
     run_experiment_set(params_filepath)
