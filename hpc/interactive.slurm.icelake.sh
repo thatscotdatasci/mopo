@@ -13,3 +13,6 @@ export RAY_DISABLE_MEMORY_MONITOR=1
 jupyter notebook --no-browser --ip=* --port=8081
 ssh -L 8081:cpu-q-53:8081 -fN hpc
 
+module load rhel8/default-icl
+module load miniconda/3
+source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate

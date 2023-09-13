@@ -583,7 +583,7 @@ class MOPO(RLAlgorithm):
             env_samples = self._pool.return_all_samples(self.obs_indices)
             for field_name in env_samples:
                 if 'observations' in field_name:
-                    print('_train_model field_name', field_name)
+                    print('_train_model field_name', field_name, env_samples[field_name].shape)
                     env_samples[field_name][:, self.obs_indices] = 0
             train_inputs, train_outputs, train_policies = format_samples_for_training(env_samples)
             model_metrics = self._model.train(train_inputs, train_outputs, train_policies, **kwargs)

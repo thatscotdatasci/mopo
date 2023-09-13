@@ -194,14 +194,14 @@ def restore_pool_contiguous(replay_pool, load_path, policy_type=None):
         ends.append(current_end)
     states, actions, next_states, rewards, dones, policies = np.split(data, ends, axis=1)[:6]
 
-    done_idx = 0
-    for i in range(len(dones)):
-        done_idx += 1
-        if dones[i]:
-            done_idx = 0
-        if done_idx == 1000:
-            dones[i] = 1
-            done_idx = 0
+    # done_idx = 0
+    # for i in range(len(dones)):
+    #     done_idx += 1
+    #     if dones[i]:
+    #         done_idx = 0
+        # if done_idx == 1000:
+        #     dones[i] = 1
+        #     done_idx = 0
 
     def get_limits(arr, N=5):
         size = len(arr) // N

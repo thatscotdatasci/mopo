@@ -29,14 +29,41 @@ module load rhel8/default-amp              # REQUIRED - loads the basic environm
 #! Insert additional module load commands after this line if needed:
 module load cuda/10.0 cudnn/7.4_cuda-10.0
 #module load miniconda/3
-source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 
+module load miniconda/3
+source ~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/README.mopo.activate
 #! Full path to application executable: 
-application="mopo"
+#application="mopo"
+
+#application="mopo run_local examples.development \
+#        --config=examples.config.d4rl.halfcheetah_custom \
+#        --gpu=1 --trial-gpus=1 \
+#        --checkpoint-frequency=100 \
+#        --exp-name=HalfCheetah-Expert-100k-r0 \
+#        --seed=17 \
+#        --rex 0 \
+#        --rex-beta 0 \
+#        --rex_type var \
+#        --policy_type default \
+#        --train_bnn_only  1 \
+#        --dataset=HalfCheetah-Expert-100k"
+
+application="mopo run_local examples.development \
+        --config=examples.config.d4rl.halfcheetah_custom \
+        --gpu=1 --trial-gpus=1 \
+        --checkpoint-frequency=100 \
+        --exp-name=test-new-datasets \
+        --seed=17 \
+        --rex 0 \
+        --rex-beta 0 \
+        --rex_type var \
+        --policy_type default \
+        --train_bnn_only  1 \
+        --dataset=HalfCheetah-Expert-100k"
 
 #! Run options for the application:
 #options="run_local examples.development --config=examples.config.d4rl.halfcheetah_mixed --gpus=1 --trial-gpus=1 --checkpoint-frequency=50"
-options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5"
+#options="run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5"
 
 #! Work directory (i.e. where the job will run):
 workdir="$SLURM_SUBMIT_DIR"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory
