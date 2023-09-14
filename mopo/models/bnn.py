@@ -72,11 +72,11 @@ class BNN:
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
             self.exp_name = self._log_dir.split('/')[-2]
             print('self.exp_name', self.exp_name)
-            print("'_'+self.domain+'_bnn'", '_'+self.domain+'_bnn')
+            # print("'_'+self.domain+'_bnn'", '_'+self.domain+'_bnn')
             # if ('mopo' in self.rex_type):
             #     self.wlogger = params.get('wlogger')
             # else:
-            self.wlogger = Wandb(params, group_name=self.exp_name, name=self.exp_seed, project='_'+self.domain+'_bnn')
+            self.wlogger = Wandb(params, group_name=self.exp_name, name=self.exp_seed, project='Diversity_BNN')
         else:
             self.wlogger = None
 
@@ -727,6 +727,8 @@ class BNN:
         model_metrics = {'val_loss': val_loss}
         print('[ BNN ] Holdout', np.sort(holdout_losses), model_metrics)
         print('finished BNN training!')
+        self.wandb.finish()
+
         return OrderedDict(model_metrics)
         # return np.sort(holdout_losses)[]
 

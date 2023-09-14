@@ -147,7 +147,7 @@ class MOPO(RLAlgorithm):
         print('self._log_dir', self._log_dir)
         self._writer = Writer(self._log_dir)
         if not train_bnn_only:
-            wparams = {**dict(training_environmen=training_environment,
+            self.wparams = {**dict(training_environmen=training_environment,
                             evaluation_environment=evaluation_environment,
                             policy=policy, Qs=Qs, pool=pool, static_fns=static_fns, plotter=plotter,
                             tf_summaries=tf_summaries,
@@ -196,8 +196,8 @@ class MOPO(RLAlgorithm):
             self.domain = self._log_dir.split('/')[-3]
             self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
             self.exp_name = self._log_dir.split('/')[-2]
-            print('creating wandb logger policy!!!')
-            self.wlogger = Wandb(wparams, group_name=self.exp_name, name=self.exp_seed, project='_'+self.domain+'_policy')
+            # print('creating wandb logger policy!!!')
+            # self.wlogger = Wandb(self.wparams, group_name=self.exp_name, name=self.exp_seed, project='Diversity_Policy')
 
         obs_dim = np.prod(training_environment.active_observation_shape)
         act_dim = np.prod(training_environment.action_space.shape)
@@ -345,6 +345,7 @@ class MOPO(RLAlgorithm):
             holdout_policy=self._holdout_policy,
             repeat_dynamics_epochs=self._repeat_dynamics_epochs
         )
+
         model_metrics.update(model_train_metrics)
         self._log_model()
         print('finished training model')
@@ -354,7 +355,10 @@ class MOPO(RLAlgorithm):
         # No policy training will take place
         if self._train_bnn_only:
             yield {'done': True, **{}}
-        #### 
+        ####
+
+        print('creating wandb logger policy!!!')
+        self.wlogger = Wandb(self.wparams, group_name=self.exp_name, name=self.exp_seed, project='Diversity_Policy')
 
         for self._epoch in gt.timed_for(range(self._epoch, self._n_epochs)):
 
