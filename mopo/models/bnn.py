@@ -66,19 +66,16 @@ class BNN:
         self.rex_type = params.get('rex_type', 'var')
 
         self.train_bnn_only = params.get('train_bnn_only', None)
-        if self.train_bnn_only:
-            print('CREAting wandb logger!!!')
-            self.domain = self._log_dir.split('/')[-3]
-            self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
-            self.exp_name = self._log_dir.split('/')[-2]
-            print('self.exp_name', self.exp_name)
-            # print("'_'+self.domain+'_bnn'", '_'+self.domain+'_bnn')
-            # if ('mopo' in self.rex_type):
-            #     self.wlogger = params.get('wlogger')
-            # else:
-            self.wlogger = Wandb(params, group_name=self.exp_name, name=self.exp_seed, project='Diversity_BNN')
-        else:
-            self.wlogger = None
+        print('CREAting wandb logger!!!')
+        self.domain = self._log_dir.split('/')[-3]
+        self.exp_seed = self._log_dir.split('/')[-1].split('_')[0]
+        self.exp_name = self._log_dir.split('/')[-2]
+        print('self.exp_name', self.exp_name)
+        # print("'_'+self.domain+'_bnn'", '_'+self.domain+'_bnn')
+        # if ('mopo' in self.rex_type):
+        #     self.wlogger = params.get('wlogger')
+        # else:
+        self.wlogger = Wandb(params, group_name=self.exp_name, name=self.exp_seed, project='Diversity_BNN')
 
         print('[ BNN ] Initializing model: {} | {} networks | {} elites'.format(params['name'], params['num_networks'], params['num_elites']))
         if params.get('sess', None) is None:
@@ -674,7 +671,7 @@ class BNN:
                 progress.update()
                 t = time.time() - t0
 
-                # if epoch > 2:
+                # if epoch > 0:
                 #     break
                 # Break conditions apply only in the first, standard training loop
                 # In the second loop we force `repeat_dynamics_epochs` times the number of training epochs as in the first loop to be completed
@@ -727,7 +724,7 @@ class BNN:
         model_metrics = {'val_loss': val_loss}
         print('[ BNN ] Holdout', np.sort(holdout_losses), model_metrics)
         print('finished BNN training!')
-        self.wandb.finish()
+        self.wlogger.wandb.finish()
 
         return OrderedDict(model_metrics)
         # return np.sort(holdout_losses)[]

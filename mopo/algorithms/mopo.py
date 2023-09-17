@@ -359,6 +359,7 @@ class MOPO(RLAlgorithm):
 
         print('creating wandb logger policy!!!')
         self.wlogger = Wandb(self.wparams, group_name=self.exp_name, name=self.exp_seed, project='Diversity_Policy')
+        # self.wlogger = None
 
         for self._epoch in gt.timed_for(range(self._epoch, self._n_epochs)):
 
@@ -467,7 +468,7 @@ class MOPO(RLAlgorithm):
 
                 # print('logging diagnostics!')
                 # print('diagnostics', diagnostics)
-                self.wlogger.wandb.log(diagnostics, step=self._total_timestep)
+                self.wlogger.wandb.log(diagnostics, step=self._total_timestep) if self.wlogger is not None else None
 
             if self._eval_render_mode is not None and hasattr(
                     evaluation_environment, 'render_rollouts'):
