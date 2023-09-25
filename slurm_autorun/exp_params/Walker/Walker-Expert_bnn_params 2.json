@@ -1,0 +1,22 @@
+[
+  {"config": "walker2d_custom_rex_std", "dataset": "Walker-Mixed-Novice", "rex_beta": 2, "seed": 12, "exp_name": "rexstdb2"},
+  {"config": "walker2d_custom_rex_std", "dataset": "Walker-Mixed-Novice", "rex_beta": 8, "seed": 12, "exp_name": "rexstdb8"},
+  {"config": "walker2d_custom_rex_std", "dataset": "Walker-Mixed-Novice", "rex_beta": 0.5, "seed": 12, "exp_name": "rexstdb05"},
+  {"config": "walker2d_custom_rex_std", "dataset": "Walker-Mixed-Novice", "rex_beta": 2, "seed": 12, "exp_name": "rexstdb2"},
+  {"config": "walker2d_custom_rex_std", "dataset": "Walker-Mixed-Novice", "rex_beta": 8, "seed": 12, "exp_name": "rexstdb8"},
+  {"config": "walker2d_custom_rex_r", "dataset": "Walker-Mixed-Novice", "rex_beta": 5, "seed": 12, "exp_name": "r_rexb5"},
+  {"config": "walker2d_custom_rex_r", "dataset": "Walker-Mixed-Novice", "rex_beta": 10, "seed": 12, "exp_name": "r_rexb10"},
+  {"config": "walker2d_custom_rex_r", "dataset": "Walker-Mixed-Novice", "rex_beta": 20, "seed": 12, "exp_name": "r_rexb20"},
+  {"config": "walker2d_custom_rex_r5", "dataset": "Walker-Mixed-Novice", "rex_beta": 5, "seed": 12, "exp_name": "r5_rexb5"},
+  {"config": "walker2d_custom_rex_r5", "dataset": "Walker-Mixed-Novice", "rex_beta": 10, "seed": 12, "exp_name": "r5_rexb10"},
+  {"config": "walker2d_custom_rex_r5", "dataset": "Walker-Mixed-Novice", "rex_beta": 20, "seed": 12, "exp_name": "r5_rexb20"},
+  {"config": "walker2d_custom_rex_rewp", "dataset": "Walker-Mixed-Novice", "rex_beta": 5, "seed": 12, "exp_name": "rew_rexb5"},
+  {"config": "walker2d_custom_rex_rewp", "dataset": "Walker-Mixed-Novice", "rex_beta": 10, "seed": 12, "exp_name": "rew_rexb10"},
+  {"config": "walker2d_custom_rex_rewp", "dataset": "Walker-Mixed-Novice", "rex_beta": 20, "seed": 12, "exp_name": "rew_rexb20"},
+  {"config": "walker2d_custom_rex_tp", "dataset": "Walker-Mixed-Novice", "rex_beta": 5, "seed": 12, "exp_name": "t_rexb5"},
+  {"config": "walker2d_custom_rex_tp", "dataset": "Walker-Mixed-Novice", "rex_beta": 10, "seed": 12, "exp_name": "t_rexb10"},
+  {"config": "walker2d_custom_rex_tp", "dataset": "Walker-Mixed-Novice", "rex_beta": 20, "seed": 12, "exp_name": "t_rexb20"},
+  {"config": "walker2d_custom_rex_vp", "dataset": "Walker-Mixed-Novice", "rex_beta": 5, "seed": 12, "exp_name": "v_rexb5"},
+  {"config": "walker2d_custom_rex_vp", "dataset": "Walker-Mixed-Novice", "rex_beta": 10, "seed": 12, "exp_name": "v_rexb10"},
+  {"config": "walker2d_custom_rex_vp", "dataset": "Walker-Mixed-Novice", "rex_beta": 20, "seed": 12, "exp_name": "v_rexb20"}
+]

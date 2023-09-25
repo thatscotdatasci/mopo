@@ -1,0 +1,15 @@
+[
+    {"config":"walker2d_custom_rl",  "exp_name": "default_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/default/s12_2023-02-27_15-47-18bs6_l049"},
+    {"config":"walker2d_custom_rl",  "exp_name": "default_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 2, "model_load_dir": "Walker2d_W-MIXED-RT-1/default/s12_2023-02-27_15-47-18bs6_l049"},
+    {"config":"walker2d_custom_rl",  "exp_name": "default_mp5rl10", "mopo_penalty_coeff":5.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/default/s12_2023-02-27_15-47-18bs6_l049v"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexb10s13_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexb10/s13_2023-02-27_15-48-57fvlflejv"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexb10s13_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 2, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexb10/s13_2023-02-27_15-48-57fvlflejv"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexb10s13_mp5rl10", "mopo_penalty_coeff":5.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexb10/s13_2023-02-27_15-48-57fvlflejv"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexstdb10s2_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexstdb10/s2_2023-02-28_07-11-56tqmooaez"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexstdb10s2_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 2, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexstdb10/s2_2023-02-28_07-11-56tqmooaez"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexstdb10s2_mp5rl10", "mopo_penalty_coeff":5.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexstdb10/s2_2023-02-28_07-11-56tqmooaez"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexstdb40s2_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexstdb40/s2_2023-02-28_08-56-46j7hd1z7h"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexstdb40s2_mp5rl10", "mopo_penalty_coeff":5.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexstdb40/s2_2023-02-28_08-56-46j7hd1z7h"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexstdb100s2_mp0rl10", "mopo_penalty_coeff":0.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexstdb100/s2_2023-03-01_09-35-27hc9xw_cw"},
+    {"config":"walker2d_custom_rl",  "exp_name": "rexstdb100s2_mp5rl10", "mopo_penalty_coeff":5.0, "rollout_length":10, "dataset":"W-MIXED-RT-1", "seed": 1, "model_load_dir": "Walker2d_W-MIXED-RT-1/rexstdb100/s2_2023-03-01_09-35-27hc9xw_cw"}
+]
