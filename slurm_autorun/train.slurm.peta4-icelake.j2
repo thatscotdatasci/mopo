@@ -50,9 +50,9 @@ options="run_local examples.development \
         --train_bnn_only {{ train_bnn_only }} \
         --rex_type {{ rex_type }} \
         --policy_type {{ policy_type }} \
-        --dataset {{ dataset }} \
-        --model-load-dir {{ model_load_dir }}"
-        #         --dataset {{ dataset }} \
+        --dataset {{ dataset }}"
+
+#        --model-load-dir {{ model_load_dir }} \
 
 #! Work directory (i.e. where the job will run):
 workdir="/home/hpcanok1/rds/project/rds-eWkDxBhxBrQ/dimorl/code/mopo"  # The value of SLURM_SUBMIT_DIR sets workdir to the directory

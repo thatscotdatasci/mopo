@@ -11,7 +11,7 @@ export TF_FORCE_GPU_ALLOW_GROWTH=true
 export RAY_DISABLE_MEMORY_MONITOR=1
 
 jupyter notebook --no-browser --ip=* --port=8081
-ssh -L 8081:cpu-q-53:8081 -fN hpc
+ssh -L 8081:cpu-q-84:8081 -fN hpc
 
 module load rhel8/default-icl
 module load miniconda/3

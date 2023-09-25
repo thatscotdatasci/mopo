@@ -1,0 +1,80 @@
+[
+{
+"config": "halfcheetah_custom",
+"dataset": "HalfCheetah-Expert-Medium10e-50-50-100k-1p",
+"rex_type": "var",
+"rex": 1,
+"rex_beta": 10,
+"policy_type": "random_5",
+"rollout_length": 5,
+"mopo_penalty_coeff": 5,
+"train_bnn_only": 0,
+"seed": 21,
+"exp_name": "HalfCheetah-Expert-Medium10e-50-50-100k-1p-r5b10"
+},
+{
+"config": "halfcheetah_custom",
+"dataset": "HalfCheetah-Expert-Medium10e-50-50-100k-1p",
+"rex_type": "var",
+"rex": 1,
+"rex_beta": 10,
+"policy_type": "random_5",
+"rollout_length": 5,
+"mopo_penalty_coeff": 5,
+"train_bnn_only": 0,
+"seed": 22,
+"exp_name": "HalfCheetah-Expert-Medium10e-50-50-100k-1p-r5b10"
+},
+{
+"config": "halfcheetah_custom",
+"dataset": "HalfCheetah-Expert-Medium10e-50-50-100k-1p",
+"rex_type": "var",
+"rex": 1,
+"rex_beta": 10,
+"policy_type": "random_5",
+"rollout_length": 5,
+"mopo_penalty_coeff": 5,
+"train_bnn_only": 0,
+"seed": 23,
+"exp_name": "HalfCheetah-Expert-Medium10e-50-50-100k-1p-r5b10"
+},
+{
+"config": "halfcheetah_custom",
+"dataset": "HalfCheetah-Expert-Medium30e-50-50-100k-1p",
+"rex_type": "var",
+"rex": 1,
+"rex_beta": 10,
+"policy_type": "random_5",
+"rollout_length": 5,
+"mopo_penalty_coeff": 5,
+"train_bnn_only": 0,
+"seed": 21,
+"exp_name": "HalfCheetah-Expert-Medium30e-50-50-100k-1p-r5b10"
+},
+{
+"config": "halfcheetah_custom",
+"dataset": "HalfCheetah-Expert-Medium30e-50-50-100k-1p",
+"rex_type": "var",
+"rex": 1,
+"rex_beta": 10,
+"policy_type": "random_5",
+"rollout_length": 5,
+"mopo_penalty_coeff": 5,
+"train_bnn_only": 0,
+"seed": 22,
+"exp_name": "HalfCheetah-Expert-Medium30e-50-50-100k-1p-r5b10"
+},
+{
+"config": "halfcheetah_custom",
+"dataset": "HalfCheetah-Expert-Medium30e-50-50-100k-1p",
+"rex_type": "var",
+"rex": 1,
+"rex_beta": 10,
+"policy_type": "random_5",
+"rollout_length": 5,
+"mopo_penalty_coeff": 5,
+"train_bnn_only": 0,
+"seed": 23,
+"exp_name": "HalfCheetah-Expert-Medium30e-50-50-100k-1p-r5b10"
+}
+]
