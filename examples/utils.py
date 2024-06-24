@@ -165,7 +165,7 @@ def add_ray_tune_args(parser):
     parser.add_argument(
         '--trial-name-template',
         type=str,
-        default='seed:{trial.config[run_params][seed]}',
+        default='s{trial.config[run_params][seed]}',
         # default='id={trial.trial_id}-seed={trial.config[run_params][seed]}',
         help=tune_help_string(
             "Optional string template for trial name. For example:"
@@ -308,7 +308,13 @@ def get_parser(allow_policy_list=False):
         type=str,
         default=None,
         help="The experiment whose dynamics model should be loaded.")
-    
+
+    parser.add_argument(
+        '--model-load-dir',
+        type=str,
+        default=None,
+        help="Path to models directory")
+
     parser.add_argument(
         '--penalty-coeff',
         type=float,
@@ -338,6 +344,30 @@ def get_parser(allow_policy_list=False):
         type=float,
         default=None,
         help="The REx penalty coefficient to use.")
+
+    parser.add_argument(
+        '--rex',
+        type=int,
+        default=0,
+        help="Whether to use rex.")
+
+    parser.add_argument(
+        '--rex_type',
+        type=str,
+        default='var',
+        help="var or std")
+
+    parser.add_argument(
+        '--policy_type',
+        type=str,
+        default=None,
+        help="reward default etc")
+
+    parser.add_argument(
+        '--train_bnn_only',
+        type=int,
+        default=1,
+        help="Whether to train only world model.")
 
     parser = add_ray_init_args(parser)
     parser = add_ray_tune_args(parser)

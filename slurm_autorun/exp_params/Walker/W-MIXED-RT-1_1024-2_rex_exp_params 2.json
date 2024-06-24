@@ -1,0 +1,29 @@
+[
+{
+"config": "walker2d_custom_rl_1024",
+"dataset": "W-MIXED-RT-1",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 1,
+"model_load_dir": "Walker2d_W-MIXED-RT-1/default-1024-2/s3_2023-04-18_18-11-49km76jrt1",
+"exp_name": "default-1024-2s3_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl_1024",
+"dataset": "W-MIXED-RT-1",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 2,
+"model_load_dir": "Walker2d_W-MIXED-RT-1/default-1024-2/s3_2023-04-18_18-11-49km76jrt1",
+"exp_name": "default-1024-2s3_mp0rl5"
+},
+{
+"config": "walker2d_custom_rl_1024",
+"dataset": "W-MIXED-RT-1",
+"rollout_length": 5,
+"mopo_penalty_coeff": 0,
+"seed": 3,
+"model_load_dir": "Walker2d_W-MIXED-RT-1/default-1024-2/s3_2023-04-18_18-11-49km76jrt1",
+"exp_name": "default-1024-2s3_mp0rl5"
+}
+]

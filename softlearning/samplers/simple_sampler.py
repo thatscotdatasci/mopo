@@ -7,7 +7,7 @@ from .base_sampler import BaseSampler
 
 
 class SimpleSampler(BaseSampler):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs, ):
         super(SimpleSampler, self).__init__(**kwargs)
 
         self._path_length = 0
@@ -18,6 +18,8 @@ class SimpleSampler(BaseSampler):
         self._n_episodes = 0
         self._current_observation = None
         self._total_samples = 0
+        self.obs_indices = kwargs['obs_indices']
+        print('SimpleSampler obs_indices', self.obs_indices)
 
     def _process_observations(self,
                               observation,
@@ -45,10 +47,13 @@ class SimpleSampler(BaseSampler):
                 self._reset_state_vector = self.env.unwrapped.state_vector()
             ####
 
-        action = self.policy.actions_np([
-            self.env.convert_to_active_observation(
+        obs = self.env.convert_to_active_observation(
                 self._current_observation)[None]
-        ])[0]
+
+        # print('sample evaluation?? obs', obs.shape)
+        obs[:, self.obs_indices] = 0
+
+        action = self.policy.actions_np([obs])[0]
 
         try:
             next_observation, reward, terminal, info = self.env.step(action)

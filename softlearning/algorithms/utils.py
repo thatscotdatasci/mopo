@@ -27,6 +27,8 @@ def create_MVE_algorithm(variant, *args, **kwargs):
 def create_MOPO_algorithm(variant, *args, **kwargs):
     from mopo.algorithms.mopo import MOPO
 
+    print('create_MOPO_algorithm args', args)
+    print('create_MOPO_algorithm kwargs', kwargs)
     algorithm = MOPO(*args, **kwargs)
 
     return algorithm

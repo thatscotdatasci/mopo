@@ -90,15 +90,30 @@ class SimpleReplayPool(FlexibleReplayPool):
     def batch_by_indices(self,
                          indices,
                          field_name_filter=None,
-                         observation_keys=None):
+                         observation_keys=None,
+                         obs_indices=None):
         if not isinstance(self._observation_space, Dict):
             return super(SimpleReplayPool, self).batch_by_indices(
                 indices, field_name_filter=field_name_filter)
 
-        batch = {
-            field_name: self.fields[field_name][indices]
-            for field_name in self.field_names
-        }
+        # batch_ = {
+        #     field_name: self.fields[field_name][indices]
+        #     for field_name in self.field_names
+        # }
+
+        batch = {}
+
+        for field_name in self.field_names:
+            batch[field_name] = self.fields[field_name][indices]
+            # if 'observation' in field_name and obs_indices is not None:
+            #     batch[field_name][:, obs_indices] = 0
+                # print('batch[field_name]', batch[field_name].shape)
+                # print("batch[field_name][:, obs_indices]", batch[field_name][:, obs_indices].shape)
+                # print("batch[field_name][:, obs_indices]", batch[field_name][:3, obs_indices])
+
+        # for field_name in self.field_names:
+        #     print(field_name, '(batch[field_name] == batch_[field_name]).all()',
+        #           (batch[field_name] == batch_[field_name]).all())
 
         if field_name_filter is not None:
             filtered_fields = self.filter_fields(

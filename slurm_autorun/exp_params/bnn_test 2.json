@@ -1,0 +1,3 @@
+[
+  {"config": "halfcheetah_custom", "dataset": "MIXED-RT-1", "rex_beta": 0, "seed": 6, "exp_name": "default"}
+]

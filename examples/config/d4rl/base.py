@@ -11,11 +11,15 @@ base_params = {
         'eval_render_mode': None,
         'eval_n_episodes': 10,
         'eval_deterministic': True,
+        'policy_type': 'default', #random_5 random default
 
         'discount': 0.99,
         'tau': 5e-3,
         'reward_scale': 1.0,
-
+        'hidden_dim': 200,
+        'bnn_lr': 0.001,  # 0.001
+        'improvement_threshold': 0.01,
+        'break_train_rex': False,
         'model_train_freq': 1000,
         'model_retain_epochs': 5,
         'rollout_batch_size': 50e3,
@@ -24,6 +28,7 @@ base_params = {
         'num_elites': 5,
         'real_ratio': 0.05,
         'target_entropy': -3,
-        'max_model_t': None
+        'max_model_t': None,
+        'obs_indices': [],
     }
 }

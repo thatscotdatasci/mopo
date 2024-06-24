@@ -1,0 +1,17 @@
+[
+  {"config": "halfcheetah_custom_rex_r", "dataset": "MIXED-RT-4", "rex_beta": 5, "seed": 20, "exp_name": "nl_r_rexb5"},
+  {"config": "halfcheetah_custom_rex_r", "dataset": "MIXED-RT-4", "rex_beta": 10, "seed": 20, "exp_name": "nl_r_rexb10"},
+  {"config": "halfcheetah_custom_rex_r", "dataset": "MIXED-RT-4", "rex_beta": 20, "seed": 20, "exp_name": "nl_r_rexb20"},
+  {"config": "halfcheetah_custom_rex_r5", "dataset": "MIXED-RT-4", "rex_beta": 5, "seed": 20, "exp_name": "nl_r5_rexb5"},
+  {"config": "halfcheetah_custom_rex_r5", "dataset": "MIXED-RT-4", "rex_beta": 10, "seed": 20, "exp_name": "nl_r5_rexb10"},
+  {"config": "halfcheetah_custom_rex_r5", "dataset": "MIXED-RT-4", "rex_beta": 20, "seed": 20, "exp_name": "nl_r5_rexb20"},
+  {"config": "halfcheetah_custom_rex_rewp", "dataset": "MIXED-RT-4", "rex_beta": 5, "seed": 20, "exp_name": "nl_rew_rexb5"},
+  {"config": "halfcheetah_custom_rex_rewp", "dataset": "MIXED-RT-4", "rex_beta": 10, "seed": 20, "exp_name": "nl_rew_rexb10"},
+  {"config": "halfcheetah_custom_rex_rewp", "dataset": "MIXED-RT-4", "rex_beta": 20, "seed": 20, "exp_name": "nl_rew_rexb20"},
+  {"config": "halfcheetah_custom_rex_tp", "dataset": "MIXED-RT-4", "rex_beta": 5, "seed": 20, "exp_name": "nl_t_rexb5"},
+  {"config": "halfcheetah_custom_rex_tp", "dataset": "MIXED-RT-4", "rex_beta": 10, "seed": 20, "exp_name": "nl_t_rexb10"},
+  {"config": "halfcheetah_custom_rex_tp", "dataset": "MIXED-RT-4", "rex_beta": 20, "seed": 20, "exp_name": "nl_t_rexb20"},
+  {"config": "halfcheetah_custom_rex_vp", "dataset": "MIXED-RT-4", "rex_beta": 5, "seed": 20, "exp_name": "nl_v_rexb5"},
+  {"config": "halfcheetah_custom_rex_vp", "dataset": "MIXED-RT-4", "rex_beta": 10, "seed": 20, "exp_name": "nl_v_rexb10"},
+  {"config": "halfcheetah_custom_rex_vp", "dataset": "MIXED-RT-4", "rex_beta": 20, "seed": 20, "exp_name": "nl_v_rexb20"}
+]

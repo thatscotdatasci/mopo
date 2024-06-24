@@ -7,7 +7,8 @@ class BaseSampler(object):
                  max_path_length,
                  min_pool_size,
                  batch_size,
-                 store_last_n_paths=10):
+                 store_last_n_paths=10,
+                 obs_indices=None):
         self._max_path_length = max_path_length
         self._min_pool_size = min_pool_size
         self._batch_size = batch_size

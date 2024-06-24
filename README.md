@@ -1,6 +1,6 @@
 # Model-based Offline Policy Optimization (MOPO)
 
-Code to reproduce the experiments in [MOPO: Model-based Offline Policy Optimization](https://arxiv.org/pdf/2005.13239.pdf).
+Code to reproduce the experiments in [MOPO: Model-based Offline Policy ls](https://arxiv.org/pdf/2005.13239.pdf).
 
 
 
@@ -46,3 +46,17 @@ If you use MOPO for academic research, please kindly cite our paper the using fo
   year={2020}
 }
 ```
+# environment model
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=5 --exp-name rexb5 --dataset MIXED-RT-5
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom_rex --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 2 --rex-beta=5 --exp-name rexb5 --dataset MIXED-RT-5
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 1 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --gpus=1 --trial-gpus=1 --checkpoint-frequency=100 --seed 2 --rex-beta=0 --exp-name rexb0 --dataset MIXED-RT-5
+
+
+# agent
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name halfcheetah_mixed_rt_49 --seed 1449 --dynamics-model-exp MP748 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
+
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name halfcheetah_mixed_rt_49 --seed 1449 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
+
+mopo run_local examples.development --config=examples.config.d4rl.halfcheetah_custom --cpus=1 --trial-cpus=1 --checkpoint-frequency=100 --exp-name pen0 --seed 2 --bnn-retrain-epochs 0 --penalty-coeff 0.0 --rollout-length 5 --rollout-batch-size 50000 --dataset MIXED-RT-1
+

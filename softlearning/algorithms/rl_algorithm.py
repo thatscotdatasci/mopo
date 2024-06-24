@@ -116,7 +116,9 @@ class RLAlgorithm(tf.contrib.checkpoint.Checkpointable):
         pass
 
     def _training_batch(self, batch_size=None):
-        return self.sampler.random_batch(batch_size)
+        batch = self.sampler.random_batch(batch_size)
+        print('_training_batch batch', batch)
+        return batch
 
     def _evaluation_batch(self, *args, **kwargs):
         return self._training_batch(*args, **kwargs)
@@ -256,7 +258,7 @@ class RLAlgorithm(tf.contrib.checkpoint.Checkpointable):
 
         yield {'done': True, **diagnostics}
 
-    def _evaluation_paths(self, policy, evaluation_env):
+    def _evaluation_paths(self, policy, evaluation_env, **kwargs):
         if self._eval_n_episodes < 1: return ()
 
         with policy.set_deterministic(self._eval_deterministic):
@@ -265,7 +267,8 @@ class RLAlgorithm(tf.contrib.checkpoint.Checkpointable):
                 evaluation_env,
                 policy,
                 self.sampler._max_path_length,
-                render_mode=self._eval_render_mode)
+                render_mode=self._eval_render_mode,
+                **kwargs)
 
         should_save_video = (
             self._video_save_frequency > 0

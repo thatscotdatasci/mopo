@@ -68,12 +68,37 @@ def add_command_line_args_to_variant_spec(variant_spec, command_line_args):
 
     variant_spec['restore'] = command_line_args.restore
 
+    print('add_command_line_args_to_variant_spec')
+    print('variant_spec', variant_spec)
+    print('command_line_args', command_line_args)
+    for key in vars(command_line_args):
+        if key in ['rex', 'rex_type', 'policy_type', 'train_bnn_only']:
+            value = getattr(command_line_args, key)
+            if value is not None:
+                variant_spec['algorithm_params']['kwargs'][key] = value
+
+    # variant['algorithm_params']['kwargs']['obs_indices']
+
     return variant_spec
 
 
 def generate_experiment(trainable_class, variant_spec, command_line_args):
+    print('command_line_args', command_line_args)
+    print('trainable_class', trainable_class)
+    print('variant_spec', variant_spec)
     params = variant_spec.get('algorithm_params')
-    local_dir = os.path.join(params.get('log_dir'), params.get('domain'))
+    print('params', params)
+    if command_line_args.dataset is not None:
+        dataset = command_line_args.dataset
+    else:
+        dataset = params.get('task')
+    if command_line_args.model_load_dir:
+        print('command_line_args.model_load_dir', command_line_args.model_load_dir)
+        # local_dir = params.get('log_dir') + '/' + command_line_args.model_load_dir + '/rl'
+        local_dir = params.get('log_dir') + '/rl/' + params.get('domain') +'_' + dataset
+    else:
+        local_dir = os.path.join(params.get('log_dir'), params.get('domain') +'_' +dataset)
+    print('local_dir', local_dir)
     resources_per_trial = _normalize_trial_resources(
         command_line_args.resources_per_trial,
         command_line_args.trial_cpus,
@@ -84,10 +109,11 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
     experiment_id = params.get('exp_name')
 
     #### add pool_load_max_size to experiment_id
-    if 'pool_load_max_size' in variant_spec['algorithm_params']['kwargs']:
-        max_size = variant_spec['algorithm_params']['kwargs']['pool_load_max_size']
-        experiment_id = '{}_{}e3'.format(experiment_id, int(max_size/1000))
+    # if 'pool_load_max_size' in variant_spec['algorithm_params']['kwargs']:
+    #     max_size = variant_spec['algorithm_params']['kwargs']['pool_load_max_size']
+        # experiment_id = '{}_{}e3'.format(experiment_id, int(max_size/1000)) #ToDo: why pool_load_max_size is important?
     ####
+
 
     variant_spec = add_command_line_args_to_variant_spec(
         variant_spec, command_line_args)
@@ -122,6 +148,8 @@ def generate_experiment(trainable_class, variant_spec, command_line_args):
         'restore': command_line_args.restore,  # Defaults to None
     }
 
+    # print('experiment', experiment)
+    # print('experiment_id', experiment_id)
     return experiment_id, experiment
 
 
@@ -133,6 +161,7 @@ def unique_cluster_name(args):
         args.task
     )
     cluster_name = "-".join(cluster_name_parts).lower()
+    print('cluster_name', cluster_name)
     return cluster_name
 
 
@@ -207,6 +236,7 @@ def run_example_local(example_module_name, example_argv, local_mode=False):
     example_module = importlib.import_module(example_module_name)
 
     example_args = example_module.get_parser().parse_args(example_argv)
+    print('example_args', example_args)
     variant_spec = example_module.get_variant_spec(example_args)
     trainable_class = example_module.get_trainable_class(example_args)
 
@@ -220,7 +250,9 @@ def run_example_local(example_module_name, example_argv, local_mode=False):
         resources=example_args.resources or {},
         local_mode=local_mode,
         include_webui=example_args.include_webui,
-        temp_dir=example_args.temp_dir)
+        temp_dir=example_args.temp_dir,
+        # _temp_dir=example_args.temp_dir,
+    )
 
     tune.run_experiments(
         experiments,
@@ -305,6 +337,7 @@ def launch_example_cluster(example_module_name,
     also fill in more useful defaults for our workflow (i.e. for tmux and
     cluster_name).
     """
+    print('launch_example_cluster')
     example_module = importlib.import_module(example_module_name)
 
     example_args = example_module.get_parser().parse_args(example_argv)

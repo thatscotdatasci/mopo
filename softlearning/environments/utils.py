@@ -30,5 +30,6 @@ def get_environment_from_params(environment_params):
     task = environment_params['task']
     domain = environment_params['domain']
     environment_kwargs = environment_params.get('kwargs', {}).copy()
+    print('environment_kwargs', environment_kwargs)
 
     return get_environment(universe, domain, task, environment_kwargs)

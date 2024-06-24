@@ -128,3 +128,5 @@ slurm_logs/
 machine.file.*
 slurm-*out
 slurm_autorun/output/*
+
+.idea/

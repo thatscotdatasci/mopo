@@ -29,7 +29,12 @@ def parse_args():
 def get_qpos_qvel(obs, env_name):
     # Return qpos and qvel values from the current obs
     # These are necessary if setting the environment
-    pos_vel_split_ind = 5 if env_name == 'Hopper' else 8
+    if env_name == 'Hopper':
+        pos_vel_split_ind = 5
+    elif env_name == 'Humanoid':
+        pos_vel_split_ind = 23
+    else:
+        pos_vel_split_ind = 8
     qpos = np.hstack((np.zeros(1),obs[:pos_vel_split_ind]))
     qvel = obs[pos_vel_split_ind:]
     return qpos, qvel

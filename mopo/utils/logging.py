@@ -1,6 +1,7 @@
 import time
 import math
 import pdb
+import os
 
 class Progress:
 
@@ -173,3 +174,21 @@ if __name__ == '__main__':
 		progress.set_description(params)
 		time.sleep(0.01)
 	progress.close()
+
+class Wandb():
+	def __init__(self, flags, name='', group_name='', project=''):
+		import wandb
+		print('wandb name', name)
+		self.wandb = wandb
+		self.wandb.init(
+			project='REx' + project,
+			config=flags,
+			entity=os.getenv('WANDB_USER', 'avecplezir'),
+			reinit=False,
+			group=group_name,
+			# Restore parameters
+			# resume="allow",
+			# id=name,
+			name=name,
+		)
+		# self.wandb.config.update(flags, allow_val_change=True)

@@ -12,6 +12,7 @@ from dogo.results import get_experiment_details
 TIME_FORMAT = '%Y%m%d%H%M%S'
 SLRUM_AUTORUN_DIR = os.path.expanduser('~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun')
 SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
+# SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.wilkes2.j2'
 
 # Map rollout lengths to rollout batch sizes
 # The following calculation is performed in the `_reallocate_model_pool` function of mopo.py:
@@ -23,6 +24,8 @@ SLURM_TRAIN_TEMPLATE_PATH = 'train.slurm.peta4-icelake.j2'
 # Thus, to keep the total pool size constant across experiments, `rollout_batch_size` needs
 # to decrease as `_rollout_length` increases.
 ROLLOUT_BATCH_SIZES = {
+    -1: -1,
+    1: 50000,
     5: 50000,
     10: 25000,
     20: 12500,
@@ -34,35 +37,42 @@ ROLLOUT_BATCH_SIZES = {
 class MopoAgentExp:
     def __init__(
         self,
-        config,
-        dynamics_model_exp,
-        mopo_penalty_coeff,
-        rollout_length,
-        dataset,
         output_dir,
-        exp_id,
+        config=None,
+        dataset=None,
+        mopo_penalty_coeff=0,
+        rollout_length=-1,
         exp_name=None,
         seed=None,
         bnn_retrain_epochs=0,
-        rollout_batch_size=None
-    ) -> None:
+        rollout_batch_size=None,
+        model_load_dir=None,
+        rex_beta=0,
+        rex=1,
+        train_bnn_only=1,
+        rex_type='var',
+        policy_type='default',
+
+            ) -> None:
         """ This object is used to define a MOPO experiment.
         """
-        dynamics_exp = get_experiment_details(dynamics_model_exp)
-
         # Parameters that must always be specified by the user
         self.config = config
-        self.dynamics_model_exp = dynamics_model_exp
         self.mopo_penalty_coeff = mopo_penalty_coeff
         self.rollout_length = rollout_length
         self.dataset = dataset
-        self.exp_id = exp_id
+        self.rex = rex
+        self.train_bnn_only = train_bnn_only
+        self.rex_type = rex_type
+        self.policy_type = policy_type
 
         # Parameters with defaults, or values that are taken from the dynamics experiment
-        self.exp_name = exp_name or '_'.join(dynamics_exp.base_dir.split('_')[:-1])
+        self.exp_name = exp_name
         self.seed = seed or dynamics_exp.seed
         self.bnn_retrain_epochs = bnn_retrain_epochs
         self.rollout_batch_size = rollout_batch_size or ROLLOUT_BATCH_SIZES[self.rollout_length]
+        self.model_load_dir = model_load_dir
+        self.rex_beta = rex_beta
 
         # Other arguments
         self.output_dir = output_dir
@@ -78,22 +88,44 @@ class MopoAgentExp:
 
     @property
     def exp_record(self):
-        return {
-            "config": self.config,
-            "exp_name": self.exp_name,
-            "seed": self.seed,
-            "dynamics_model_exp": self.dynamics_model_exp,
-            "bnn_retrain_epochs": self.bnn_retrain_epochs,
-            "mopo_penalty_coeff": self.mopo_penalty_coeff,
-            "rollout_length": self.rollout_length,
-            "rollout_batch_size": self.rollout_batch_size,
-            "dataset": self.dataset,
-        }
+        if self.model_load_dir:
+            return {
+                "config": self.config,
+                "exp_name": self.exp_name,
+                "seed": self.seed,
+                "bnn_retrain_epochs": self.bnn_retrain_epochs,
+                "mopo_penalty_coeff": self.mopo_penalty_coeff,
+                "rollout_length": self.rollout_length,
+                "rollout_batch_size": self.rollout_batch_size,
+                "dataset": self.dataset,
+                "model_load_dir": self.model_load_dir,
+                "rex_beta": self.rex_beta,
+                "rex": self.rex,
+                "train_bnn_only": self.train_bnn_only,
+                "rex_type": self.rex_type,
+                "policy_type": self.policy_type,
+            }
+        else:
+            return {
+                "config": self.config,
+                "exp_name": self.exp_name,
+                "seed": self.seed,
+                "bnn_retrain_epochs": self.bnn_retrain_epochs,
+                "mopo_penalty_coeff": self.mopo_penalty_coeff,
+                "rollout_length": self.rollout_length,
+                "rollout_batch_size": self.rollout_batch_size,
+                "dataset": self.dataset,
+                "rex_beta": self.rex_beta,
+                "rex": self.rex,
+                "train_bnn_only": self.train_bnn_only,
+                "rex_type": self.rex_type,
+                "policy_type": self.policy_type,
+            }
 
     @property
     def slurm_tmp_filename(self):
         t_stamp = datetime.utcfromtimestamp(int(time.time())).strftime(TIME_FORMAT)
-        return os.path.join(SLRUM_AUTORUN_DIR, 'output', self.output_dir, f'train.slurm.peta4-icelake.{t_stamp}')
+        return os.path.join(SLRUM_AUTORUN_DIR, 'output', self.output_dir, f'{SLURM_TRAIN_TEMPLATE_PATH}.{t_stamp}')
         
     def run_experiment(self):
         # Create the SLURM submission script, with the appropriate experiment parameters
@@ -166,6 +198,15 @@ def run_experiment_set(params_filepath):
 if __name__ == '__main__':
     # params_filepath = sys.argv[1]
 
-    params_filepath = os.path.expanduser("~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/exp_params.260922_2.json")
+    # params_filepath = os.path.expanduser(
+    #     "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/W-MIXED-RT-1_rex_exp_params.json")
+    # params_filepath = os.path.expanduser(
+    #     "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/Ant-Mixed-Novice_rex_exp_params.json")
+    # params_filepath = os.path.expanduser(
+    #     "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/hmed_bnn_params.json")
+    params_filepath = os.path.expanduser(
+        "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/diversity_mixed_params_rex.json")
+    # params_filepath = os.path.expanduser(
+    #     "~/rds/rds-dsk-lab-eWkDxBhxBrQ/dimorl/code/mopo/slurm_autorun/exp_params/pomdp3_bnn.json")
 
     run_experiment_set(params_filepath)

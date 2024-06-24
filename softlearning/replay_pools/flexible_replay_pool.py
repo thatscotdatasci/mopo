@@ -83,10 +83,10 @@ class FlexibleReplayPool(ReplayPool):
         if self._size == 0: return np.arange(0, 0)
         return np.random.randint(0, self._size, batch_size)
 
-    def random_batch(self, batch_size, field_name_filter=None, **kwargs):
+    def random_batch(self, batch_size, field_name_filter=None, obs_indices=None, **kwargs):
         random_indices = self.random_indices(batch_size)
         return self.batch_by_indices(
-            random_indices, field_name_filter=field_name_filter, **kwargs)
+            random_indices, field_name_filter=field_name_filter, obs_indices=obs_indices, **kwargs)
 
     def last_n_batch(self, last_n, field_name_filter=None, **kwargs):
         last_n_indices = np.arange(
@@ -151,11 +151,28 @@ class FlexibleReplayPool(ReplayPool):
         self.add_samples(latest_samples)
         self._samples_since_save = 0
 
-    def return_all_samples(self):
-        return {
-            field_name: self.fields[field_name][:self.size]
-            for field_name in self.field_names
-        }
+    def return_all_samples(self, obs_indices):
+        # print('return_all_samples obs_indices', obs_indices)
+        output = {}
+        for field_name in self.field_names:
+            output[field_name] = self.fields[field_name][:self.size]
+            # if 'observations' in field_name and obs_indices is not None:
+            #     print('return_all_samples', field_name, 'obs_indices', obs_indices)
+            #     output[field_name][:, obs_indices] = 0
+            #     print('output[field_name]', output[field_name].shape)
+            #     print("output[field_name][:, obs_indices]", output[field_name][:, obs_indices].shape)
+            #     print("output[field_name][:, obs_indices]", output[field_name][:3, obs_indices])
+
+        # output_ = {
+        #     field_name: self.fields[field_name][:self.size]
+        #     for field_name in self.field_names
+        # }
+        #
+        # for field_name in self.field_names:
+        #     print('return_all_samples', field_name, (output_[field_name] == output[field_name]).all())
+
+        return output
+
 
     def __getstate__(self):
         state = self.__dict__.copy()

@@ -9,8 +9,9 @@ class RolloutCollector:
         self.acts = []
         self.next_obs = []
         self.rews = []
+        self.imgs = []
 
-    def add_transition(self, obs, act, next_obs, rew):
+    def add_transition(self, obs, act, next_obs, rew, img=None):
         if type(obs) == dict:
             obs = obs['observations']
         if type(next_obs) == dict:
@@ -22,6 +23,7 @@ class RolloutCollector:
         self.acts.append(act)
         self.next_obs.append(next_obs)
         self.rews.append(rew)
+        self.imgs.append(img)
 
     def return_transitions(self):
         return {
@@ -29,6 +31,7 @@ class RolloutCollector:
             'acts':     np.vstack(self.acts),
             'next_obs': np.vstack(self.next_obs),
             'rewards':  np.vstack(self.rews),
+            'imgs': np.vstack(self.imgs),
         }
 
 class MopoRolloutCollector(RolloutCollector):
@@ -48,8 +51,8 @@ class MopoRolloutCollector(RolloutCollector):
         self.ensemble_vars_std = []
         self.ensemble_stds_norm = []
 
-    def add_transition(self, obs, act, next_obs, rew, info):
-        super().add_transition(obs, act, next_obs, rew)
+    def add_transition(self, obs, act, next_obs, rew, info, img=None):
+        super().add_transition(obs, act, next_obs, rew, img=img)
         self.unpen_rews.append(info['unpenalized_rewards'])
         self.rew_pens.append(info['penalty'])
         self.ensemble_means_mean.append(info['ensemble_means_mean'])
